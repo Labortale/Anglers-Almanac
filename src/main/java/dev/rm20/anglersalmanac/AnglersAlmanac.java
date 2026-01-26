@@ -11,9 +11,10 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.server.core.util.Config;
 import dev.rm20.anglersalmanac.components.BobberComponent;
-import dev.rm20.anglersalmanac.components.MinigameComponent;
+import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.components.PhysicsComponent;
-import dev.rm20.anglersalmanac.config.MinigameConfig;
+import dev.rm20.anglersalmanac.config.AnglersAlmanacConfig;
+import dev.rm20.anglersalmanac.config.MinigameConfig_TensionBar;
 import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.interactions.MinigameInteraction;
 import dev.rm20.anglersalmanac.registration.RegisterManager;
@@ -27,16 +28,17 @@ public class AnglersAlmanac extends JavaPlugin {
     private static AnglersAlmanac instance;
     public static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     public static ComponentType<EntityStore, BobberComponent> bobberComponent;
-    public static ComponentType<EntityStore, MinigameComponent> minigameComponent;
 
-    public static Config<MinigameConfig> MINIGAME_CONFIG;
+    public static Config<MinigameConfig_TensionBar> MINIGAME_CONFIG_TENSIONBAR;
+    public static Config<AnglersAlmanacConfig> MOD_CONFIG;
 
 
     public FishLootManager fishLootManager;
     public AnglersAlmanac(@Nonnull JavaPluginInit init) {
         super(init);
         instance = this;
-        MINIGAME_CONFIG = this.withConfig(MinigameConfig.KEY, MinigameConfig.CODEC);
+        MINIGAME_CONFIG_TENSIONBAR = this.withConfig(MinigameConfig_TensionBar.KEY, MinigameConfig_TensionBar.CODEC);
+        MOD_CONFIG = this.withConfig(AnglersAlmanacConfig.KEY, AnglersAlmanacConfig.CODEC);
         //LOGGER.atInfo().log("Hello from " + this.getName() + " version " + this.getManifest().getVersion().toString());
     }
     public static AnglersAlmanac getInstance() {
@@ -56,7 +58,7 @@ public class AnglersAlmanac extends JavaPlugin {
 
         // Register Components
         bobberComponent = this.getEntityStoreRegistry().registerComponent(BobberComponent.class, BobberComponent::new);
-        minigameComponent = this.getEntityStoreRegistry().registerComponent(MinigameComponent.class, MinigameComponent::new);
+        MinigameComponent_TensionBar.COMPONENT_TYPE = this.getEntityStoreRegistry().registerComponent(MinigameComponent_TensionBar.class, MinigameComponent_TensionBar::new);
 
         // Register Interaction Codecs
         this.getCodecRegistry(Interaction.CODEC).register("launch_bobber_interaction", LaunchBobberInteraction.class, LaunchBobberInteraction.CODEC);

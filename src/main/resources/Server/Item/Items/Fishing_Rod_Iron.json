@@ -9,6 +9,16 @@
           }
         }
       ]
+    },
+    "Primary": {
+      "Interactions": [
+        {
+          "Type": "minigame_interaction"
+        }
+      ],
+      "Cooldown": {
+        "Cooldown": 0
+      }
     }
   },
   "MaxStack": 1,

@@ -7,9 +7,9 @@ import com.hypixel.hytale.codec.codecs.map.MapCodec;
 
 import java.util.HashMap;
 
-public class MinigameConfig {
-    public static final String KEY = "MinigameConfig";
-    public static final BuilderCodec<MinigameConfig> CODEC;
+public class MinigameConfig_TensionBar {
+    public static final String KEY = "MinigameConfig_TensionBar";
+    public static final BuilderCodec<MinigameConfig_TensionBar> CODEC;
     // Config:
     public float maxHookTime = 6f; // The longest that it can take to hook a fish in seconds.
     public float fishEscapeRate = 0.3333f; // The progress lost per-second that the fish is not in the catch bar.
@@ -28,7 +28,7 @@ public class MinigameConfig {
 
     // Builds the codec for plugin configuration.
     static {
-        var codecBuilder = BuilderCodec.builder(MinigameConfig.class, MinigameConfig::new);
+        var codecBuilder = BuilderCodec.builder(MinigameConfig_TensionBar.class, MinigameConfig_TensionBar::new);
 
         // Add a new key and value to the config.
         codecBuilder.append(new KeyedCodec("MaxHookTime", new MapCodec(Codec.FLOAT, HashMap::new)),
@@ -94,5 +94,5 @@ public class MinigameConfig {
         // Build and set the codec.
         CODEC = codecBuilder.build();
     }
-    public static final KeyedCodec<MinigameConfig> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);
+    public static final KeyedCodec<MinigameConfig_TensionBar> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);
 }

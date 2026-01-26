@@ -27,7 +27,7 @@ import com.hypixel.hytale.server.core.util.TargetUtil;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.components.BobberComponent;
-import dev.rm20.anglersalmanac.components.MinigameComponent;
+import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.components.PhysicsComponent;
 import dev.rm20.anglersalmanac.models.FishingRodData;
 
@@ -57,16 +57,26 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         AnglersAlmanac.LOGGER.atInfo().log("Testing if can cast / reel interaction");
 
         // Catch for if the rod mode got messed up. (e.g. Disconnecting from server while minigame active).
-        if(meta == null | (meta != null && meta.getBoundMinigame() == null)){
+        // Checks if the metadata is in a state which should not exist.
+        if(meta != null)AnglersAlmanac.LOGGER.atInfo().log("metadata: %s, %s, %s", meta.getBoundBobber(), meta.getBoundMinigame(), meta.getMode());
+
+        if(
+                // Minigame UUID is invalid.
+                (meta != null && meta.getMode() != 0 && (meta.getBoundMinigame() != null && commandBuffer.getExternalData().getRefFromUUID(meta.getBoundMinigame()) == null))
+                // Bobber UUID is invalid.
+                | (meta != null && (meta.getBoundBobber() != null && commandBuffer.getExternalData().getRefFromUUID(meta.getBoundBobber()) == null))){
             AnglersAlmanac.LOGGER.atInfo().log("Fixing busted metadata");
-            stopFishing(commandBuffer, player, heldItem);
+            cancelFishing(commandBuffer, player, heldItem);
         }
 
+        /*
         // Check rod mode, moving to minigame interaction if in minigame mode.
         if(meta != null && meta.getMode() != 0){
             context.getState().state = InteractionState.Finished;
             return;
         }
+
+         */
 
         AnglersAlmanac.LOGGER.atInfo().log("Doing cast / reel interaction!");
 
@@ -79,6 +89,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
     }
 
     private void castOut(@Nonnull InteractionType interactionType, @Nonnull InteractionContext interactionContext, Player player) {
+        AnglersAlmanac.LOGGER.atInfo().log("Casting out");
         CommandBuffer<EntityStore> commandBuffer = interactionContext.getCommandBuffer();
         Ref<EntityStore> playerRef = interactionContext.getOwningEntity();
         TransformComponent transform = playerRef.getStore().getComponent(playerRef, TransformComponent.getComponentType());
@@ -144,8 +155,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
                     //launchFishAtPlayer(bobberRef,player,commandBuffer,depth);
                 }else{
                     // Didn't hook fish, just stop fishing.
-                    stopFishing(commandBuffer, player, player.getInventory().getActiveHotbarItem());
-                    //updateMetadata(player.getInventory(), player.getInventory().getActiveHotbarSlot(), heldItem, null, null, 0);
+                    cancelFishing(commandBuffer, player, player.getInventory().getActiveHotbarItem());
                 }
             }
 
@@ -158,8 +168,8 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
 
     }
 
-    public static void stopFishing(CommandBuffer<EntityStore> commandBuffer, Player player, ItemStack heldItem){
-        AnglersAlmanac.LOGGER.atInfo().log("Stopping fishing.");
+    public static void cancelFishing(CommandBuffer<EntityStore> commandBuffer, Player player, ItemStack heldItem){
+        AnglersAlmanac.LOGGER.atInfo().log("Cancelling fishing.");
         World world = commandBuffer.getExternalData().getWorld();
         FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEYED_CODEC);
 
@@ -167,26 +177,20 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         if(meta != null) {
             if(meta.getBoundBobber() != null) {
                 Ref<EntityStore> bobberRef = world.getEntityStore().getRefFromUUID(meta.getBoundBobber());
-
-                AnglersAlmanac.LOGGER.atInfo().log("Removing bobber");
-                //commandBuffer.getExternalData().getWorld().execute(() -> {
                     if (bobberRef != null && bobberRef.isValid()) {
                         commandBuffer.removeEntity(bobberRef, RemoveReason.REMOVE);
                     }
-                //});
-
             }
             if(meta.getBoundMinigame() != null) {
                 Ref<EntityStore> minigameRef = world.getEntityStore().getRefFromUUID(meta.getBoundMinigame());
                 if (minigameRef != null && minigameRef.isValid()) {
-                    commandBuffer.getComponent(minigameRef, MinigameComponent.getComponentType()).despawnSelf(commandBuffer.getExternalData().getWorld());
+                    MinigameManager.CancelGame(commandBuffer, minigameRef);
                 }
             }
         }
 
         updateMetadata(player.getInventory(), player.getInventory().getActiveHotbarSlot(), heldItem, null, null, 0);
 
-        AnglersAlmanac.LOGGER.atInfo().log("Updated metadata and reset mode to: %s.", player.getInventory().getActiveHotbarItem().getFromMetadataOrNull(FishingRodData.KEYED_CODEC).getMode());
     }
 
     public static void updateMetadata(Inventory inventory, byte slot, ItemStack stack, @Nullable UUID bobberId, @Nullable UUID minigameId, int rodMode) {
@@ -202,6 +206,8 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         newRod = stack.withMetadata(FishingRodData.KEYED_CODEC, fishingMetaData);
 
         inventory.getHotbar().replaceItemStackInSlot(slot, stack, newRod);
+
+        AnglersAlmanac.LOGGER.atInfo().log("Updated metadata: %s, %s, %s", fishingMetaData.getBoundBobber(), fishingMetaData.getBoundMinigame(), fishingMetaData.getMode());
     }
 
 

@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
+import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.models.FishingRodData;
 import org.jspecify.annotations.NonNull;
 
@@ -26,8 +27,6 @@ public class MinigameInteraction extends SimpleInstantInteraction {
         ItemStack heldItem = context.getHeldItem();
         if (commandBuffer == null || playerRef == null || heldItem == null) return;
 
-        AnglersAlmanac.LOGGER.atInfo().log("Testing if can do minigame interaction.");
-
         // Cancel interaction if the rod is not in minigame mode.
         FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
         if(meta == null){
@@ -39,8 +38,17 @@ public class MinigameInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        AnglersAlmanac.LOGGER.atInfo().log("Doing minigame interaction.");
+        if(meta.getBoundMinigame() == null){
+            AnglersAlmanac.LOGGER.atInfo().log("NO bound minigame UUID for DoInteraction");
+            return;
+        }
+        Ref<EntityStore> minigameRef = commandBuffer.getExternalData().getRefFromUUID(meta.getBoundMinigame());
+        if(minigameRef == null){
+            AnglersAlmanac.LOGGER.atInfo().log("FAILED to get minigameRef for DoInteraction");
+            return;
+        }
 
+        MinigameManager.DoMinigameInteraction(commandBuffer, minigameRef, interactionType, context, cooldownHandler);
 
     }
 

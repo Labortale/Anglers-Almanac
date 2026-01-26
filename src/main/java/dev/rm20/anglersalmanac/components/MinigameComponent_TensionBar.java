@@ -3,8 +3,10 @@ package dev.rm20.anglersalmanac.components;
 import com.hypixel.hytale.component.*;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.asset.type.model.config.Model;
 import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
+import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.BoundingBox;
@@ -12,17 +14,20 @@ import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.physics.SimplePhysicsProvider;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.utils.TransformUtils;
+import org.jspecify.annotations.NonNull;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class MinigameComponent  implements Component<EntityStore> {
+public class MinigameComponent_TensionBar implements Component<EntityStore> {
+    public static ComponentType<EntityStore, MinigameComponent_TensionBar> COMPONENT_TYPE;
     // How long a player has been playing
     private float TimePlayed;
     // Total points that the player has
@@ -30,7 +35,7 @@ public class MinigameComponent  implements Component<EntityStore> {
     // PerfectScore
     private float perfectScore;
 
-    public MinigameComponent() {
+    public MinigameComponent_TensionBar() {
 
     }
 
@@ -88,7 +93,7 @@ public class MinigameComponent  implements Component<EntityStore> {
     public float minigameScale = 2f; // The visual size of the minigame display, adjusted based on distance from bobber.
 
 
-    public MinigameComponent(Ref<EntityStore> ownerPlayerRef, Ref<EntityStore> bobberRef, UUID selfUUID){
+    public MinigameComponent_TensionBar(Ref<EntityStore> ownerPlayerRef, Ref<EntityStore> bobberRef, UUID selfUUID){
         this.ownerRef = ownerPlayerRef;
         this.bobberRef = bobberRef;
         this.selfUUID = selfUUID;
@@ -97,7 +102,7 @@ public class MinigameComponent  implements Component<EntityStore> {
     @Nullable
     @Override
     public Component<EntityStore> clone() {
-        MinigameComponent component = new MinigameComponent(this.ownerRef, this.bobberRef, this.selfUUID);
+        MinigameComponent_TensionBar component = new MinigameComponent_TensionBar(this.ownerRef, this.bobberRef, this.selfUUID);
         component.TimePlayed = this.TimePlayed;
         component.Points = this.Points;
         component.perfectScore = this.perfectScore;
@@ -105,23 +110,29 @@ public class MinigameComponent  implements Component<EntityStore> {
         return component;
     }
 
-    public static ComponentType<EntityStore, MinigameComponent> getComponentType() {
-        return AnglersAlmanac.minigameComponent;
-    }
+
 
     public static UUID spawnMinigame(Store<EntityStore> store, Ref<EntityStore> playerRef, Ref<EntityStore> bobberRef){
+        // Set up and spawn minigame entity:
         Holder<EntityStore> holder = EntityStore.REGISTRY.newHolder();
 
         UUID id = UUIDUtil.generateVersion3UUID();
         holder.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(id));
 
-        MinigameComponent game = new MinigameComponent(playerRef, bobberRef, id);
-        holder.addComponent(MinigameComponent.getComponentType(), game);
-        game.spawnMinigameModels(store);
+        MinigameComponent_TensionBar game = new MinigameComponent_TensionBar(playerRef, bobberRef, id);
+        holder.addComponent(MinigameComponent_TensionBar.COMPONENT_TYPE, game);
+
 
         store.getExternalData().getWorld().execute( () -> {
             store.addEntity(holder, AddReason.SPAWN);
         });
+
+
+        // Adjust minigame initialisation variables:
+        double distanceFromPlayer = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().distanceTo(store.getComponent(playerRef, TransformComponent.getComponentType()).getPosition());
+        game.minigameScale = Math.clamp((float)distanceFromPlayer * AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMultiplier, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMin, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMax);
+
+        game.spawnMinigameModels(store);
 
         return id;
     }
@@ -158,7 +169,7 @@ public class MinigameComponent  implements Component<EntityStore> {
         });
     }
 
-    protected void spawnMinigameModels(Store<EntityStore> store){
+    public void spawnMinigameModels(Store<EntityStore> store){
 
 
         // ------- FISH MODEL -------------------------------------------------------------------
@@ -172,7 +183,7 @@ public class MinigameComponent  implements Component<EntityStore> {
         // Assign transform to minigame and move it above the bobber.
         fishModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
         Vector3d newPos = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
-        newPos = newPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG.get().minigameModelVerticalOffset,0));
+        newPos = newPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset,0));
         fishModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newPos);
         //TransformUtils.applyBillboard(store.getExternalData().getRefFromUUID(fishModelId), ownerRef, new Vector3f(90,0,0), store);
 
@@ -214,7 +225,7 @@ public class MinigameComponent  implements Component<EntityStore> {
         // Add model.
         ModelAsset barModelAsset = ModelAsset.getAssetMap().getAsset("SSF_FishingBar");
         if (barModelAsset == null) barModelAsset = ModelAsset.DEBUG;
-        Model barModel = Model.createScaledModel(barModelAsset, (AnglersAlmanac.MINIGAME_CONFIG.get().barRadius * 2f) * minigameScale);
+        Model barModel = Model.createScaledModel(barModelAsset, (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barRadius * 2f) * minigameScale);
         barModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(barModel.toReference()));
         barModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(barModel));
         barModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(barModel.getBoundingBox()));
@@ -232,7 +243,7 @@ public class MinigameComponent  implements Component<EntityStore> {
 
     }
 
-    public  void updateMinigameModelPositions(Store<EntityStore> store){
+    public void updateMinigameModelPositions(Store<EntityStore> store){
 
         // Do fish logic.
         Ref<EntityStore> fishModelRef = store.getExternalData().getWorld().getEntityRef(minigameFishModelId);
@@ -252,7 +263,7 @@ public class MinigameComponent  implements Component<EntityStore> {
          */
 
         // Adjust fish height based on minigame fishPos.
-        newFishPos = newFishPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG.get().minigameModelVerticalOffset + (fishPos * minigameScale),0));
+        newFishPos = newFishPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset + (fishPos * minigameScale),0));
 
 
 
@@ -269,23 +280,26 @@ public class MinigameComponent  implements Component<EntityStore> {
 
         // Do bar model motion.
         Vector3d newBarPos = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
-        newBarPos = newBarPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG.get().minigameModelVerticalOffset + (barPos * minigameScale) ,0));
+        newBarPos = newBarPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset + (barPos * minigameScale) ,0));
         Vector3d playerPos = store.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
-        //newBarPos = newBarPos.add(HelperTransforms.moveAwayFrom(newBarPos ,playerPos, 0.2));
 
         Vector3d layering = newBarPos.clone().add(TransformUtils.moveAwayFrom(newBarPos.clone() ,playerPos, 0.2));
         newBarPos = new Vector3d(layering.x, newBarPos.y, layering.z);
 
-
         store.getComponent(barModelRef, TransformComponent.getComponentType()).setPosition(newBarPos);
-
-
 
         // Do bar rotation.
         TransformUtils.applyBillboardYOnly(minigameBarModelId, newBarPos, playerHeadPos, new Vector3f(0,0,0), store);
 
-        //LOGGER.atInfo().log("CamOffset: %s,   PlayerHeadPos: %s",camOffset, playerHeadPos);
-        //LOGGER.atInfo().log("GameBarPos = %s,  WorldBarPos = %s", bobber.barPos ,newBarPos);
 
+    }
+
+    public void DoInteraction(@NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler){
+        //AnglersAlmanac.LOGGER.atInfo().log("Running TensionBar Minigame interaction");
+
+        //Move bar up.
+        barVelocity = Math.clamp(barVelocity + (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed * AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration)
+                + (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity*AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration)
+                , AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed);
     }
 }

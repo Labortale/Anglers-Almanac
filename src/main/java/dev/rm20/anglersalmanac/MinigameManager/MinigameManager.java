@@ -3,17 +3,21 @@ package dev.rm20.anglersalmanac.MinigameManager;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldMapTracker;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.util.InventoryHelper;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
-import dev.rm20.anglersalmanac.components.MinigameComponent;
+import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.models.FishingContext;
 import dev.rm20.anglersalmanac.models.FishingRodData;
@@ -21,6 +25,7 @@ import dev.rm20.anglersalmanac.models.ZoneInfo;
 import dev.rm20.anglersalmanac.utils.EnvironmentParser;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
 import dev.rm20.anglersalmanac.utils.TimeUtils;
+import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 
@@ -31,15 +36,52 @@ public class MinigameManager {
         //TODO add fail safes for hotbar item changing.
         //Assuming active hotbar item has not changed.
 
-        // Spawn minigame and set rod mode to minigame (1)
-        FishingRodData meta = player.getInventory().getActiveHotbarItem().getFromMetadataOrNull(FishingRodData.KEYED_CODEC);
-        assert meta != null;
-        Inventory inv  = player.getInventory();
-        UUID minigameID = MinigameComponent.spawnMinigame(commandBuffer.getStore(),player.getReference(), bobberRef);
-        LaunchBobberInteraction.updateMetadata(inv, inv.getActiveHotbarSlot(), inv.getActiveHotbarItem(), meta.getBoundBobber(), minigameID, 1);
+        // Select which minigame to use from the config and set it up.
+        switch(AnglersAlmanac.MOD_CONFIG.get().minigameToUse){
+            case "TensionBar":
+                FishingRodData meta = player.getInventory().getActiveHotbarItem().getFromMetadataOrNull(FishingRodData.KEYED_CODEC);
+                assert meta != null;
+                Inventory inv  = player.getInventory();
+                UUID minigameID = MinigameComponent_TensionBar.spawnMinigame(commandBuffer.getStore(),player.getReference(), bobberRef);
+                LaunchBobberInteraction.updateMetadata(inv, inv.getActiveHotbarSlot(), inv.getActiveHotbarItem(), meta.getBoundBobber(), minigameID, 1);
+                break;
+            case "NoMinigame":
+                FirstRoll(bobberRef, player, commandBuffer, depth);
+                break;
+            default: // No Minigame, just reel fish.
+                FirstRoll(bobberRef, player, commandBuffer, depth);
+                break;
+        }
 
-        // v Moved to MinigameSystem success V
-        //FirstRoll(bobberRef, player, commandBuffer, depth);
+    }
+
+    public static void CancelGame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef){
+        AnglersAlmanac.LOGGER.atInfo().log("Selecting Minigame to cancel:");
+    // Select which minigame to use from the config and cancel it.
+        switch(AnglersAlmanac.MOD_CONFIG.get().minigameToUse){
+            case "TensionBar":
+                AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
+                commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).despawnSelf(commandBuffer.getExternalData().getWorld());
+                break;
+            case "NoMinigame":
+                break;
+            default:
+                break;
+        }
+
+    }
+
+
+    public static void DoMinigameInteraction(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef, @NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler){
+        switch(AnglersAlmanac.MOD_CONFIG.get().minigameToUse){
+            case "TensionBar":
+                commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).DoInteraction(interactionType, context, cooldownHandler);
+                break;
+            case "NoMinigame":
+                break;
+            default:
+                break;
+        }
     }
 
 
