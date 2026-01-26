@@ -54,22 +54,13 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
 
 
-
         AnglersAlmanac.LOGGER.atInfo().log("Testing if can cast / reel interaction");
-        // Cancel interaction if the rod is not in reel/cast mode.
-
-        //AnglersAlmanac.LOGGER.atInfo().log("Rod metadata bobber: %s,  mode: %s", heldItem.getFromMetadataOrNull(FishingRodData.KEYED_CODEC).getBoundBobber(), heldItem.getFromMetadataOrNull(ItemModeData.KEYED_CODEC).getMode());
-
-
-
 
         // Catch for if the rod mode got messed up. (e.g. Disconnecting from server while minigame active).
         if(meta == null | (meta != null && meta.getBoundMinigame() == null)){
             AnglersAlmanac.LOGGER.atInfo().log("Fixing busted metadata");
             stopFishing(commandBuffer, player, heldItem);
         }
-
-
 
         // Check rod mode, moving to minigame interaction if in minigame mode.
         if(meta != null && meta.getMode() != 0){
@@ -79,7 +70,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
 
         AnglersAlmanac.LOGGER.atInfo().log("Doing cast / reel interaction!");
 
-
+        // Choose reel or cast depending on rod state.
         if (meta != null && meta.getBoundBobber() != null) {
             reelIn(commandBuffer, player, heldItem, meta.getBoundBobber(),meta,playerRef);
         } else {
@@ -157,12 +148,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
                     //updateMetadata(player.getInventory(), player.getInventory().getActiveHotbarSlot(), heldItem, null, null, 0);
                 }
             }
-            commandBuffer.getExternalData().getWorld().execute(() -> {
-                if(bobberRef.isValid()) {
-                    commandBuffer.removeEntity(bobberRef, RemoveReason.REMOVE);
-                }
-            });
-            //HytaleLogger.getLogger().atInfo().log("Reeled in" + bobberId);
+
         }
         else
         {

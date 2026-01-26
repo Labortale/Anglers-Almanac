@@ -13,7 +13,10 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
+import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
+import dev.rm20.anglersalmanac.components.BobberComponent;
 import dev.rm20.anglersalmanac.components.MinigameComponent;
+import dev.rm20.anglersalmanac.config.MinigameConfig;
 import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.models.FishingRodData;
 import org.jspecify.annotations.NonNull;
@@ -23,7 +26,7 @@ import java.util.Random;
 
 public class MinigameSystem extends EntityTickingSystem<EntityStore> {
     @Override
-    public void tick(float v, int i, @NonNull ArchetypeChunk<EntityStore> archetypeChunk, @NonNull Store<EntityStore> store, @NonNull CommandBuffer<EntityStore> commandBuffer) {
+    public void tick(float deltaTime, int i, @NonNull ArchetypeChunk<EntityStore> archetypeChunk, @NonNull Store<EntityStore> store, @NonNull CommandBuffer<EntityStore> commandBuffer) {
 
         MinigameComponent game = store.getComponent(archetypeChunk.getReferenceTo(i), MinigameComponent.getComponentType());
 
@@ -45,23 +48,49 @@ public class MinigameSystem extends EntityTickingSystem<EntityStore> {
             case FAIL:
                 AnglersAlmanac.LOGGER.atInfo().log("YOU FAIL");
                 // Reel in the rod which the bobber owner is using.
-
                 LaunchBobberInteraction.stopFishing(commandBuffer, player, rodItem);
                 break;
             case SUCCESS:
                 AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
-                // Spawn fish rewards!
-                //ItemStack fishStack = DefaultLootTableGenerator.createRandomFish(DefaultLootTableGenerator.GENERIC());
-                //if (!fishStack.isEmpty()) {
-                //    ItemUtils.throwItem(store.getExternalData().getWorld().getEntityRef(bobber.ownerID), fishStack, 4.0F, commandBuffer);
-                //}
-                // Reel in the rod which the bobber owner is using.
-                //UseFishingRodInteraction.reelRod(store.getComponent(store.getExternalData().getWorld().getEntityRef(bobber.ownerID), Player.getComponentType()), store.getExternalData().getWorld(), bobber);
+                // Deal rewards.
+                MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
+
+                // Finish fishing.
                 LaunchBobberInteraction.stopFishing(commandBuffer, player, rodItem);
                 break;
         }
 
-        game.stateTrigger = MinigameComponent.Trigger.SUCCESS;
+        // Do minigame logic.
+
+        // Check if bar is over the fish and check win state.
+        if(game.fishPos < game.barPos +  AnglersAlmanac.MINIGAME_CONFIG.get().barRadius && game.fishPos > game.barPos - AnglersAlmanac.MINIGAME_CONFIG.get().barRadius){
+            game.fightProgress += AnglersAlmanac.MINIGAME_CONFIG.get().fishReelRate * deltaTime;
+            if(game.fightProgress >= 1.0f){
+                game.stateTrigger = MinigameComponent.Trigger.SUCCESS;
+                return;
+            }
+        }else{
+            game.fightProgress -= AnglersAlmanac.MINIGAME_CONFIG.get().fishEscapeRate * deltaTime;
+            if(game.fightProgress <= 0f){
+                game.stateTrigger = MinigameComponent.Trigger.FAIL;
+                return;
+            }
+        }
+
+        // Check if fish will change velocity or direction.
+        if(game.fishMoveTimer >= game.nextFishMoveTime){
+            game.stateTrigger = MinigameComponent.Trigger.FISHMOVE;
+        }
+
+        // Apply bar motion. (Rising is computed in MinigameInteraction by changing barVelocity)
+        game.barVelocity = Math.clamp(game.barVelocity - (AnglersAlmanac.MINIGAME_CONFIG.get().barGravity*AnglersAlmanac.MINIGAME_CONFIG.get().barAcceleration), -AnglersAlmanac.MINIGAME_CONFIG.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG.get().barSpeed);
+        game.barPos = Math.clamp(game.barPos + (game.barVelocity * deltaTime), 0f, 1.0f);
+
+        // Apply fish movement.
+        game.fishPos = Math.clamp(game.fishPos + (game.fishVelocity*deltaTime), 0f, 1.0f);
+
+        game.updateMinigameModelPositions(store);
+        game.fishMoveTimer += deltaTime;
 
     }
 

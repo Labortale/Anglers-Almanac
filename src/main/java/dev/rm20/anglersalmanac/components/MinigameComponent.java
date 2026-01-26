@@ -232,7 +232,7 @@ public class MinigameComponent  implements Component<EntityStore> {
 
     }
 
-    protected void updateMinigameModelPositions(Store<EntityStore> store){
+    public  void updateMinigameModelPositions(Store<EntityStore> store){
 
         // Do fish logic.
         Ref<EntityStore> fishModelRef = store.getExternalData().getWorld().getEntityRef(minigameFishModelId);

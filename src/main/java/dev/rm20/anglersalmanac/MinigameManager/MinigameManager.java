@@ -38,12 +38,12 @@ public class MinigameManager {
         UUID minigameID = MinigameComponent.spawnMinigame(commandBuffer.getStore(),player.getReference(), bobberRef);
         LaunchBobberInteraction.updateMetadata(inv, inv.getActiveHotbarSlot(), inv.getActiveHotbarItem(), meta.getBoundBobber(), minigameID, 1);
 
-        //TODO finish this
-        FirstRoll(bobberRef, player, commandBuffer, depth);
+        // v Moved to MinigameSystem success V
+        //FirstRoll(bobberRef, player, commandBuffer, depth);
     }
 
 
-    private static void FirstRoll(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
+    public static void FirstRoll(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
         AnglersAlmanac plugin = AnglersAlmanac.getInstance();
         Store<EntityStore> store = bobberRef.getStore();
 
