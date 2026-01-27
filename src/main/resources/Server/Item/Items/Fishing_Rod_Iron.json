@@ -3,9 +3,22 @@
     "Secondary": {
       "Interactions": [
         {
-          "Type": "launch_bobber_interaction"
+          "Type": "launch_bobber_interaction",
+          "Next": {
+            "Type": "minigame_interaction"
+          }
         }
       ]
+    },
+    "Primary": {
+      "Interactions": [
+        {
+          "Type": "minigame_interaction"
+        }
+      ],
+      "Cooldown": {
+        "Cooldown": 0
+      }
     }
   },
   "MaxStack": 1,

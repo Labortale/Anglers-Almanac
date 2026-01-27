@@ -5,6 +5,7 @@ plugins {
 
 ext {
     hytaleHome = "${System.getProperty("user.home")}/AppData/Roaming/Hytale"
+    hytaleHomeLinux = "${System.getProperty("user.home")}/.var/app/com.hypixel.HytaleLauncher/data/Hytale"
 }
 
 java {
@@ -25,6 +26,7 @@ javadoc {
 // the official launcher for now.
 dependencies {
     implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
+    implementation(files("$hytaleHomeLinux/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
     implementation("com.google.guava:guava:33.5.0-jre")
 
 }
