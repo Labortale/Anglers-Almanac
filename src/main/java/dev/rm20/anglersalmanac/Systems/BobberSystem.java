@@ -14,6 +14,7 @@ import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.components.BobberComponent;
+import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.models.FishingRodData;
 
 import javax.annotation.Nonnull;
@@ -23,6 +24,8 @@ import java.util.Random;
 
 public class BobberSystem extends EntityTickingSystem<EntityStore> {
     private final Random random = new Random();
+    ItemStack fishingRod = null;
+    byte slot = 0;
     @Override
     public void tick(float v, int i, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         BobberComponent component = archetypeChunk.getComponent(i, BobberComponent.getComponentType());
@@ -34,13 +37,18 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
                 ItemStack heldItem = player.getInventory().getItemInHand();
                 FishingRodData meta = (heldItem != null) ? heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC) : null;
                 UUIDComponent uuidComponent = archetypeChunk.getComponent(i, UUIDComponent.getComponentType());
+                if(meta != null)
+                {
+                    slot = player.getInventory().getActiveHotbarSlot();
+                    fishingRod = heldItem;
+                }
                 if (meta == null || !Objects.requireNonNull(uuidComponent).getUuid().equals(meta.getBoundBobber())) {
-                    //AnglersAlmanac.getInstance().getLogger().atInfo().log("Removed bobber - Rod swapped or dropped");
-                    commandBuffer.removeEntity(archetypeChunk.getReferenceTo(i), RemoveReason.REMOVE);
-                    if(meta != null)
-                    {
-                        meta.setBoundBobber(null);
-                    }
+                    AnglersAlmanac.getInstance().getLogger().atInfo().log("Removed bobber - Rod swapped or dropped");
+                    //commandBuffer.removeEntity(archetypeChunk.getReferenceTo(i), RemoveReason.REMOVE);
+                    assert fishingRod != null;
+                    //AnglersAlmanac.getInstance().getLogger().atInfo().log(fishingRod.toString());
+                    LaunchBobberInteraction.cancelFishing(commandBuffer,player,fishingRod,slot);
+                    //AnglersAlmanac.getInstance().getLogger().atInfo().log(fishingRod.toString());
                     return;
                 }
             }

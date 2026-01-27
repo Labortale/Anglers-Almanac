@@ -11,8 +11,11 @@ public class FishingRodData {
     public static final String KEY = "AnglersAlmanacBoundBobber";
     public static final BuilderCodec<FishingRodData> CODEC = BuilderCodec.builder(FishingRodData.class, FishingRodData::new)
             .append(new KeyedCodec<>("BoundBobber", Codec.UUID_BINARY), (metaData, value) -> metaData.boundBobber = value, (config) -> config.boundBobber).add()
+            .append(new KeyedCodec<>("BoundMinigame", Codec.UUID_BINARY), (metaData, value) -> metaData.boundMinigame = value, (config) -> config.boundMinigame).add()
+            .append(new KeyedCodec<>("Mode", Codec.INTEGER), (metaData, value) -> metaData.mode = value, (config) -> config.mode).add()
             .build();
     public static final KeyedCodec<FishingRodData> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);
+
     private UUID boundBobber = null;
 
     public UUID getBoundBobber() {
@@ -22,4 +25,26 @@ public class FishingRodData {
     public void setBoundBobber(UUID uuid) {
         this.boundBobber = uuid;
     }
+
+    private UUID boundMinigame = null;
+
+    public UUID getBoundMinigame() {
+        return this.boundMinigame;
+    }
+    public void setBoundMinigame(UUID uuid) {
+        this.boundMinigame = uuid;
+    }
+
+    private int mode = 0;
+
+    public int getMode() {
+        return this.mode;
+    }
+
+    public void setMode(int i) {
+        this.mode = i;
+    }
+
+
+
 }
