@@ -98,7 +98,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         Ref<EntityStore> playerRef = interactionContext.getOwningEntity();
         TransformComponent transform = playerRef.getStore().getComponent(playerRef, TransformComponent.getComponentType());
         Transform lookTransform = TargetUtil.getLook(playerRef, commandBuffer);
-        Vector3d spawnPos = transform.getPosition();
+        Vector3d spawnPos = transform.getPosition().clone();
         spawnPos.add(0, 1.5, 0);
         Vector3d lookDir = lookTransform.getDirection();
         Vector3d launchVelocity = new Vector3d(lookDir.x * 15, (lookDir.y * 15) + 2, lookDir.z * 15);

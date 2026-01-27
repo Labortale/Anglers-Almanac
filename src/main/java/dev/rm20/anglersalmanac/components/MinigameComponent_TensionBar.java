@@ -24,6 +24,7 @@ import dev.rm20.anglersalmanac.utils.TransformUtils;
 import org.jspecify.annotations.NonNull;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MinigameComponent_TensionBar implements Component<EntityStore> {
@@ -248,9 +249,9 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
         // Do fish logic.
         Ref<EntityStore> fishModelRef = store.getExternalData().getWorld().getEntityRef(minigameFishModelId);
         if(fishModelRef == null) return;
-
+        if(!bobberRef.isValid()) return;
         // Do fish model motion.
-        Vector3d newFishPos = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        Vector3d newFishPos = Objects.requireNonNull(store.getComponent(bobberRef, TransformComponent.getComponentType())).getPosition().clone();
 
         /*
         // Move fish to player based on progress.
