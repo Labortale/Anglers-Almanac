@@ -9,10 +9,7 @@ import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.modules.entity.component.BoundingBox;
-import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
-import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.modules.entity.component.*;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.physics.SimplePhysicsProvider;
@@ -120,8 +117,12 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
         UUID id = UUIDUtil.generateVersion3UUID();
         holder.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(id));
 
+        // Minigame
         MinigameComponent_TensionBar game = new MinigameComponent_TensionBar(playerRef, bobberRef, id);
         holder.addComponent(MinigameComponent_TensionBar.COMPONENT_TYPE, game);
+
+        // Audio
+        holder.addComponent(AudioComponent.getComponentType(), new AudioComponent());
 
 
         store.getExternalData().getWorld().execute( () -> {
