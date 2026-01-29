@@ -93,23 +93,23 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
         // Do minigame logic.
 
         PlayerRef playerRefObj = store.getComponent(playerRef, PlayerRef.getComponentType());
-        AudioPlayerComponent apc = store.getComponent(store.getExternalData().getRefFromUUID(game.selfUUID), AudioPlayerComponent.getComponentType());
-
+        AudioPlayerComponent apc = store.getComponent(store.getExternalData().getRefFromUUID(game.audioPlayerId), AudioPlayerComponent.getComponentType());
+        apc.autoplayAsRandom = true;
 
         // Check if bar is over the fish and check win state.
         if(game.fishPos < game.barPos +  AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barRadius && game.fishPos > game.barPos - AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barRadius){
             game.fightProgress += AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().fishReelRate * deltaTime;
 
             // Remove escape audio
-            if(apc.hasSound("AA_Fishing_Line_Tension")) {
-                apc.removeSound("AA_Fishing_Line_Tension");
-                AnglersAlmanac.LOGGER.atInfo().log("Removed escape sound");
+            if(apc.hasSound(game.escapeSounds[0])) {
+                apc.removeSounds(game.escapeSounds);
+                //AnglersAlmanac.LOGGER.atInfo().log("Removed escape sound");
             }
 
-            // Autoplay reel audio
-            apc.autoplayAsRandom = true;
-            AnglersAlmanac.LOGGER.atInfo().log("Playing reel slow sound");
-
+            // Add reel in audio
+            if(!apc.hasSound(game.reelInSounds[0])){
+                apc.addSounds(game.reelInSounds);
+            }
 
 
             // Check win condition.
@@ -120,16 +120,19 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
         }else{
             game.fightProgress -= AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().fishEscapeRate * deltaTime;
 
-            AnglersAlmanac.LOGGER.atInfo().log("Removing reel slow sound");
+            // Remove escape audio
+            if(apc.hasSound(game.reelInSounds[0])) {
+                apc.removeSounds(game.reelInSounds);
+                //AnglersAlmanac.LOGGER.atInfo().log("Removed escape sound");
+            }
 
-            // Add new audio
-            apc.addSound("AA_Fishing_Line_Tension");
-            apc.autoplayAsRandom = false;
-            apc.doLoopSingle("AA_Fishing_Line_Tension", store);
-            AnglersAlmanac.LOGGER.atInfo().log("Playing line tension sound");
+            // Add reel in audio
+            if(!apc.hasSound(game.escapeSounds[0])){
+                apc.addSounds(game.escapeSounds);
+            }
 
 
-            // Check win condition.
+            // Check lose condition.
             if(game.fightProgress <= 0f){
                 game.stateTrigger = MinigameComponent_TensionBar.Trigger.FAIL;
                 return;

@@ -1,5 +1,6 @@
 package dev.rm20.anglersalmanac.components;
 
+import com.hypixel.hytale.assetstore.JsonAsset;
 import com.hypixel.hytale.component.*;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
@@ -10,6 +11,7 @@ import com.hypixel.hytale.server.core.asset.common.CommonAssetRegistry;
 import com.hypixel.hytale.server.core.asset.common.OggVorbisInfoCache;
 import com.hypixel.hytale.server.core.asset.common.ResourceCommonAsset;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEventLayer;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.system.AudioSystems;
@@ -24,13 +26,14 @@ import org.jspecify.annotations.Nullable;
 import javax.annotation.Nonnull;
 import javax.sound.sampled.spi.AudioFileReader;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class AudioPlayerComponent implements Component<EntityStore> {
     public static ComponentType<EntityStore, AudioPlayerComponent> COMPONENT_TYPE;
     private List<String> sounds = new ArrayList<>();
-    private HashMap<String, Double> soundDurations = new HashMap<>();
+    private HashMap<String, Long> soundDurations = new HashMap<>(); // Duration of each sound as nanoseconds
     public long playNextTime = 0;
     public long lastPlayTime = 0;
     public int lastSoundIndex = 0;
@@ -49,32 +52,54 @@ public class AudioPlayerComponent implements Component<EntityStore> {
         soundDurations.put(soundEventId, readDurationOf(soundEventId));
     }
 
+    public void addSounds(String[] soundEventIds){
+        for(String sound : soundEventIds){
+            addSound(sound);
+        }
+    }
+
     public void removeSound(String soundEventId){
         sounds.remove(soundEventId);
         soundDurations.remove(soundEventId);
+    }
+
+    public void removeSounds(String[] soundEventIds){
+        for(String sound : soundEventIds){
+            removeSound(sound);
+        }
     }
 
     public boolean hasSound(String soundEventId){
         return sounds.contains(soundEventId);
     }
 
-    private double readDurationOf(String soundEventId){
+    private long readDurationOf(String soundEventId){
         if(!sounds.contains(soundEventId)) return 0;
-        // TODO get the path to the actual sound file, not the json SoundEvent asset.
-        AnglersAlmanac.LOGGER.atInfo().log("file path: %s", CommonAssetRegistry.getByName("fishing_reel_slow_0.ogg"));
-        AnglersAlmanac.LOGGER.atInfo().log("file path derp: %s", CommonAssetRegistry.getByName(soundEventId));
-        AnglersAlmanac.LOGGER.atInfo().log("duration: %s", OggVorbisInfoCache.getNow(SoundEvent.getAssetMap().getPath(soundEventId).toString()).duration);
-        return OggVorbisInfoCache.getNow(SoundEvent.getAssetMap().getPath(soundEventId).toString()).duration;
+        // TODO search through all files in all layers to find the longest duration to return.
+        var asset = SoundEvent.getAssetMap().getAsset(soundEventId);
+        if(asset == null){
+            AnglersAlmanac.LOGGER.atWarning().log("No sound file matching name %s found!", soundEventId);
+        }
+
+        // Get duration from file info.
+        SoundEventLayer layer = asset.getLayers()[0];
+        double durationSeconds = OggVorbisInfoCache.getNow(layer.getFiles()[0]).duration;
+
+        // Convert to nanoseconds (without losing precision)
+        BigDecimal secDecimal = BigDecimal.valueOf(durationSeconds);
+        BigDecimal nanoMultiplier = new BigDecimal("1000000000");
+
+        return secDecimal.multiply(nanoMultiplier).longValue();
     }
 
-    public double getDurationOf(String soundEventId){
+    public long getDurationOf(String soundEventId){
         if(!sounds.contains(soundEventId)) return 0;
         return soundDurations.get(soundEventId);
     }
 
     public boolean isCurrentlyPlaying(){
         //TimeUnit.SECONDS.convert(System.nanoTime() - lastCastOrReelTime, TimeUnit.NANOSECONDS) >= cooldownTime;
-        return TimeUnit.SECONDS.convert(System.nanoTime() - lastPlayTime, TimeUnit.NANOSECONDS) < playNextTime;
+        return System.nanoTime() < playNextTime;
     }
 
     public void playRandomSound(Vector3d pos, @Nonnull ComponentAccessor<EntityStore> componentAccessor){
@@ -88,20 +113,23 @@ public class AudioPlayerComponent implements Component<EntityStore> {
 
     public void playSound(String soundId, Vector3d pos, @Nonnull ComponentAccessor<EntityStore> componentAccessor){
         SoundUtil.playSoundEvent3d(SoundEvent.getAssetMap().getIndex(soundId), SoundCategory.UI, pos, componentAccessor);
-        playNextTime = System.nanoTime() + TimeUnit.NANOSECONDS.convert((long)getDurationOf(soundId), TimeUnit.SECONDS);
+        playNextTime = System.nanoTime() + getDurationOf(soundId);
+        AnglersAlmanac.LOGGER.atInfo().log("current time: %s   next play time: %s", System.nanoTime(), playNextTime);
         lastPlayTime = System.nanoTime();
         lastSoundIndex = sounds.indexOf(soundId);
+        AnglersAlmanac.LOGGER.atInfo().log("AudioPlayerComponenet Playing sound %s", soundId);
     }
     public void playSound(String soundId, @Nonnull ComponentAccessor<EntityStore> componentAccessor){
-        SoundUtil.playSoundEvent3d(SoundEvent.getAssetMap().getIndex(soundId), SoundCategory.UI, getAudioPlayerPos(componentAccessor), componentAccessor);
-        playNextTime = System.nanoTime() + TimeUnit.NANOSECONDS.convert((long)getDurationOf(soundId), TimeUnit.SECONDS);
-        lastPlayTime = System.nanoTime();
-        lastSoundIndex = sounds.indexOf(soundId);
+        playSound(soundId, getAudioPlayerPos(componentAccessor), componentAccessor);
+
     }
 
     /// Can be run in a system tick. Will only play the next sound if the current sound has concluded.
     public void doLoopAll(boolean pickRandom, Vector3d pos, @Nonnull ComponentAccessor<EntityStore> componentAccessor){
-        if(isCurrentlyPlaying()) return;
+        if(isCurrentlyPlaying()) {
+            AnglersAlmanac.LOGGER.atInfo().log("Sound already playing; skipping");
+            return;
+        }
         if(pickRandom){
             playRandomSound(pos, componentAccessor);
         }else{

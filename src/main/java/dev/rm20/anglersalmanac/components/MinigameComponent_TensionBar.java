@@ -81,6 +81,9 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
     public UUID audioPlayerId;
     public float minigameScale = 2f; // The visual size of the minigame display, adjusted based on distance from bobber.
 
+    public String[] reelInSounds = {"AA_Fishing_Reel_Slow0", "AA_Fishing_Reel_Slow1", "AA_Fishing_Reel_Slow2", "AA_Fishing_Reel_Slow3"};
+    public String[] escapeSounds = {"AA_Fishing_Line_Tension0", "AA_Fishing_Line_Tension1", "AA_Fishing_Line_Tension2", "AA_Fishing_Line_Tension3"};
+
 
     public MinigameComponent_TensionBar(Ref<EntityStore> ownerPlayerRef, Ref<EntityStore> bobberRef, UUID selfUUID){
         this.ownerRef = ownerPlayerRef;
@@ -158,6 +161,15 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
             }
         }
 
+        if(audioPlayerId != null) {
+            Ref<EntityStore> audioPlayerRef = world.getEntityRef(audioPlayerId);
+            if (audioPlayerRef != null) {
+                world.execute(() -> {
+                    store.removeEntity(audioPlayerRef, RemoveReason.REMOVE);
+                });
+            }
+        }
+
 
         // Despawn self.
         world.execute(() -> {
@@ -171,10 +183,7 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
 
         // Also spawn audio
         AudioPlayerComponent apc = AudioPlayerComponent.spawnNewAudioPlayerEntity(bobberPos, store);
-        apc.addSound("AA_Fishing_Reel_Slow0");
-        apc.addSound("AA_Fishing_Reel_Slow1");
-        apc.addSound("AA_Fishing_Reel_Slow2");
-        apc.addSound("AA_Fishing_Reel_Slow3");
+        apc.addSounds(reelInSounds);
         audioPlayerId = apc.selfUUID;
 
 
