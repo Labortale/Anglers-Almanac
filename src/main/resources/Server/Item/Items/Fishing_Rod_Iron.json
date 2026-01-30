@@ -2,23 +2,16 @@
   "Interactions": {
     "Secondary": {
       "Interactions": [
-        {
-          "Type": "launch_bobber_interaction",
-          "Next": {
-            "Type": "minigame_interaction"
-          }
-        }
+        "LaunchBobberInteraction"
       ]
     },
     "Primary": {
-      "Interactions": [
-        {
-          "Type": "minigame_interaction"
-        }
-      ],
       "Cooldown": {
         "Cooldown": 0
-      }
+      },
+      "Interactions": [
+        "MinigameInteraction"
+      ]
     }
   },
   "MaxStack": 1,

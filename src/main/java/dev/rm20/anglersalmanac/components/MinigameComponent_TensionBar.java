@@ -9,10 +9,7 @@ import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.modules.entity.component.BoundingBox;
-import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
-import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.modules.entity.component.*;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.physics.SimplePhysicsProvider;
@@ -67,9 +64,6 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
 
 
     // Internal use:
-    public boolean isFishOn = false;
-    public boolean isInWater = false;
-    public float wetLifetime = 0f; // The seconds for which the bobber has spent in the water.
     public float fightProgress = 0.25f; // The progress to successful catch. Success when progress is at 1f.
     public float fishPos = 0f; // The position of the fish in the bar as a scale from 0 - 1.
     public float barPos = 0f; // The position of the catch bar.
@@ -77,21 +71,18 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
     public float nextFishMoveTime = 0.5f; // The time until the next fish movement.
     public float fishMoveTimer = 0f; // Counts up until next fish move.
     public float fishVelocity = 0f; // The movement of the fish.
-    public float hookAtTime = 10f; // Randomised time at which fish will be hooked.
-    public SimplePhysicsProvider physicsProvider;
     public Ref<EntityStore> ownerRef;
     public Ref<EntityStore> bobberRef;
     public UUID selfUUID;
-    public byte rodItemStackSlot; // The inventory slot in which the bobber rod exists.
-    public ItemStack rodItemStack; // Both these rod item vars are used to ensure player doesn't move it or their active hotbar slot.
     public enum Trigger {NOTRIGGER, FISHMOVE, SUCCESS, FAIL}
     public Trigger stateTrigger = Trigger.NOTRIGGER;
     public UUID minigameFishModelId;
     public UUID minigameBarModelId;
-    public float bobberAge = 0f;
-    public long lastInteractionTime = 0;
-    public float approxBobberSystemDeltaTime = 1f; // The last known delta time of the bobber system tick.
+    public UUID audioPlayerId;
     public float minigameScale = 2f; // The visual size of the minigame display, adjusted based on distance from bobber.
+
+    public String[] reelInSounds = {"AA_Fishing_Reel_Slow0", "AA_Fishing_Reel_Slow1", "AA_Fishing_Reel_Slow2", "AA_Fishing_Reel_Slow3"};
+    public String[] escapeSounds = {"AA_Fishing_Line_Tension0", "AA_Fishing_Line_Tension1", "AA_Fishing_Line_Tension2", "AA_Fishing_Line_Tension3"};
 
 
     public MinigameComponent_TensionBar(Ref<EntityStore> ownerPlayerRef, Ref<EntityStore> bobberRef, UUID selfUUID){
@@ -111,15 +102,22 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
         return component;
     }
 
+    public static ComponentType<EntityStore, MinigameComponent_TensionBar> getComponentType() {
+        return COMPONENT_TYPE;
+    }
+
 
 
     public static UUID spawnMinigame(Store<EntityStore> store, Ref<EntityStore> playerRef, Ref<EntityStore> bobberRef){
+        Vector3d bobberPos = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+
         // Set up and spawn minigame entity:
         Holder<EntityStore> holder = EntityStore.REGISTRY.newHolder();
 
         UUID id = UUIDUtil.generateVersion3UUID();
         holder.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(id));
 
+        // Minigame
         MinigameComponent_TensionBar game = new MinigameComponent_TensionBar(playerRef, bobberRef, id);
         holder.addComponent(MinigameComponent_TensionBar.COMPONENT_TYPE, game);
 
@@ -130,7 +128,7 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
 
 
         // Adjust minigame initialisation variables:
-        double distanceFromPlayer = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().distanceTo(store.getComponent(playerRef, TransformComponent.getComponentType()).getPosition());
+        double distanceFromPlayer = bobberPos.distanceTo(store.getComponent(playerRef, TransformComponent.getComponentType()).getPosition());
         game.minigameScale = Math.clamp((float)distanceFromPlayer * AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMultiplier, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMin, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMax);
 
         game.spawnMinigameModels(store);
@@ -163,6 +161,15 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
             }
         }
 
+        if(audioPlayerId != null) {
+            Ref<EntityStore> audioPlayerRef = world.getEntityRef(audioPlayerId);
+            if (audioPlayerRef != null) {
+                world.execute(() -> {
+                    store.removeEntity(audioPlayerRef, RemoveReason.REMOVE);
+                });
+            }
+        }
+
 
         // Despawn self.
         world.execute(() -> {
@@ -171,6 +178,14 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
     }
 
     public void spawnMinigameModels(Store<EntityStore> store){
+
+        Vector3d bobberPos = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+
+        // Also spawn audio
+        AudioPlayerComponent apc = AudioPlayerComponent.spawnNewAudioPlayerEntity(bobberPos, store);
+        apc.addSounds(reelInSounds);
+        apc.allowedOverlap = 30000000;
+        audioPlayerId = apc.selfUUID;
 
 
         // ------- FISH MODEL -------------------------------------------------------------------
@@ -183,7 +198,7 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
 
         // Assign transform to minigame and move it above the bobber.
         fishModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
-        Vector3d newPos = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        Vector3d newPos = bobberPos.clone();
         newPos = newPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset,0));
         fishModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newPos);
         //TransformUtils.applyBillboard(store.getExternalData().getRefFromUUID(fishModelId), ownerRef, new Vector3f(90,0,0), store);

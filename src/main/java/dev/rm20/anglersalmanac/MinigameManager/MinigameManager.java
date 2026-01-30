@@ -46,10 +46,10 @@ public class MinigameManager {
                 LaunchBobberInteraction.updateMetadata(inv, inv.getActiveHotbarSlot(), inv.getActiveHotbarItem(), meta.getBoundBobber(), minigameID, 1);
                 break;
             case "NoMinigame":
-                FirstRoll(bobberRef, player, commandBuffer, depth);
+                DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef);
                 break;
             default: // No Minigame, just reel fish.
-                FirstRoll(bobberRef, player, commandBuffer, depth);
+                DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef);
                 break;
         }
 
@@ -85,13 +85,13 @@ public class MinigameManager {
     }
 
 
-    public static void FirstRoll(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
+    public static String FirstRoll(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
         AnglersAlmanac plugin = AnglersAlmanac.getInstance();
         Store<EntityStore> store = bobberRef.getStore();
 
         // Location
         var transform = store.getComponent(bobberRef, TransformComponent.getComponentType());
-        if (transform == null) return;
+        if (transform == null) return null;
 
 //        double x = transform.getPosition().getX();
         double y = transform.getPosition().getY();
@@ -131,13 +131,16 @@ public class MinigameManager {
         FishLootManager lootEntry = FishLootManager.getRandomWeightedLoot(LocationInfo);
         if(lootEntry == null)
         {
-            return;
+            return null;
         }
         String lootID = lootEntry.getItemID();
         plugin.getLogger().atInfo().log(lootID);
 
         //TODO 2nd roll depending on minigame
 
+        return lootID;
+
+        /*
         //Drop loot
         if(lootID ==null) return;
         ItemStack fishStack;
@@ -147,9 +150,11 @@ public class MinigameManager {
         }
         DropItem(fishStack, player, commandBuffer, bobberRef);
 
+         */
+
     }
 
-    private static void DropItem(ItemStack loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef) {
+    public static void DropItem(ItemStack loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef) {
 
         assert player.getReference() != null;
         ItemUtils.throwItem(player.getReference(), loot, 0f, commandBuffer);
@@ -157,6 +162,16 @@ public class MinigameManager {
         //TODO
         //Rework to make it look like the fish is coming from the bobber and fly to the player?
 
+    }
+
+    public static void DropLoot(String lootID, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef){
+        if(lootID ==null) return;
+        ItemStack fishStack;
+        fishStack = InventoryHelper.createItem(lootID);
+        if (fishStack == null) {
+            return;
+        }
+        DropItem(fishStack, player, commandBuffer, bobberRef);
     }
 
 }

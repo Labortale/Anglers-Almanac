@@ -64,6 +64,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         // Checks if the metadata is in a state which should not exist.
         if (meta != null)
         {
+            // TODO: add check for metadata breaking when player is disconnected during minigame.
             AnglersAlmanac.LOGGER.atInfo().log("metadata: %s, %s, %s", meta.getBoundBobber(), meta.getBoundMinigame(), meta.getMode());
         }
         if (

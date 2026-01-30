@@ -23,7 +23,7 @@ public class MinigameConfig_TensionBar {
     public float castCooldown = 0.5f; // Seconds before rod can be cast or reeled.
     public float barGravity = 0.7f; // How fast the bar falls when not being risen. Should be close to fish max velocity.
     public float barSpeed = 1.0f; // How fast the bar rises when right click is held. Should be faster than fish max velocity.
-    public float barAcceleration = 0.25f; // The rate at which the bar accelerates multiplied by the speed of its direction.
+    public float barAcceleration = 0.4f; // The rate at which the bar accelerates multiplied by the speed of its direction.
     public double waterFriction = 0.85; // The amount by which the bobber model is slowed down while in water.
 
     // Builds the codec for plugin configuration.

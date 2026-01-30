@@ -59,7 +59,7 @@
           "shape": {
             "type": "box",
             "offset": {"x": -1.5, "y": 1.5, "z": 0},
-            "stretch": {"x": 1, "y": 1, "z": 1},
+            "stretch": {"x": 1.001, "y": 1.001, "z": 1.001},
             "settings": {
               "isPiece": false,
               "size": {"x": 3, "y": 3, "z": 1},
@@ -111,7 +111,7 @@
           "shape": {
             "type": "box",
             "offset": {"x": 1, "y": -2, "z": 0},
-            "stretch": {"x": 1, "y": 1, "z": 1},
+            "stretch": {"x": 0.999, "y": 0.999, "z": 0.999},
             "settings": {
               "isPiece": false,
               "size": {"x": 2, "y": 4, "z": 1},
@@ -163,7 +163,7 @@
           "shape": {
             "type": "box",
             "offset": {"x": -1, "y": -2, "z": 0},
-            "stretch": {"x": 1, "y": 1, "z": 1},
+            "stretch": {"x": 0.998, "y": 0.998, "z": 0.998},
             "settings": {
               "isPiece": false,
               "size": {"x": 2, "y": 4, "z": 1},

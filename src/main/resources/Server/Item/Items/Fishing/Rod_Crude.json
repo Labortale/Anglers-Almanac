@@ -16,11 +16,11 @@
     "Input": [
       {
         "ResourceTypeId": "Wood_Trunk",
-        "Quantity": 2
+        "Quantity": 4
       },
       {
-        "Quantity": 2,
-        "ItemId": "Ingredient_Bolt_Wool"
+        "Quantity": 3,
+        "ItemId": "Ingredient_Fabric_Scrap_Linen"
       }
     ],
     "BenchRequirement": [
@@ -42,16 +42,15 @@
   "Interactions": {
     "Secondary": {
       "Interactions": [
-        {
-          "Type": "launch_bobber_interaction",
-          "Next": {
-            "Type": "minigame_interaction"
-          }
-        }
+        "LaunchBobberInteraction"
+      ]
+    },
+    "Primary": {
+      "Interactions": [
+        "MinigameInteraction"
       ],
       "Cooldown": {
-        "Cooldown": 0,
-        "Id": "use_cooldown"
+        "Cooldown": 0
       }
     }
   },
