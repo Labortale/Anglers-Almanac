@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.server.core.util.Config;
+import dev.rm20.anglersalmanac.Database.AlmanacDatabase;
 import dev.rm20.anglersalmanac.components.AudioPlayerComponent;
 import dev.rm20.anglersalmanac.components.BobberComponent;
 import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
@@ -32,7 +33,7 @@ public class AnglersAlmanac extends JavaPlugin {
 
     public static Config<MinigameConfig_TensionBar> MINIGAME_CONFIG_TENSIONBAR;
     public static Config<AnglersAlmanacConfig> MOD_CONFIG;
-
+    public AlmanacDatabase database;
 
     public FishLootManager fishLootManager;
     public AnglersAlmanac(@Nonnull JavaPluginInit init) {
@@ -79,6 +80,8 @@ public class AnglersAlmanac extends JavaPlugin {
         }
 
 
+        //start database
+        this.database = new AlmanacDatabase();
 
     }
 

@@ -28,6 +28,7 @@ dependencies {
     implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
     implementation(files("$hytaleHomeLinux/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
     implementation("com.google.guava:guava:33.5.0-jre")
+    implementation 'org.xerial:sqlite-jdbc:3.51.1.0'
 
 }
 

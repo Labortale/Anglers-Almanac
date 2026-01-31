@@ -6,6 +6,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -172,6 +173,17 @@ public class MinigameManager {
             return;
         }
         DropItem(fishStack, player, commandBuffer, bobberRef);
+        SaveLoot(player,lootID);
+    }
+
+    public static void SaveLoot(Player player, String FishId)
+    {
+        //save to database
+        var playerRef = player.getReference();
+        assert playerRef != null;
+        UUIDComponent uuid = playerRef.getStore().getComponent(playerRef, UUIDComponent.getComponentType());
+        assert uuid != null;
+        AnglersAlmanac.getInstance().database.saveCatch(uuid.getUuid().toString(), FishId);
     }
 
 }

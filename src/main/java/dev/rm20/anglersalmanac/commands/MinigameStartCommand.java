@@ -9,6 +9,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.pages.PageManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.rm20.anglersalmanac.Database.StatUiPage;
 import dev.rm20.anglersalmanac.MinigameManager.SkillCheck.LinearSkillPage;
 import dev.rm20.anglersalmanac.MinigameManager.SkillCheck.SkillCheckPage;
 import dev.rm20.anglersalmanac.registration.CommandInfo;
@@ -31,8 +32,9 @@ public class MinigameStartCommand extends AbstractPlayerCommand {
         {
             PageManager pageManager = player.getPageManager();
             //SkillCheckPage minigamePage = new SkillCheckPage(playerRef);
-            LinearSkillPage minigamePage = new LinearSkillPage(playerRef);
-            pageManager.openCustomPage(ref, store, minigamePage);
+            //LinearSkillPage minigamePage = new LinearSkillPage(playerRef);
+            StatUiPage statUiPage = new StatUiPage(playerRef);
+            pageManager.openCustomPage(ref, store, statUiPage);
 
         }
     }

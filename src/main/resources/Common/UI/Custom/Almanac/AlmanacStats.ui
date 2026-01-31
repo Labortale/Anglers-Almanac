@@ -1,0 +1,53 @@
+$Common = "Common.ui";
+
+@Background = PatchStyle(TexturePath: "book_2.png");
+
+Group #AlmanacStats {
+  Anchor: (Width: 1200, Height: 872);
+
+  Group #background {
+    Background: @Background;
+  }
+  // --- LEFT PAGE CONTENT ---
+
+  Label #Header {
+    Anchor: (Top: 60, Left: 120);
+    Style: (TextColor: #494950, FontSize: 30, RenderBold: true);
+    Text: "Player Stats:";
+  }
+
+  Label #TotalFish {
+    Anchor: (Top: 120, Left: 120);
+    Style: (TextColor: #494950, FontSize: 25);
+    Text: "Total fish: {total_catches}";
+  }
+
+  Label #MostFound {
+    Anchor: (Top: 160, Left: 120);
+    Style: (TextColor: #494950, FontSize: 25);
+    Text: "Most found: {top_fish_name}";
+  }
+
+  Label #LegendaryCount {
+    Anchor: (Top: 200, Left: 120);
+    Style: (TextColor: #494950, FontSize: 25);
+    Text: "Legendary fish: {legendary_count}";
+  }
+
+  Label #ListHeader {
+    Anchor: (Top: 280, Left: 120);
+    Style: (TextColor: #494950, FontSize: 25);
+    Text: "Top 10 Catches:";
+  }
+
+  Label #Fish1 { Anchor: (Top: 330, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_1} : {fish_1_count}"; }
+  Label #Fish2 { Anchor: (Top: 365, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_2} : {fish_2_count}"; }
+  Label #Fish3 { Anchor: (Top: 400, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_3} : {fish_3_count}"; }
+  Label #Fish4 { Anchor: (Top: 435, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_4} : {fish_4_count}"; }
+  Label #Fish5 { Anchor: (Top: 470, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_5} : {fish_5_count}"; }
+  Label #Fish6 { Anchor: (Top: 505, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_6} : {fish_6_count}"; }
+  Label #Fish7 { Anchor: (Top: 540, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_7} : {fish_7_count}"; }
+  Label #Fish8 { Anchor: (Top: 575, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_8} : {fish_8_count}"; }
+  Label #Fish9 { Anchor: (Top: 610, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_9} : {fish_9_count}"; }
+  Label #Fish10 { Anchor: (Top: 645, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_10} : {fish_10_count}"; }
+}
