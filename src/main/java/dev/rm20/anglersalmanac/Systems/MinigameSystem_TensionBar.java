@@ -22,6 +22,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
+import dev.rm20.anglersalmanac.MinigameManager.Minigame;
 import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.components.AudioPlayerComponent;
 import dev.rm20.anglersalmanac.components.BobberComponent;
@@ -80,6 +81,8 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 break;
             case SUCCESS:
                 AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
+                Minigame.PerformanceRating  rating = game.getPerformanceRating(game.getPerformancePercentage());
+                AnglersAlmanac.LOGGER.atInfo().log("Minigame performance rating = %s", rating);
                 // Deal rewards.
                 String lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
                 MinigameManager.DropLoot(lootID, player, commandBuffer,game.bobberRef);
@@ -111,6 +114,8 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 apc.addSounds(game.reelInSounds);
             }
 
+            // Increment tick tracker.
+            game.ticksReeling++;
 
             // Check win condition.
             if(game.fightProgress >= 1.0f){
@@ -131,6 +136,8 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 apc.addSounds(game.escapeSounds);
             }
 
+            // Increment tick tracker.
+            game.ticksEscaping++;
 
             // Check lose condition.
             if(game.fightProgress <= 0f){

@@ -17,6 +17,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
+import dev.rm20.anglersalmanac.MinigameManager.Minigame;
 import dev.rm20.anglersalmanac.utils.TransformUtils;
 import org.jspecify.annotations.NonNull;
 
@@ -24,44 +25,13 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.UUID;
 
-public class MinigameComponent_TensionBar implements Component<EntityStore> {
+public class MinigameComponent_TensionBar  extends Minigame implements Component<EntityStore> {
     public static ComponentType<EntityStore, MinigameComponent_TensionBar> COMPONENT_TYPE;
-    // How long a player has been playing
-    private float TimePlayed;
-    // Total points that the player has
-    private int Points;
-    // PerfectScore
-    private float perfectScore;
+
 
     public MinigameComponent_TensionBar() {
 
     }
-
-    public float getTimePlayed() {
-        return TimePlayed;
-    }
-
-    public void setTimePlayed(float timePlayed) {
-        TimePlayed = timePlayed;
-    }
-
-    public int getPoints() {
-        return Points;
-    }
-
-    public void setPoints(int points) {
-        Points = points;
-    }
-
-
-    public float getPerfectScore() {
-        return perfectScore;
-    }
-
-    public void setPerfectScore(float perfectScore) {
-        this.perfectScore = perfectScore;
-    }
-
 
     // Internal use:
     public float fightProgress = 0.25f; // The progress to successful catch. Success when progress is at 1f.
@@ -84,6 +54,10 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
     public String[] reelInSounds = {"AA_Fishing_Reel_Slow0", "AA_Fishing_Reel_Slow1", "AA_Fishing_Reel_Slow2", "AA_Fishing_Reel_Slow3"};
     public String[] escapeSounds = {"AA_Fishing_Line_Tension0", "AA_Fishing_Line_Tension1", "AA_Fishing_Line_Tension2", "AA_Fishing_Line_Tension3"};
 
+    // Used for calculating performance:
+    public int ticksReeling = 0;
+    public int ticksEscaping = 0;
+
 
     public MinigameComponent_TensionBar(Ref<EntityStore> ownerPlayerRef, Ref<EntityStore> bobberRef, UUID selfUUID){
         this.ownerRef = ownerPlayerRef;
@@ -95,9 +69,9 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
     @Override
     public Component<EntityStore> clone() {
         MinigameComponent_TensionBar component = new MinigameComponent_TensionBar(this.ownerRef, this.bobberRef, this.selfUUID);
-        component.TimePlayed = this.TimePlayed;
-        component.Points = this.Points;
-        component.perfectScore = this.perfectScore;
+        component.setTimePlayed(getTimePlayed());
+        component.setPoints(getPoints());
+        component.setPerfectScore(getPerfectScore());
         component.stateTrigger = this.stateTrigger;
         return component;
     }
@@ -317,5 +291,14 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
         barVelocity = Math.clamp(barVelocity + (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed * AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration)
                 + (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity*AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration)
                 , AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed);
+    }
+
+
+    @Override
+    public int getPerformancePercentage(){
+        int totalGameTicks  = ticksReeling + ticksEscaping;
+        int performancePercentage = (int)( ((float)ticksReeling  / (float)totalGameTicks) * 100);
+        AnglersAlmanac.LOGGER.atInfo().log("Minigame performance percentage = %s", performancePercentage);
+        return performancePercentage;
     }
 }
