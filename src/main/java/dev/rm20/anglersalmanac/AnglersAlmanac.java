@@ -77,8 +77,7 @@ public class AnglersAlmanac extends JavaPlugin {
         } else {
             LOGGER.atInfo().log("FishLootManager registered via Builder. Assets will be loaded during the asset phase.");
         }
-
-
+        MOD_CONFIG.save();
 
     }
 
