@@ -36,21 +36,28 @@ public class MinigameManager {
         // Set rod mode
         //TODO add fail safes for hotbar item changing.
         //Assuming active hotbar item has not changed.
+        ItemStack fishingRod = player.getInventory().getActiveHotbarItem();
 
         // Select which minigame to use from the config and set it up.
-        switch(AnglersAlmanac.MOD_CONFIG.get().minigameToUse){
+        switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
             case "TensionBar":
-                FishingRodData meta = player.getInventory().getActiveHotbarItem().getFromMetadataOrNull(FishingRodData.KEYED_CODEC);
-                assert meta != null;
+                FishingRodData meta = fishingRod.getFromMetadataOrNull(FishingRodData.KEYED_CODEC);
+                if(meta== null)
+                {
+                    LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
+                    break;
+                }
                 Inventory inv  = player.getInventory();
                 UUID minigameID = MinigameComponent_TensionBar.spawnMinigame(commandBuffer.getStore(),player.getReference(), bobberRef);
                 LaunchBobberInteraction.updateMetadata(inv, inv.getActiveHotbarSlot(), inv.getActiveHotbarItem(), meta.getBoundBobber(), minigameID, 1);
                 break;
             case "NoMinigame":
                 DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef);
+                LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
             default: // No Minigame, just reel fish.
                 DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef);
+                LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
         }
 
@@ -59,7 +66,7 @@ public class MinigameManager {
     public static void CancelGame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef){
         AnglersAlmanac.LOGGER.atInfo().log("Selecting Minigame to cancel:");
     // Select which minigame to use from the config and cancel it.
-        switch(AnglersAlmanac.MOD_CONFIG.get().minigameToUse){
+        switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
             case "TensionBar":
                 AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
                 commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).despawnSelf(commandBuffer.getExternalData().getWorld());
@@ -74,7 +81,7 @@ public class MinigameManager {
 
 
     public static void DoMinigameInteraction(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef, @NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler){
-        switch(AnglersAlmanac.MOD_CONFIG.get().minigameToUse){
+        switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
             case "TensionBar":
                 commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).DoInteraction(interactionType, context, cooldownHandler);
                 break;
