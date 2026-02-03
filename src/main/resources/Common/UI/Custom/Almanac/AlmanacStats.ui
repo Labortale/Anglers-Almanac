@@ -35,7 +35,7 @@ Group #AlmanacStats {
   }
 
   Label #ListHeader {
-    Anchor: (Top: 280, Left: 120);
+    Anchor: (Top: 300, Left: 120);
     Style: (TextColor: #494950, FontSize: 25);
     Text: "Top 10 Catches:";
   }
@@ -50,4 +50,11 @@ Group #AlmanacStats {
   Label #Fish8 { Anchor: (Top: 575, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_8} : {fish_8_count}"; }
   Label #Fish9 { Anchor: (Top: 610, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_9} : {fish_9_count}"; }
   Label #Fish10 { Anchor: (Top: 645, Left: 120); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_10} : {fish_10_count}"; }
+
+
+  Label #OwnerInfo {
+    Anchor: (Top: 780, Left: 120, Width: 450);
+    Style: (TextColor: #1c1c25, FontSize: 18, HorizontalAlignment:End);
+    Text: "Property of: {owner_name}";
+  }
 }

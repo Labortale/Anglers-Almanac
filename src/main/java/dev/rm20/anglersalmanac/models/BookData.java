@@ -1,0 +1,39 @@
+package dev.rm20.anglersalmanac.models;
+
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+
+import java.util.UUID;
+
+public class BookData {
+    public static final String KEY = "AnglersAlmanacBookOwner";
+    public static final BuilderCodec<BookData> CODEC = BuilderCodec.builder(BookData.class, BookData::new)
+            .append(new KeyedCodec<>("PlayerUUID", Codec.STRING), (metaData, value) -> metaData.playerUUID = value, (config) -> config.playerUUID).add()
+            .append(new KeyedCodec<>("PlayerName", Codec.STRING), (metaData, value) -> metaData.playerName = value, (config) -> config.playerName).add()
+            .build();
+
+    public static final KeyedCodec<BookData> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);
+
+    private String playerUUID = "";
+    private String playerName = "";
+    public String getPlayerUUID() {
+        return this.playerUUID;
+    }
+
+    public void setPlayerUUID(String playerUUID) {
+        this.playerUUID = playerUUID;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+}

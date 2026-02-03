@@ -1,4 +1,4 @@
-package dev.rm20.anglersalmanac.Database;
+package dev.rm20.anglersalmanac.AlmanacBook;
 
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AlmanacDatabase {
-    private static final String DB_PATH = "mods/AnglersAlmanac/Data/almanac.db";
+    private static final String DB_PATH = "mods/dev.rm20_AnglersAlmanac/Data/almanac.db";
     private Connection connection;
 
     public AlmanacDatabase() {
@@ -17,18 +17,20 @@ public class AlmanacDatabase {
 
     private void init() {
         try {
-            File dir = new File("mods/AnglersAlmanac/Data/");
+            File dir = new File("mods/dev.rm20_AnglersAlmanac/Data/");
             if (!dir.exists()) dir.mkdirs();
-            try {
-                Class.forName("org.sqlite.JDBC");
-            } catch (ClassNotFoundException e) {
-                System.err.println("[AnglersAlmanac] SQLite Driver not found in classpath!");
-                return;
+
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+
+            // Optimization: Enable WAL mode to allow concurrent reads/writes
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute("PRAGMA journal_mode=WAL;");
+                stmt.execute("PRAGMA synchronous=NORMAL;");
             }
 
-            connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
             createTables();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -81,4 +83,35 @@ public class AlmanacDatabase {
             e.printStackTrace();
         }
     }
+
+    public PlayerStatsData getPlayerStats(String uuid) {
+        PlayerStatsData data = new PlayerStatsData();
+        try {
+            // Get total catches
+            var psTotal = connection.prepareStatement("SELECT total_catches FROM players WHERE uuid = ?");
+            psTotal.setString(1, uuid);
+            ResultSet rs1 = psTotal.executeQuery();
+            if (rs1.next()) data.totalCatches = rs1.getInt("total_catches");
+
+            // Get Top 10 fish
+            var psTop = connection.prepareStatement(
+                    "SELECT fish_id, count FROM catches WHERE player_uuid = ? ORDER BY count DESC LIMIT 10");
+            psTop.setString(1, uuid);
+            ResultSet rs2 = psTop.executeQuery();
+            while (rs2.next()) {
+                data.topFish.add(new FishEntry(rs2.getString("fish_id"), rs2.getInt("count")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
+    // Simple POJO to hold the results
+    public static class PlayerStatsData {
+        public int totalCatches = 0;
+        public List<FishEntry> topFish = new ArrayList<>();
+        public int legendaryCount;
+    }
+    public static record FishEntry(String name, int count) {}
 }

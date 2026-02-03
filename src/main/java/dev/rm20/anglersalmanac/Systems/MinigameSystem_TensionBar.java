@@ -28,6 +28,7 @@ import dev.rm20.anglersalmanac.components.BobberComponent;
 import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.models.FishingRodData;
+import dev.rm20.anglersalmanac.utils.FishLootManager;
 import dev.rm20.anglersalmanac.utils.SoundUtils;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntPredicate;
@@ -81,7 +82,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
             case SUCCESS:
                 AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
                 // Deal rewards.
-                String lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
+                FishLootManager lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
                 MinigameManager.DropLoot(lootID, player, commandBuffer,game.bobberRef);
 
                 // Finish fishing.

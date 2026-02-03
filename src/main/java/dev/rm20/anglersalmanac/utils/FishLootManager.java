@@ -105,7 +105,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     public Habitats getHabitats() { return habitats; }
     public int getWeight() { return weight; }
     public boolean isGlobal() { return isGlobal; }
-
+    public String getName() {return name;}
     // Classes used by BuilderCodec
 
     public static class Habitats {

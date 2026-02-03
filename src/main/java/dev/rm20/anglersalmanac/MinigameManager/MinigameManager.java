@@ -93,7 +93,7 @@ public class MinigameManager {
     }
 
 
-    public static String FirstRoll(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
+    public static FishLootManager FirstRoll(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
         AnglersAlmanac plugin = AnglersAlmanac.getInstance();
         Store<EntityStore> store = bobberRef.getStore();
 
@@ -146,8 +146,8 @@ public class MinigameManager {
 
         //TODO 2nd roll depending on minigame
 
-        return lootID;
-
+        //return lootID;
+        return lootEntry;
         /*
         //Drop loot
         if(lootID ==null) return;
@@ -172,15 +172,16 @@ public class MinigameManager {
 
     }
 
-    public static void DropLoot(String lootID, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef){
-        if(lootID ==null) return;
+    public static void DropLoot(FishLootManager loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef){
+        if(loot ==null) return;
+        if(loot.getItemID() == null) return;
         ItemStack fishStack;
-        fishStack = InventoryHelper.createItem(lootID);
+        fishStack = InventoryHelper.createItem(loot.getItemID());
         if (fishStack == null) {
             return;
         }
         DropItem(fishStack, player, commandBuffer, bobberRef);
-        SaveLoot(player,lootID);
+        SaveLoot(player,loot.getName());
     }
 
     public static void SaveLoot(Player player, String FishId)

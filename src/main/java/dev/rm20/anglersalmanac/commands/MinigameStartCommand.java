@@ -9,9 +9,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.pages.PageManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.rm20.anglersalmanac.Database.StatUiPage;
-import dev.rm20.anglersalmanac.MinigameManager.SkillCheck.LinearSkillPage;
-import dev.rm20.anglersalmanac.MinigameManager.SkillCheck.SkillCheckPage;
+import dev.rm20.anglersalmanac.AlmanacBook.StatUiPage;
 import dev.rm20.anglersalmanac.registration.CommandInfo;
 
 import javax.annotation.Nonnull;
