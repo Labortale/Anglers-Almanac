@@ -3,6 +3,7 @@ package dev.rm20.anglersalmanac.metadata;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import dev.rm20.anglersalmanac.utils.FishLootManager;
 
 import java.util.UUID;
 

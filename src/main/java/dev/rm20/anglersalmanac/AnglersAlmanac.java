@@ -4,6 +4,7 @@ import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
+import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -46,16 +47,28 @@ public class AnglersAlmanac extends JavaPlugin {
         return instance;
     }
 
+
     @Override
     protected void setup() {
         LOGGER.atInfo().log("Setting up plugin " + this.getName());
         RegisterManager.registerCommands(this);
+
+        // Register FishLoot asset.
         AssetRegistry.register(HytaleAssetStore.builder(FishLootManager.class, new DefaultAssetMap<String, FishLootManager>())
                 .setPath("AnglersAlmanac")
                 .setCodec(FishLootManager.CODEC)
                 .setKeyFunction(FishLootManager::getId)
                 .build()
         );
+
+        // Register FishingRodItem asset.
+        AssetRegistry.register(HytaleAssetStore.builder(Item.class, new DefaultAssetMap<String, Item>())
+                .setPath("AnglersAlmanac")
+                .setCodec(FishingRodItem.CODEC)
+                .setKeyFunction(Item::getId)
+                .build()
+        );
+
 
         // Register Components
         bobberComponent = this.getEntityStoreRegistry().registerComponent(BobberComponent.class, BobberComponent::new);
