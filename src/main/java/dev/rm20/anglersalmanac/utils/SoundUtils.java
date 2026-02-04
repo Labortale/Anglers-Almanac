@@ -53,7 +53,7 @@ public class SoundUtils {
             updates.put(soundIndex, modifiedSound);
             UpdateSoundEvents packet = new UpdateSoundEvents(UpdateType.AddOrUpdate, assetMap.getNextIndex(), updates);
             playerRef.getPacketHandler().write(packet);
-            AnglersAlmanac.LOGGER.atInfo().log("Changing sound asset volume to %s", newVolume);
+            //AnglersAlmanac.LOGGER.atInfo().log("Changing sound asset volume to %s", newVolume);
         } catch (Exception e) {
             AnglersAlmanac.LOGGER.atWarning().log("Changing sound volume failed: " + e.getMessage());
         }

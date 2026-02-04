@@ -47,7 +47,7 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
                     fishingRod = heldItem;
                 }
                 if (meta == null || !Objects.requireNonNull(uuidComponent).getUuid().equals(meta.getBoundBobber())) {
-                    AnglersAlmanac.getInstance().getLogger().atInfo().log("Removed bobber - Rod swapped or dropped");
+                    //AnglersAlmanac.getInstance().getLogger().atInfo().log("Removed bobber - Rod swapped or dropped");
                     //commandBuffer.removeEntity(archetypeChunk.getReferenceTo(i), RemoveReason.REMOVE);
                     assert fishingRod != null;
                     //AnglersAlmanac.getInstance().getLogger().atInfo().log(fishingRod.toString());

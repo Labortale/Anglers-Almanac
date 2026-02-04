@@ -74,12 +74,12 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 game.stateTrigger = MinigameComponent_TensionBar.Trigger.NOTRIGGER;
                 break;
             case FAIL:
-                AnglersAlmanac.LOGGER.atInfo().log("YOU FAIL");
+                //AnglersAlmanac.LOGGER.atInfo().log("YOU FAIL");
                 // Reel in the rod which the bobber owner is using.
                 LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
             case SUCCESS:
-                AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
+                //AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
                 // Deal rewards.
                 String lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
                 MinigameManager.DropLoot(lootID, player, commandBuffer,game.bobberRef);

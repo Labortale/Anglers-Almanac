@@ -138,7 +138,7 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
 
     public void despawnSelf(World world){
 
-        AnglersAlmanac.LOGGER.atInfo().log("Fishing Minigame is despawning itself.");
+        //AnglersAlmanac.LOGGER.atInfo().log("Fishing Minigame is despawning itself.");
 
         Store<EntityStore> store = world.getEntityStore().getStore();
 
@@ -218,7 +218,7 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
         World world = store.getExternalData().getWorld();
         world.execute(() -> {
             store.addEntity(fishModelEntity, AddReason.SPAWN);
-            AnglersAlmanac.LOGGER.atInfo().log("Spawned fish model at: %s", fishModelEntity.getComponent(TransformComponent.getComponentType()).getPosition());
+            //AnglersAlmanac.LOGGER.atInfo().log("Spawned fish model at: %s", fishModelEntity.getComponent(TransformComponent.getComponentType()).getPosition());
         });
 
 
@@ -254,7 +254,7 @@ public class MinigameComponent_TensionBar implements Component<EntityStore> {
         // Spawn the model in the world.
         world.execute(() -> {
             store.addEntity(barModelEntity, AddReason.SPAWN);
-            AnglersAlmanac.LOGGER.atInfo().log("Spawned bar model at: %s", barModelEntity.getComponent(TransformComponent.getComponentType()).getPosition());
+            //AnglersAlmanac.LOGGER.atInfo().log("Spawned bar model at: %s", barModelEntity.getComponent(TransformComponent.getComponentType()).getPosition());
         });
 
     }

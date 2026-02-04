@@ -63,11 +63,11 @@ public class MinigameManager {
     }
 
     public static void CancelGame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef){
-        AnglersAlmanac.LOGGER.atInfo().log("Selecting Minigame to cancel:");
+        //AnglersAlmanac.LOGGER.atInfo().log("Selecting Minigame to cancel:");
     // Select which minigame to use from the config and cancel it.
         switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
             case "TensionBar":
-                AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
+                //AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
                 commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).despawnSelf(commandBuffer.getExternalData().getWorld());
                 break;
             case "NoMinigame":
@@ -141,7 +141,7 @@ public class MinigameManager {
             return null;
         }
         String lootID = lootEntry.getItemID();
-        plugin.getLogger().atInfo().log(lootID);
+        //plugin.getLogger().atInfo().log(lootID);
 
         //TODO 2nd roll depending on minigame
 
