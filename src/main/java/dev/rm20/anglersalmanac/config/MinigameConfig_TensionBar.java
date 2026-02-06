@@ -95,4 +95,8 @@ public class MinigameConfig_TensionBar {
         CODEC = codecBuilder.build();
     }
     public static final KeyedCodec<MinigameConfig_TensionBar> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);
+
+    public static MinigameConfig_TensionBar clone(){
+
+    }
 }

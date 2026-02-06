@@ -12,6 +12,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.logger.HytaleLogger;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
+import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.models.FishingContext;
 
 import java.util.*;
@@ -252,5 +253,9 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
         }
 
         return this.weight;
+    }
+
+    public MinigameStats getMinigameStats(){
+        return minigameStats;
     }
 }

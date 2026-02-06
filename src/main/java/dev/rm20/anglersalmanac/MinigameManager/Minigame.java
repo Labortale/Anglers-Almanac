@@ -57,13 +57,31 @@ public abstract class Minigame {
        return PerformanceRating.FAIL;
     }
 
-    /*
+
     public abstract void applyDifficultyModifer(FishLootManager.MinigameStats stats);
     public abstract void applyFishBehaviourModifer(FishLootManager.MinigameStats stats);
     public abstract void applyFishStaminaModifer(FishLootManager.MinigameStats stats);
-    public abstract void applyRodSizeModifer(FishingRodData rodData);
-    public abstract void applyRodDifficultyModifer(FishingRodData rodData);
-    public abstract void applyRodStaminaModifer(FishingRodData rodData);
-     */
+    public void applyFishModifiers(FishLootManager.MinigameStats stats){
+        applyDifficultyModifer(stats);
+        applyFishBehaviourModifer(stats);
+        applyFishStaminaModifer(stats);
+    }
+
+    public abstract void applyRodControlModifer(RodStats rodStats);
+    public abstract void applyRodDifficultyModifer(RodStats rodStats);
+    public abstract void applyRodForgivenessModifer(RodStats rodStats);
+    public abstract void applyRodStaminaModifer(RodStats rodStats);
+    public abstract void applyRodFishWeightModifer(RodStats rodStats);
+    public abstract void applyRodRarityModifer(RodStats rodStats);
+    public void applyRodModifiers(RodStats rodStats){
+        applyRodControlModifer(rodStats);
+        applyRodDifficultyModifer(rodStats);
+        applyRodForgivenessModifer(rodStats);
+        applyRodStaminaModifer(rodStats);
+        applyRodFishWeightModifer(rodStats);
+        applyRodRarityModifer(rodStats);
+    }
+
+
 
 }

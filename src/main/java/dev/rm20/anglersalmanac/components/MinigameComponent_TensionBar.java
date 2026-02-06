@@ -9,17 +9,19 @@ import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.*;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
-import com.hypixel.hytale.server.core.modules.physics.SimplePhysicsProvider;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.MinigameManager.Minigame;
 import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
+import dev.rm20.anglersalmanac.MinigameManager.RodStats;
+import dev.rm20.anglersalmanac.config.MinigameConfig_TensionBar;
+import dev.rm20.anglersalmanac.utils.FishLootManager;
+import dev.rm20.anglersalmanac.utils.MinigameRodStats;
 import dev.rm20.anglersalmanac.utils.TransformUtils;
 import org.jspecify.annotations.NonNull;
 
@@ -56,6 +58,8 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     public String[] reelInSounds = {"AA_Fishing_Reel_Slow0", "AA_Fishing_Reel_Slow1", "AA_Fishing_Reel_Slow2", "AA_Fishing_Reel_Slow3"};
     public String[] escapeSounds = {"AA_Fishing_Line_Tension0", "AA_Fishing_Line_Tension1", "AA_Fishing_Line_Tension2", "AA_Fishing_Line_Tension3"};
 
+    MinigameConfig_TensionBar gameConfig;
+
     // Used for calculating performance:
     public int ticksReeling = 0;
     public int ticksEscaping = 0;
@@ -84,7 +88,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
 
 
-    public static UUID spawnMinigame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> playerRef, Ref<EntityStore> bobberRef){
+    public static UUID spawnMinigame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> playerRef, Ref<EntityStore> bobberRef, String rodAssetId){
         Vector3d bobberPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
 
         // Set up and spawn minigame entity:
@@ -93,25 +97,35 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         UUID id = UUIDUtil.generateVersion3UUID();
         holder.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(id));
 
-        // Minigame
+        //  --- Minigame --------
         MinigameComponent_TensionBar game = new MinigameComponent_TensionBar(playerRef, bobberRef, id);
+            // Set minigame config as defaults.
+        game.gameConfig = AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get();
+            // Assign fish and apply modifiers.
+        game.fishHooked = MinigameManager.FirstRoll(bobberRef, commandBuffer.getComponent(playerRef, Player.getComponentType()),commandBuffer, commandBuffer.getComponent(bobberRef, BobberComponent.getComponentType()).getWaterDepth());
+        assert game.fishHooked != null;
+        game.applyFishModifiers(game.fishHooked.getMinigameStats());
+            // Apply rod modifiers.
+        AnglersAlmanac.LOGGER.atInfo().log("RodAssetId String = %s", rodAssetId);
+        RodStats rodStats = MinigameRodStats.getRodStatsFromRodId(rodAssetId);
+        game.applyRodModifiers(rodStats);
         holder.addComponent(MinigameComponent_TensionBar.COMPONENT_TYPE, game);
 
-        // Set the fish on the hook.
-        game.fishHooked = MinigameManager.FirstRoll(bobberRef, commandBuffer.getComponent(playerRef, Player.getComponentType()),commandBuffer, commandBuffer.getComponent(bobberRef, BobberComponent.getComponentType()).getWaterDepth());
+        //-----------------------
 
-        // Apply modifiers to the minigame based on fish and rod.
-
-        commandBuffer.getExternalData().getWorld().execute( () -> {
-            commandBuffer.addEntity(holder, AddReason.SPAWN);
-        });
+        // DEBUG
+        AnglersAlmanac.LOGGER.atInfo().log("Fish diffiucly = %s, behaviour = %s, stamina = %s", game.fishHooked.getMinigameStats().difficulty, game.fishHooked.getMinigameStats().behavior, game.fishHooked.getMinigameStats().stamina);
 
 
         // Adjust minigame initialisation variables:
         double distanceFromPlayer = bobberPos.distanceTo(commandBuffer.getComponent(playerRef, TransformComponent.getComponentType()).getPosition());
         game.minigameScale = Math.clamp((float)distanceFromPlayer * AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMultiplier, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMin, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameScaleMax);
 
-        game.spawnMinigameModels(commandBuffer);
+        commandBuffer.getExternalData().getWorld().execute( () -> {
+            commandBuffer.addEntity(holder, AddReason.SPAWN);
+        });
+
+        game.spawnMinigameAdditionals(commandBuffer);
 
         return id;
     }
@@ -157,11 +171,11 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         });
     }
 
-    public void spawnMinigameModels(CommandBuffer<EntityStore> commandBuffer){
+    public void spawnMinigameAdditionals(CommandBuffer<EntityStore> commandBuffer){
 
         Vector3d bobberPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
 
-        // Also spawn audio
+        // Spawn audio player
         AudioPlayerComponent apc = AudioPlayerComponent.spawnNewAudioPlayerEntity(bobberPos, commandBuffer);
         apc.addSounds(reelInSounds);
         apc.allowedOverlap = 30000000;
@@ -306,5 +320,54 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         int performancePercentage = (int)( ((float)ticksReeling  / (float)totalGameTicks) * 100);
         AnglersAlmanac.LOGGER.atInfo().log("Minigame performance percentage = %s", performancePercentage);
         return performancePercentage;
+    }
+
+// ----------  GAME MODIFIER ADAPTION  ----------------------------------------------------------------------------
+// ================================================================================================================
+
+    @Override
+    public void applyDifficultyModifer(FishLootManager.MinigameStats stats) {
+        gameConfig.fishMaxVeocity += stats.difficulty/20;
+        AnglersAlmanac.LOGGER.atInfo().log("Applying fish difficulty! stat: %s, fishMaxVelocity: %s", stats.difficulty, gameConfig.fishMaxVeocity);
+    }
+
+    @Override
+    public void applyFishBehaviourModifer(FishLootManager.MinigameStats stats) {
+        AnglersAlmanac.LOGGER.atInfo().log("Applying fish behaviour!");
+    }
+
+    @Override
+    public void applyFishStaminaModifer(FishLootManager.MinigameStats stats) {
+        AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina!");
+    }
+
+    @Override
+    public void applyRodControlModifer(RodStats rodStats) {
+        AnglersAlmanac.LOGGER.atInfo().log("Applying rod control");
+    }
+
+    @Override
+    public void applyRodDifficultyModifer(RodStats rodStats) {
+        AnglersAlmanac.LOGGER.atInfo().log("Applying rod difficulty");
+    }
+
+    @Override
+    public void applyRodForgivenessModifer(RodStats rodStats) {
+        AnglersAlmanac.LOGGER.atInfo().log("Applying rod forgiveness");
+    }
+
+    @Override
+    public void applyRodStaminaModifer(RodStats rodStats) {
+        AnglersAlmanac.LOGGER.atInfo().log("Applying rod stamina");
+    }
+
+    @Override
+    public void applyRodFishWeightModifer(RodStats rodStats) {
+        AnglersAlmanac.LOGGER.atInfo().log("Applying fish weight modfifer");
+    }
+
+    @Override
+    public void applyRodRarityModifer(RodStats rodStats) {
+        AnglersAlmanac.LOGGER.atInfo().log("Applying fish rarity modifier");
     }
 }

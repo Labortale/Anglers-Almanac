@@ -31,10 +31,10 @@ import java.util.UUID;
 public class MinigameManager {
     public static void StartGame(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth)
     {
-        // Set rod mode
-        //TODO add fail safes for hotbar item changing.
+
         //Assuming active hotbar item has not changed.
         ItemStack fishingRod = player.getInventory().getActiveHotbarItem();
+
 
         // Select which minigame to use from the config and set it up.
         switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
@@ -46,7 +46,7 @@ public class MinigameManager {
                     break;
                 }
                 Inventory inv  = player.getInventory();
-                UUID minigameID = MinigameComponent_TensionBar.spawnMinigame(commandBuffer,player.getReference(), bobberRef);
+                UUID minigameID = MinigameComponent_TensionBar.spawnMinigame(commandBuffer,player.getReference(), bobberRef, fishingRod.getItemId());
                 LaunchBobberInteraction.updateMetadata(inv, inv.getActiveHotbarSlot(), inv.getActiveHotbarItem(), meta.getBoundBobber(), minigameID, 1);
                 break;
             case "NoMinigame":

@@ -22,6 +22,7 @@ import dev.rm20.anglersalmanac.interactions.MinigameInteraction;
 import dev.rm20.anglersalmanac.registration.RegisterManager;
 import dev.rm20.anglersalmanac.registration.SystemRegisteration;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
+import dev.rm20.anglersalmanac.utils.MinigameRodStats;
 
 
 import javax.annotation.Nonnull;
@@ -61,11 +62,11 @@ public class AnglersAlmanac extends JavaPlugin {
                 .build()
         );
 
-        // Register FishingRodItem asset.
-        AssetRegistry.register(HytaleAssetStore.builder(Item.class, new DefaultAssetMap<String, Item>())
+        // Register MinigameRodStats asset.
+        AssetRegistry.register(HytaleAssetStore.builder(MinigameRodStats.class, new DefaultAssetMap<String, MinigameRodStats>())
                 .setPath("AnglersAlmanac")
-                .setCodec(FishingRodItem.CODEC)
-                .setKeyFunction(Item::getId)
+                .setCodec(MinigameRodStats.CODEC)
+                .setKeyFunction(MinigameRodStats::getId)
                 .build()
         );
 
@@ -90,7 +91,11 @@ public class AnglersAlmanac extends JavaPlugin {
         } else {
             LOGGER.atInfo().log("FishLootManager registered via Builder. Assets will be loaded during the asset phase.");
         }
+
+        // Create mod config files.
         MOD_CONFIG.save();
+        MINIGAME_CONFIG_TENSIONBAR = this.withConfig(MinigameConfig_TensionBar.CODEC);
+        MINIGAME_CONFIG_TENSIONBAR.save();
 
     }
 

@@ -126,7 +126,7 @@ public class AudioPlayerComponent implements Component<EntityStore> {
     /// Can be run in a system tick. Will only play the next sound if the current sound has concluded.
     public void doLoopAll(boolean pickRandom, Vector3d pos, @Nonnull ComponentAccessor<EntityStore> componentAccessor){
         if(isCurrentlyPlaying()) {
-            AnglersAlmanac.LOGGER.atInfo().log("Sound already playing; skipping");
+            //AnglersAlmanac.LOGGER.atInfo().log("Sound already playing; skipping");
             return;
         }
         if(pickRandom){

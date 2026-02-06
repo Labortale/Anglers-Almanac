@@ -3,8 +3,11 @@ package dev.rm20.anglersalmanac.metadata;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import dev.rm20.anglersalmanac.MinigameManager.RodStats;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class FishingRodData {
@@ -13,6 +16,7 @@ public class FishingRodData {
             .append(new KeyedCodec<>("BoundBobber", Codec.UUID_BINARY), (metaData, value) -> metaData.boundBobber = value, (config) -> config.boundBobber).add()
             .append(new KeyedCodec<>("BoundMinigame", Codec.UUID_BINARY), (metaData, value) -> metaData.boundMinigame = value, (config) -> config.boundMinigame).add()
             .append(new KeyedCodec<>("Mode", Codec.INTEGER), (metaData, value) -> metaData.mode = value, (config) -> config.mode).add()
+            //.append(RodStats.KEYED_CODEC, (s, v) -> s.rodStats = v, (g) -> g.rodStats).add()
             .build();
     public static final KeyedCodec<FishingRodData> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);
 
@@ -40,9 +44,16 @@ public class FishingRodData {
         this.mode = i;
     }
 
-    public float difficultyMultiplier =  1.2f;
-    public float staminaModifier =  -10f;
-    public float rarityBoost  =1.2f;
-    public float sizeMultiplier = 1.15f;
+    /*private RodStats rodStats;
+    public RodStats getRodStats() {return this.rodStats;
+    }
+    public void setRodStats(RodStats stats) {
+        this.rodStats = stats;
+    }
 
+    private List<RodStats> attachmentStats = new ArrayList<>();
+    public List<RodStats> getAttachmentStats(){ return attachmentStats; }
+    public void setAttachmentStats(List<RodStats> attachmentStats) {this.attachmentStats = attachmentStats;}
+
+     */
 }
