@@ -61,7 +61,7 @@ dependencies {
 }
 
 shadowJar {
-    archiveClassifier.set('')1
+    archiveClassifier.set('')
     minimize()
 }
 

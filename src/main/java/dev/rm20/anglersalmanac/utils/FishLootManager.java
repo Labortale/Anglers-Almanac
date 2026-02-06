@@ -169,6 +169,13 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
         return possibleLoot.get(0);
     }
 
+    public static FishLootManager getFishData(String id)
+    {
+        return getAllLoot().stream()
+                .filter(loot -> loot.id.equalsIgnoreCase(id)).toList().getFirst();
+
+    }
+
     private static boolean isEligible(FishLootManager loot, FishingContext ctx) {
         Habitats hab = loot.getHabitats();
         if (hab == null) return true;

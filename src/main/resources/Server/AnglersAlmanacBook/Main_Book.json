@@ -12,10 +12,18 @@
           "UiFile": "Almanac/AlmanacStats.ui"
         }
       ],
-      "ZoneName": "Stats"
+      "ZoneName": "AlmanacStats"
     },
     {
-      "ZoneName": "Global"
+      "ZoneName": "Global",
+      "Pages": [
+        {
+          "Pages": [
+            {}
+          ],
+          "UiFile": "sadf"
+        }
+      ]
     }
   ]
 }

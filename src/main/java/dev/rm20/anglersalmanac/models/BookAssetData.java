@@ -11,6 +11,9 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<String, BookAssetData>> {
@@ -77,5 +80,16 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
 
     @Override public String getId() { return id; }
 
+    public List<SpreadTemplate> getFlattenedPages() {
+        List<SpreadTemplate> flattened = new ArrayList<>();
+        if (habitats == null) return flattened;
+
+        for (habitatsInfo habitat : habitats) {
+            if (habitat.pages != null) {
+                flattened.addAll(Arrays.asList(habitat.pages));
+            }
+        }
+        return flattened;
+    }
 
 }

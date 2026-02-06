@@ -1,0 +1,101 @@
+
+$Common = "Common.ui";
+
+@Background = PatchStyle(TexturePath: "../book_2.png");
+@FishTexture = PatchStyle(TexturePath: "blueTang_1.png");
+@Stamp = PatchStyle(TexturePath: "Stamps/uncommon.png");
+
+Group #AlmanacStats {
+  Anchor: (Width: 1200, Height: 872);
+  Group #background {
+    Background: @Background;
+  }
+
+  // LEFT PAGE
+
+  Label #Header {
+    Anchor: (Top: 60, Left: 150);
+    Style: (TextColor: #3A3A3A, FontSize: 32, RenderBold: true);
+    Text: "Blue Tang";
+  }
+
+  Group #CounterSection {
+    Anchor: (Top: 100, Left: 150, Width: 380);
+    Label #CountLabel { Style: (TextColor: #7A6652, FontSize: 18, RenderBold: true); Text: "Total caught:"; }
+    Label #CountNumber { Anchor: (Left: 115); Style: (TextColor: #3A3A3A, FontSize: 18); Text: "14"; }
+  }
+
+  Group #FishContainer {
+    Anchor: (Top: 140, Left: 150, Width: 250, Height: 250);
+    Group #FishImage { Background: @FishTexture; }
+  }
+
+  Group #QuickStats {
+    Anchor: (Top: 170, Left: 430, Width: 180);
+    Label #FamilyLabel { Style: (TextColor: #7A6652, FontSize: 14, RenderBold: true); Text: "Species Class:"; }
+    Label #Family { Anchor: (Top: 20); Style: (TextColor: #5A4D41, FontSize: 20); Text: "Tang Family"; }
+  }
+
+  Label #Description {
+    Anchor: (Top: 390, Left: 140, Width: 400, Height: 200);
+    Style: (TextColor: #494950, FontSize: 19, Wrap: true);
+    Text: "Blue to deep purple ovoid body with white or yellow spine along caudal peduncle. Intermediate form has a blue body and yellow caudal fin.";
+  }
+
+  Group #HabitatSection {
+    Anchor: (Top: 575, Left: 140, Width: 380);
+    Label #HabitatTitle { Style: (TextColor: #2A5A82, FontSize: 18, RenderBold: true); Text: "LURKS WITHIN:"; }
+    Label #HabitatList { Anchor: (Top: 25); Style: (TextColor: #494950, FontSize: 17); Text: "• Open Oceans
+• Deep Trenches
+• Coastal Beaches"; }
+  }
+
+  Group #Stamp {
+    Anchor: (Top: 600, Left: 375, Width: 200, Height: 200);
+    Group #StampImage { Background: @Stamp; }
+  }
+
+  // RIGHT PAGE
+
+  Label #Header2 {
+    Anchor: (Top: 60, Left: 680);
+    Style: (TextColor: #3A3A3A, FontSize: 32, RenderBold: true);
+    Text: "Yellow Tang";
+  }
+
+  Group #CounterSection2 {
+    Anchor: (Top: 100, Left: 680, Width: 380);
+    Label #CountLabel2 { Style: (TextColor: #7A6652, FontSize: 18, RenderBold: true); Text: "Total caught:"; }
+    Label #CountNumber2 { Anchor: (Left: 115); Style: (TextColor: #3A3A3A, FontSize: 18); Text: "8"; }
+  }
+
+  Group #FishContainer2 {
+    Anchor: (Top: 140, Left: 680, Width: 250, Height: 250);
+    Group #FishImage2 { Background: @FishTexture; }
+  }
+
+  Group #QuickStats2 {
+    Anchor: (Top: 170, Left: 960, Width: 180);
+    Label #FamilyLabel2 { Style: (TextColor: #7A6652, FontSize: 14, RenderBold: true); Text: "Species Class:"; }
+    Label #Family2 { Anchor: (Top: 20); Style: (TextColor: #5A4D41, FontSize: 20); Text: "Tang Family"; }
+  }
+
+  Label #Description2 {
+    Anchor: (Top: 390, Left: 670, Width: 400, Height: 200);
+    Style: (TextColor: #494950, FontSize: 19, Wrap: true);
+    Text: "Bright yellow body with a white spine. Often found in shallower reefs compared to their blue cousins. Highly active during daylight hours.";
+  }
+
+  Group #HabitatSection2 {
+    Anchor: (Top: 575, Left: 670, Width: 380);
+    Label #HabitatTitle2 { Style: (TextColor: #2A5A82, FontSize: 18, RenderBold: true); Text: "LURKS WITHIN:"; }
+    Label #HabitatList2 { Anchor: (Top: 25); Style: (TextColor: #494950, FontSize: 17); Text: "• Tropical Reefs
+• Sunlit Lagoons
+• Coral Gardens"; }
+  }
+
+  Group #Stamp2 {
+    Anchor: (Top: 600, Left: 905, Width: 200, Height: 200);
+    Group #StampImage2 { Background: @Stamp; }
+  }
+}

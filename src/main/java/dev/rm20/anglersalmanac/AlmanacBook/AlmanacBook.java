@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.StampedLock;
 
+//TODO: what ever I was doing here.
 public class AlmanacBook {
     public static void registerAlmanacBase() {
         Item baseItem = Item.getAssetMap().getAsset("Almanac_Book");

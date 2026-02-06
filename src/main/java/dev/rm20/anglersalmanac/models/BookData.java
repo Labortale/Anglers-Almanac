@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import org.bson.types.Code;
 
 import java.util.UUID;
 
@@ -14,12 +15,24 @@ public class BookData {
     public static final BuilderCodec<BookData> CODEC = BuilderCodec.builder(BookData.class, BookData::new)
             .append(new KeyedCodec<>("PlayerUUID", Codec.STRING), (metaData, value) -> metaData.playerUUID = value, (config) -> config.playerUUID).add()
             .append(new KeyedCodec<>("PlayerName", Codec.STRING), (metaData, value) -> metaData.playerName = value, (config) -> config.playerName).add()
+            .append(new KeyedCodec<>("PageNumber", Codec.INTEGER), (metaData, value) -> metaData.pageNumber = value, (config) -> config.pageNumber).add()
             .build();
 
     public static final KeyedCodec<BookData> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);
 
     private String playerUUID = "";
     private String playerName = "";
+
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+
+    private int pageNumber = 0;
+
     public String getPlayerUUID() {
         return this.playerUUID;
     }

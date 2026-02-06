@@ -20,6 +20,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
 import dev.rm20.anglersalmanac.AlmanacBook.StatUiPage;
 import dev.rm20.anglersalmanac.models.BookData;
 
@@ -50,6 +51,7 @@ public class OpenBookInteraction extends SimpleInstantInteraction {
             BookData newData = new BookData();
             newData.setPlayerUUID(uuid.getUuid().toString());
             newData.setPlayerName(player.getDisplayName());
+            newData.setPageNumber(0);
             newBook = heldItem.withMetadata(BookData.KEYED_CODEC, newData);
             byte slot = player.getInventory().getActiveHotbarSlot();
             player.getInventory().getHotbar().replaceItemStackInSlot(slot, heldItem, newBook);
@@ -59,27 +61,30 @@ public class OpenBookInteraction extends SimpleInstantInteraction {
                     uuid.getUuid().toString(),
                     player.getDisplayName()
             );
-            PageManager pageManager = player.getPageManager();
-            StatUiPage statUiPage = new StatUiPage(playerRef1,newData.getPlayerUUID(),player.getDisplayName());
-            pageManager.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
+            BookPageManager.OpenPage(player,1,newData.getPlayerUUID(),player.getDisplayName());
+            //PageManager pageManager = player.getPageManager();
+            //StatUiPage statUiPage = new StatUiPage(playerRef1,newData.getPlayerUUID(),player.getDisplayName());
+            //.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
         }
         else
         {
             PlayerRef playerRef1 = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
-            PageManager pageManager = player.getPageManager();
-            StatUiPage statUiPage = new StatUiPage(playerRef1,data.getPlayerUUID(),player.getDisplayName());
+            //PageManager pageManager = player.getPageManager();
+            //StatUiPage statUiPage = new StatUiPage(playerRef1,data.getPlayerUUID(),player.getDisplayName());
+            //pageManager.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
+            BookPageManager.OpenPage(player,1,data.getPlayerUUID(),player.getDisplayName());
+
             syncCustomBookDisplay(
                     playerRef1,
                     data.getPlayerUUID(),
                     data.getPlayerName()
             );
-            pageManager.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
-
         }
 
     }
 
 
+    //todo
     public static void syncCustomBookDisplay(PlayerRef playerRef, String playerUuid, String playerName) {
         Item baseItem = Item.getAssetMap().getAsset("Almanac_Book");
         String customId = "Almanac_Book_" + playerUuid;

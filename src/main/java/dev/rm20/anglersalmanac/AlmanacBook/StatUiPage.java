@@ -19,14 +19,12 @@ public class StatUiPage extends InteractiveCustomUIPage<DialEventData> {
 
     private String PlayerUUID;
     private String PlayerName;
-    public StatUiPage(PlayerRef playerRef) {
-        super(playerRef, CustomPageLifetime.CanDismiss, DialEventData.CODEC);
-        PlayerUUID = null;
-    }
-    public StatUiPage(PlayerRef playerRef, String playerUUID, String playerName) {
+    private AlmanacDatabase.PlayerStatsData stats;
+    public StatUiPage(PlayerRef playerRef, String playerUUID, String playerName,AlmanacDatabase.PlayerStatsData stats) {
         super(playerRef, CustomPageLifetime.CanDismiss, DialEventData.CODEC);
         PlayerUUID = playerUUID;
         PlayerName = playerName;
+        this.stats = stats;
     }
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder,
@@ -35,8 +33,8 @@ public class StatUiPage extends InteractiveCustomUIPage<DialEventData> {
 
         uiCommandBuilder.append("Almanac/AlmanacStats.ui");
 
-        AlmanacDatabase db = AnglersAlmanac.getInstance().database;
-        AlmanacDatabase.PlayerStatsData stats = db.getPlayerStats(this.PlayerUUID);
+        //AlmanacDatabase db = AnglersAlmanac.getInstance().database;
+        //AlmanacDatabase.PlayerStatsData stats = db.getPlayerStats(this.PlayerUUID);
 
         uiCommandBuilder.set("#TotalFish.TextSpans", Message.raw("Total fish: " + stats.totalCatches));
         uiCommandBuilder.set("#LegendaryCount.TextSpans", Message.raw("Legendary fish: " + stats.legendaryCount));
