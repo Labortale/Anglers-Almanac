@@ -58,7 +58,8 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     public String[] reelInSounds = {"AA_Fishing_Reel_Slow0", "AA_Fishing_Reel_Slow1", "AA_Fishing_Reel_Slow2", "AA_Fishing_Reel_Slow3"};
     public String[] escapeSounds = {"AA_Fishing_Line_Tension0", "AA_Fishing_Line_Tension1", "AA_Fishing_Line_Tension2", "AA_Fishing_Line_Tension3"};
 
-    MinigameConfig_TensionBar gameConfig;
+    public MinigameConfig_TensionBar gameConfig;
+    public FishLootManager.MinigameStats fishStats;
 
     // Used for calculating performance:
     public int ticksReeling = 0;
@@ -327,17 +328,53 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
     @Override
     public void applyDifficultyModifer(FishLootManager.MinigameStats stats) {
-        gameConfig.fishMaxVeocity += stats.difficulty/20;
+        gameConfig.fishMaxVeocity += (float) stats.difficulty / 10;
+        gameConfig.fishChangeDirectionMaxInterval = gameConfig.fishChangeDirectionMaxInterval / ((float) stats.difficulty / 50);
         AnglersAlmanac.LOGGER.atInfo().log("Applying fish difficulty! stat: %s, fishMaxVelocity: %s", stats.difficulty, gameConfig.fishMaxVeocity);
     }
 
     @Override
     public void applyFishBehaviourModifer(FishLootManager.MinigameStats stats) {
+        switch (stats.behavior){
+            case "darting":
+                // Stays still, then max speed, then still again, repeat.
+                // Behaviour is mostly assigned in minigame system when triggering FISHMOVE.
+                gameConfig.fishMinSpeed = 1.0f;
+                break;
+            case "floater":
+                gameConfig.fishBouyancy += gameConfig.fishMaxVeocity * 0.4f;
+                break;
+            case "sinker:":
+                gameConfig.fishBouyancy -= gameConfig.fishMaxVeocity * 0.4f;
+                break;
+            case "heavy_sinker":
+                gameConfig.fishBouyancy -= gameConfig.fishMaxVeocity * 0.7f;
+                break;
+            case "aggressive":
+                // Never slow, turns rapidly.
+                gameConfig.fishMaxVeocity *= 0.9f;
+                gameConfig.fishMinSpeed = 0.7f;
+                gameConfig.fishChangeDirectionMaxInterval *= 0.5f;
+                break;
+            case "erratic":
+                // Changes direction very frequently.
+                gameConfig.fishMaxVeocity *= 0.6f;
+                gameConfig.fishChangeDirectionMaxInterval *= 0.1f;
+                break;
+            case "steady":
+                // Rarely changes direction. Very predictable.
+                gameConfig.fishMaxVeocity *= 0.8f;
+                gameConfig.fishMinSpeed = 0.4f;
+                gameConfig.fishChangeDirectionMaxInterval += 2f;
+                break;
+
+        }
         AnglersAlmanac.LOGGER.atInfo().log("Applying fish behaviour!");
     }
 
     @Override
     public void applyFishStaminaModifer(FishLootManager.MinigameStats stats) {
+
         AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina!");
     }
 

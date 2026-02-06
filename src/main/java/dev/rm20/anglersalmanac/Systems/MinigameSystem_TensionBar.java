@@ -50,12 +50,35 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
 
         switch (game.stateTrigger){
             case FISHMOVE:
-                game.nextFishMoveTime = new Random().nextFloat() * 3f;
+                // Reset timers for the next move.
+                game.nextFishMoveTime = new Random().nextFloat() * game.gameConfig.fishChangeDirectionMaxInterval;
                 game.fishMoveTimer = 0f;
-                float maxFishVel = AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().fishMaxVeocity;
-                game.fishVelocity = (maxFishVel*-1f) + new Random().nextFloat() * (maxFishVel - (maxFishVel*-1f));
-                if(game.fishPos <= 5) game.fishVelocity = Math.abs(game.fishVelocity); // Always ensure that fish moves away from edges if near top / bottom.
-                if(game.fishPos >= 95) game.fishVelocity = Math.abs(game.fishVelocity) * -1f; //  ^
+
+                // Set up important maths parameters.
+                float maxFishVel = game.gameConfig.fishMaxVeocity + game.gameConfig.fishBouyancy;
+                float minFishVel = (maxFishVel*-1f) + game.gameConfig.fishBouyancy;
+                float strength = new Random().nextFloat();
+                strength = Math.clamp(strength, game.gameConfig.fishMinSpeed, 1.0f);
+
+
+                // Override parameters for fish with "darting" behaviour.
+                if(game.fishHooked.getMinigameStats().behavior.equals("darting")){
+                    // Toggle between max speed and stopped.
+                    if(Math.abs(game.fishVelocity) >= game.gameConfig.fishMaxVeocity ){
+                        maxFishVel = game.gameConfig.fishMaxVeocity * 0.2f;
+                        minFishVel = -game.gameConfig.fishMaxVeocity * 0.2f;
+                    }else{
+                        strength = 1.0f;
+                    }
+                }
+
+                // Calculate random movement based on fish parameters.
+                game.fishVelocity = (minFishVel) + strength * (maxFishVel - (minFishVel));
+
+                // Always ensure that fish moves away from edges if near top / bottom.
+                if(game.fishPos <= 5) game.fishVelocity = Math.abs(game.fishVelocity);
+                if(game.fishPos >= 95) game.fishVelocity = Math.abs(game.fishVelocity) * -1f;
+
                 game.stateTrigger = MinigameComponent_TensionBar.Trigger.NOTRIGGER;
                 break;
             case FAIL:

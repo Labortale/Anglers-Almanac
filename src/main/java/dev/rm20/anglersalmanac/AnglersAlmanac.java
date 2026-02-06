@@ -94,7 +94,6 @@ public class AnglersAlmanac extends JavaPlugin {
 
         // Create mod config files.
         MOD_CONFIG.save();
-        MINIGAME_CONFIG_TENSIONBAR = this.withConfig(MinigameConfig_TensionBar.CODEC);
         MINIGAME_CONFIG_TENSIONBAR.save();
 
     }
