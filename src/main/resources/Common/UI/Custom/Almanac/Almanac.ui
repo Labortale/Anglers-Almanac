@@ -1,0 +1,30 @@
+
+@Background = PatchStyle(TexturePath: "book_2.png");
+
+Group #Almanac {
+  Anchor: (Width: 1200, Height: 872);
+
+  Group #background { Background: @Background; }
+
+  // --- NAVIGATION BUTTONS ---
+  Button #PrevPage {
+    TooltipText: "Prev page";
+    Anchor: (Bottom: 40, Left: 50, Width: 100, Height: 50);
+    // Logic: index--
+  }
+
+  Button #NextPage {
+    TooltipText: "Next page";
+    Anchor: (Bottom: 40, Right: 50, Width: 100, Height: 50);
+    // Logic: index++
+  }
+
+  // --- PAGE CONTENT CONTAINERS ---
+  Group #LeftPage {
+    Anchor: (Width: 600, Height: 872, Left: 0);
+  }
+
+  Group #RightPage {
+    Anchor: (Width: 600, Height: 872, Left: 600);
+  }
+}

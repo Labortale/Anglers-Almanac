@@ -1,0 +1,29 @@
+{
+  "Habitats": [
+    {
+      "Pages": [
+        {
+          "IsDoublePage": true,
+          "Pages": [
+            {
+              "ContextData": ""
+            }
+          ],
+          "UiFile": "Almanac/AlmanacStats.ui"
+        }
+      ],
+      "ZoneName": "AlmanacStats"
+    },
+    {
+      "ZoneName": "Global",
+      "Pages": [
+        {
+          "Pages": [
+            {}
+          ],
+          "UiFile": "sadf"
+        }
+      ]
+    }
+  ]
+}

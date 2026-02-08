@@ -29,10 +29,11 @@ public class MinigameStartCommand extends AbstractPlayerCommand {
     protected void execute(@Nonnull CommandContext commandContext, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
         if(commandContext.sender() instanceof Player player)
         {
-            PageManager pageManager = player.getPageManager();
-            //SkillCheckPage minigamePage = new SkillCheckPage(playerRef);
-            LinearSkillPage minigamePage = new LinearSkillPage(playerRef);
-            pageManager.openCustomPage(ref, store, minigamePage);
+            return;
+//            PageManager pageManager = player.getPageManager();
+//            SkillCheckPage minigamePage = new SkillCheckPage(playerRef);
+//            LinearSkillPage minigamePage = new LinearSkillPage(playerRef);
+//            pageManager.openCustomPage(ref, store, minigamePage);
 
         }
     }

@@ -6,6 +6,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -63,11 +64,11 @@ public class MinigameManager {
     }
 
     public static void CancelGame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef){
-        AnglersAlmanac.LOGGER.atInfo().log("Selecting Minigame to cancel:");
+        //AnglersAlmanac.LOGGER.atInfo().log("Selecting Minigame to cancel:");
     // Select which minigame to use from the config and cancel it.
         switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
             case "TensionBar":
-                AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
+                //AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
                 commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).despawnSelf(commandBuffer.getExternalData().getWorld());
                 break;
             case "NoMinigame":
@@ -141,12 +142,12 @@ public class MinigameManager {
             return null;
         }
         String lootID = lootEntry.getItemID();
-        plugin.getLogger().atInfo().log(lootID);
+        //plugin.getLogger().atInfo().log(lootID);
 
         //TODO 2nd roll depending on minigame
 
+        //return lootID;
         return lootEntry;
-
         /*
         //Drop loot
         if(lootID ==null) return;
@@ -163,22 +164,37 @@ public class MinigameManager {
 
     public static void DropItem(ItemStack loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef) {
 
+
         assert player.getReference() != null;
-        ItemUtils.throwItem(player.getReference(), loot, 0f, commandBuffer);
+        TransformComponent transform = player.getReference().getStore().getComponent(player.getReference(), TransformComponent.getComponentType());
+
+        ItemUtils.interactivelyPickupItem(player.getReference(), loot, transform.getPosition(),commandBuffer);
 
         //TODO
         //Rework to make it look like the fish is coming from the bobber and fly to the player?
 
     }
 
-    public static void DropLoot(String lootID, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef){
-        if(lootID ==null) return;
+    public static void DropLoot(FishLootManager loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef){
+        if(loot ==null) return;
+        if(loot.getItemID() == null) return;
         ItemStack fishStack;
-        fishStack = InventoryHelper.createItem(lootID);
+        fishStack = InventoryHelper.createItem(loot.getItemID());
         if (fishStack == null) {
             return;
         }
         DropItem(fishStack, player, commandBuffer, bobberRef);
+        SaveLoot(player,loot.getName());
+    }
+
+    public static void SaveLoot(Player player, String FishId)
+    {
+        //save to database
+        var playerRef = player.getReference();
+        assert playerRef != null;
+        UUIDComponent uuid = playerRef.getStore().getComponent(playerRef, UUIDComponent.getComponentType());
+        assert uuid != null;
+        AnglersAlmanac.getInstance().database.saveCatch(uuid.getUuid().toString(), FishId);
     }
 
 }

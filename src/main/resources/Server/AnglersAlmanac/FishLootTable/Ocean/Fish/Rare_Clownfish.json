@@ -1,8 +1,8 @@
 {
-  "ItemId": "Fish_Tang_Blue_Item",
+  "ItemId": "Fish_Clownfish_Item",
   "Category": ["fish", "saltwater"],
-  "Name": "A small, bright orange fish with white bands.",
-  "Description": "Tang",
+  "Name": "Clownfish",
+  "Description": "A small, bright orange fish with white bands.",
   "FamilyId": "Clownfish_family",
   "Rarity": "Rare",
   "IsGlobal": false,

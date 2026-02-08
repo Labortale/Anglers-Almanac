@@ -106,7 +106,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     public Habitats getHabitats() { return habitats; }
     public int getWeight() { return weight; }
     public boolean isGlobal() { return isGlobal; }
-
+    public String getName() {return name;}
     // Classes used by BuilderCodec
 
     public static class Habitats {
@@ -168,6 +168,13 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
             }
         }
         return possibleLoot.get(0);
+    }
+
+    public static FishLootManager getFishData(String id)
+    {
+        return getAllLoot().stream()
+                .filter(loot -> loot.id.equalsIgnoreCase(id)).toList().getFirst();
+
     }
 
     private static boolean isEligible(FishLootManager loot, FishingContext ctx) {

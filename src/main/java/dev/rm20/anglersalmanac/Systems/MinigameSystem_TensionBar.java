@@ -16,6 +16,11 @@ import dev.rm20.anglersalmanac.components.AudioPlayerComponent;
 import dev.rm20.anglersalmanac.components.BobberComponent;
 import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
+//import dev.rm20.anglersalmanac.models.FishingRodData;
+import dev.rm20.anglersalmanac.utils.FishLootManager;
+import dev.rm20.anglersalmanac.utils.SoundUtils;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntPredicate;
 import dev.rm20.anglersalmanac.metadata.FishingRodData;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -82,20 +87,20 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 game.stateTrigger = MinigameComponent_TensionBar.Trigger.NOTRIGGER;
                 break;
             case FAIL:
-                AnglersAlmanac.LOGGER.atInfo().log("YOU FAIL");
+                //AnglersAlmanac.LOGGER.atInfo().log("YOU FAIL");
                 // Reel in the rod which the bobber owner is using.
                 LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
             case SUCCESS:
-                AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
+                //AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
                 Minigame.PerformanceRating  rating = game.getPerformanceRating(game.getPerformancePercentage());
                 AnglersAlmanac.LOGGER.atInfo().log("Minigame performance rating = %s", rating);
                 if(rating == Minigame.PerformanceRating.FAIL) LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
 
                 // Deal rewards.
-                //String lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
-                MinigameManager.DropLoot(game.fishHooked.getItemID(), player, commandBuffer,game.bobberRef);
 
+                FishLootManager lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
+                MinigameManager.DropLoot(lootID, player, commandBuffer,game.bobberRef);
                 if(rating == Minigame.PerformanceRating.PERFECT){
                     // TODO Deal chance of bonus loot.
                 }

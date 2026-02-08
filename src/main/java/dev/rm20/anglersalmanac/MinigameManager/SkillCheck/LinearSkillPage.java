@@ -37,7 +37,7 @@ public class LinearSkillPage extends InteractiveCustomUIPage<DialEventData> {
     public void build(Ref<EntityStore> ref, UICommandBuilder uiCommandBuilder,
                       UIEventBuilder events, Store<EntityStore> store) {
 
-        uiCommandBuilder.append("Minigames/SkillCheck2.ui");
+        uiCommandBuilder.append("Pages/Minigames/SkillCheck2.ui");
 
         // Randomize position and cast to int
         // 0 to (600 - 60)
