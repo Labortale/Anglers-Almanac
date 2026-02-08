@@ -39,9 +39,9 @@ public class BookPageManager {
             return;
         }
         else{
-            //FishLootManager FishDataLeft = FishLootManager.getFishData(pages.get(page).pages[0].contextData);
-            //FishLootManager FishDataRight =FishLootManager.getFishData(pages.get(page).pages[1].contextData);
-            FishDataUiPage fishDataUiPage = new FishDataUiPage(playerRef1, playerUUID, playerName, stats,null ,null);
+            FishLootManager FishDataLeft = FishLootManager.getFishData(pages.get(page).pages[0].contextData);
+            FishLootManager FishDataRight =FishLootManager.getFishData(pages.get(page).pages[1].contextData);
+            FishDataUiPage fishDataUiPage = new FishDataUiPage(playerRef1, playerUUID, playerName, stats,FishDataLeft ,FishDataRight);
             pageManager.openCustomPage(playerRef, playerRef.getStore(), fishDataUiPage);
         }
 

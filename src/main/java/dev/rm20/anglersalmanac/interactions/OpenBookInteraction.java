@@ -61,7 +61,7 @@ public class OpenBookInteraction extends SimpleInstantInteraction {
                     uuid.getUuid().toString(),
                     player.getDisplayName()
             );
-            BookPageManager.OpenPage(player,1,newData.getPlayerUUID(),player.getDisplayName());
+            BookPageManager.OpenPage(player,0,newData.getPlayerUUID(),player.getDisplayName());
             //PageManager pageManager = player.getPageManager();
             //StatUiPage statUiPage = new StatUiPage(playerRef1,newData.getPlayerUUID(),player.getDisplayName());
             //.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
@@ -72,7 +72,7 @@ public class OpenBookInteraction extends SimpleInstantInteraction {
             //PageManager pageManager = player.getPageManager();
             //StatUiPage statUiPage = new StatUiPage(playerRef1,data.getPlayerUUID(),player.getDisplayName());
             //pageManager.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
-            BookPageManager.OpenPage(player,1,data.getPlayerUUID(),player.getDisplayName());
+            BookPageManager.OpenPage(player,0,data.getPlayerUUID(),player.getDisplayName());
 
             syncCustomBookDisplay(
                     playerRef1,

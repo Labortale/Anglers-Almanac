@@ -21,17 +21,26 @@ Group #AlmanacStats {
   }
 
   Label #MostFound {
-    Anchor: (Top: 160, Left: 120);
+    Anchor: (Top: 150, Left: 120);
     Style: (TextColor: #494950, FontSize: 25);
     Text: "Most found: {top_fish_name}";
   }
 
   Label #LegendaryCount {
-    Anchor: (Top: 200, Left: 120);
+    Anchor: (Top: 180, Left: 120);
     Style: (TextColor: #494950, FontSize: 25);
     Text: "Legendary fish: {legendary_count}";
   }
-
+  Label #PerfectCount {
+    Anchor: (Top: 220, Left: 120);
+    Style: (TextColor: #9b7e00, FontSize: 20);
+    Text: "Perfect: {Perfect_count}";
+  }
+  Label #GreatCount {
+    Anchor: (Top: 250, Left: 120);
+    Style: (TextColor: #0d689d, FontSize: 20);
+    Text: "Great: {Great_count}";
+  }
   Label #ListHeader {
     Anchor: (Top: 300, Left: 120);
     Style: (TextColor: #494950, FontSize: 25);

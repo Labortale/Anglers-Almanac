@@ -100,7 +100,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 // Deal rewards.
 
                 FishLootManager lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
-                MinigameManager.DropLoot(lootID, player, commandBuffer,game.bobberRef);
+                MinigameManager.DropLoot(lootID, player, commandBuffer,game.bobberRef,rating);
                 if(rating == Minigame.PerformanceRating.PERFECT){
                     // TODO Deal chance of bonus loot.
                 }

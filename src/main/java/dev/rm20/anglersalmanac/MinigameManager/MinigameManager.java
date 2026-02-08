@@ -4,6 +4,7 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -13,8 +14,10 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.WorldMapTracker;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.hypixel.hytale.server.npc.util.InventoryHelper;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
@@ -27,7 +30,11 @@ import dev.rm20.anglersalmanac.utils.FishLootManager;
 import dev.rm20.anglersalmanac.utils.TimeUtils;
 import org.jspecify.annotations.NonNull;
 
+import java.awt.*;
 import java.util.UUID;
+
+import static com.hypixel.hytale.server.core.universe.world.WorldConfig.formatDisplayName;
+import static dev.rm20.anglersalmanac.MinigameManager.Minigame.PerformanceRating.NIL;
 
 public class MinigameManager {
     public static void StartGame(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth)
@@ -51,11 +58,11 @@ public class MinigameManager {
                 LaunchBobberInteraction.updateMetadata(inv, inv.getActiveHotbarSlot(), inv.getActiveHotbarItem(), meta.getBoundBobber(), minigame.selfUUID, 1);
                 break;
             case "NoMinigame":
-                DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef);
+                DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef, NIL);
                 LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
             default: // No Minigame, just reel fish.
-                DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef);
+                DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef, NIL);
                 LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
         }
@@ -175,7 +182,7 @@ public class MinigameManager {
 
     }
 
-    public static void DropLoot(FishLootManager loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef){
+    public static void DropLoot(FishLootManager loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef, Minigame.PerformanceRating rating){
         if(loot ==null) return;
         if(loot.getItemID() == null) return;
         ItemStack fishStack;
@@ -184,17 +191,47 @@ public class MinigameManager {
             return;
         }
         DropItem(fishStack, player, commandBuffer, bobberRef);
-        SaveLoot(player,loot.getName());
+        SaveLoot(player,loot, rating);
     }
 
-    public static void SaveLoot(Player player, String FishId)
+    public static void SaveLoot(Player player, FishLootManager loot, Minigame.PerformanceRating rating)
     {
         //save to database
         var playerRef = player.getReference();
         assert playerRef != null;
         UUIDComponent uuid = playerRef.getStore().getComponent(playerRef, UUIDComponent.getComponentType());
+        com.hypixel.hytale.server.core.universe.PlayerRef playerRef1 = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
         assert uuid != null;
-        AnglersAlmanac.getInstance().database.saveCatch(uuid.getUuid().toString(), FishId);
+        boolean isLegendary = loot.getRarity().equalsIgnoreCase("Legendary");
+        boolean isNewDiscovery = AnglersAlmanac.getInstance().database.saveCatch(uuid.getUuid().toString(), loot.getId(),isLegendary,rating);
+        if(playerRef1 == null) return;
+        if (isNewDiscovery && isLegendary) {
+            String fishDisplayName = formatDisplayName(loot.getName());
+            Message fishDisplay = Message.raw(fishDisplayName).color(Color.YELLOW);
+            Message FishFound = Message.raw("LEGENDARY DISCOVERY");
+            EventTitleUtil.showEventTitleToPlayer(
+                    playerRef1,
+                    fishDisplay,
+                    FishFound,
+                    false, null, 2, 0.5f, 0.5f
+            );
+            //Play sound
+            return;
+        }
+        if (isNewDiscovery) {
+            String fishDisplayName = formatDisplayName(loot.getName());
+            Message fishDisplay = Message.raw(fishDisplayName).color(Color.GREEN);
+            Message FishFound = Message.raw("New Fish Found");
+            EventTitleUtil.showEventTitleToPlayer(
+                    playerRef1,
+                    fishDisplay,
+                    FishFound,
+                    false, null, 2, 0.5f, 0.5f
+            );
+            //Play sound
+
+            return;
+        }
     }
 
 }

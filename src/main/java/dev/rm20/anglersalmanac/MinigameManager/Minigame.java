@@ -11,7 +11,7 @@ public abstract class Minigame {
     private int Points = 0;
     // PerfectScore
     private float perfectScore = 100;
-    public enum PerformanceRating {FAIL, GOOD, GREAT, PERFECT}
+    public enum PerformanceRating {FAIL, GOOD, GREAT, PERFECT, NIL}
 
     public FishLootManager fishHooked;
 

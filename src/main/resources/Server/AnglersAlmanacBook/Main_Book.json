@@ -19,9 +19,14 @@
       "Pages": [
         {
           "Pages": [
-            {}
+            {
+              "ContextData": "Common_Bluegill"
+            },
+            {
+              "ContextData": "Common_Catfish"
+            }
           ],
-          "UiFile": "sadf"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui"
         }
       ]
     }
