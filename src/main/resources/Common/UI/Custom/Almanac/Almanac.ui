@@ -10,13 +10,11 @@ Group #Almanac {
   Button #PrevPage {
     TooltipText: "Prev page";
     Anchor: (Bottom: 40, Left: 50, Width: 100, Height: 50);
-    // Logic: index--
   }
 
   Button #NextPage {
     TooltipText: "Next page";
     Anchor: (Bottom: 40, Right: 50, Width: 100, Height: 50);
-    // Logic: index++
   }
 
   // --- PAGE CONTENT CONTAINERS ---

@@ -9,7 +9,17 @@ Group #AlmanacStats {
   Group #background {
     Background: @Background;
   }
+  //buttons
 
+  Button  #PrevPage {
+    Anchor: (Top: 5, Left: 50, Width: 100, Height: 100);
+    Background: #3A3A3A;
+  }
+
+  Button  #NextPage {
+    Anchor: (Top: 5, Right: 50, Width: 100, Height: 100);
+    Background: #3A3A3A;
+  }
   // LEFT PAGE
 
   Label #Header {
