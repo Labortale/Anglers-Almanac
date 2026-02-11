@@ -26,6 +26,7 @@ import dev.rm20.anglersalmanac.utils.TransformUtils;
 import org.jspecify.annotations.NonNull;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -50,8 +51,9 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     public UUID selfUUID;
     public enum Trigger {NOTRIGGER, FISHMOVE, SUCCESS, FAIL}
     public Trigger stateTrigger = Trigger.NOTRIGGER;
-    public UUID minigameFishModelId;
-    public UUID minigameBarModelId;
+    //public UUID minigameFishModelId;
+    //public UUID minigameBarModelId;
+    public HashMap<String, UUID> gameModels = new HashMap<>();
     public UUID audioPlayerId;
     public float minigameScale = 2f; // The visual size of the minigame display, adjusted based on distance from bobber.
 
@@ -143,8 +145,18 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Store<EntityStore> store = world.getEntityStore().getStore();
 
         // Attempt to despawn additional models.
-        if(minigameFishModelId != null) {
-            Ref<EntityStore> fishModelRef = world.getEntityRef(minigameFishModelId);
+        for(UUID id : gameModels.values()){
+            Ref<EntityStore> ref = world.getEntityRef(id);
+            if(ref != null){
+                world.execute(() -> {
+                    store.removeEntity(ref, RemoveReason.REMOVE);
+                });
+            }
+        }
+
+        /*
+        if(gameModels.get("fish") != null) {
+            Ref<EntityStore> fishModelRef = world.getEntityRef(gameModels.get("fish"));
             if (fishModelRef != null) {
                 world.execute(() -> {
                     store.removeEntity(fishModelRef, RemoveReason.REMOVE);
@@ -152,14 +164,16 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
             }
         }
 
-        if(minigameBarModelId != null) {
-            Ref<EntityStore> barModelRef = world.getEntityRef(minigameBarModelId);
+        if(gameModels.get("bar") != null) {
+            Ref<EntityStore> barModelRef = world.getEntityRef(gameModels.get("bar"));
             if (barModelRef != null) {
                 world.execute(() -> {
                     store.removeEntity(barModelRef, RemoveReason.REMOVE);
                 });
             }
         }
+
+         */
 
         if(audioPlayerId != null) {
             Ref<EntityStore> audioPlayerRef = world.getEntityRef(audioPlayerId);
@@ -192,7 +206,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Holder<EntityStore> fishModelEntity = EntityStore.REGISTRY.newHolder();
         UUID fishModelId = UUIDUtil.generateVersion3UUID();
         fishModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(fishModelId));
-        minigameFishModelId = fishModelId;
+        gameModels.put("fish", fishModelId);
 
 
 
@@ -226,7 +240,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Holder<EntityStore> barModelEntity = EntityStore.REGISTRY.newHolder();
         UUID barModelEntityId = UUID.randomUUID();
         barModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(barModelEntityId));
-        minigameBarModelId = barModelEntityId;
+        gameModels.put("bar", barModelEntityId);
 
         // Assign transform to minigame and move it above the bobber.
         barModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
@@ -246,10 +260,50 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         barModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(barModel));
         barModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(barModel.getBoundingBox()));
 
+        //---------- Frame MODEL -----------------------------------------------------
+        Holder<EntityStore> frameUpperModelEntity = EntityStore.REGISTRY.newHolder();
+        UUID frameUpperModelEntityId = UUID.randomUUID();
+        frameUpperModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(frameUpperModelEntityId));
+        gameModels.put("frameUpper", frameUpperModelEntityId);
+
+        // Assign transform to minigame and move it above the bobber.
+        frameUpperModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
+        Vector3d upperFramePos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        upperFramePos = upperFramePos.add(TransformUtils.moveAwayFrom(upperFramePos ,playerPos, 2));
+        frameUpperModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(upperFramePos.add(new Vector3d(0, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset + (1.0 * minigameScale),0)));
+
+        Holder<EntityStore> frameLowerModelEntity = EntityStore.REGISTRY.newHolder();
+        UUID frameLowerModelEntityId = UUID.randomUUID();
+        frameLowerModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(frameLowerModelEntityId));
+        gameModels.put("frameLower", frameUpperModelEntityId);
+
+        // Assign transform to minigame and move it above the bobber.
+        frameLowerModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
+        Vector3d lowerFramePos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        lowerFramePos = lowerFramePos.add(TransformUtils.moveAwayFrom(lowerFramePos ,playerPos, 2));
+        frameLowerModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(lowerFramePos);
+
+
+
+        // Add model.
+        ModelAsset frameModelAsset = ModelAsset.getAssetMap().getAsset("SSF_MinigameFrame");
+        if (frameModelAsset == null) frameModelAsset = ModelAsset.DEBUG;
+        Model frameUpperModel = Model.createScaledModel(frameModelAsset, minigameScale);
+        frameUpperModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(frameUpperModel.toReference()));
+        frameUpperModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(frameUpperModel));
+        frameUpperModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(frameUpperModel.getBoundingBox()));
+
+        Model frameLowerModel = Model.createScaledModel(frameModelAsset, minigameScale);
+        frameLowerModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(frameLowerModel.toReference()));
+        frameLowerModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(frameLowerModel));
+        frameLowerModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(frameLowerModel.getBoundingBox()));
+
 
 
         // Attach network component.
         barModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
+        frameUpperModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
+        frameLowerModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
 
         // Spawn the model in the world.
         world.execute(() -> {
@@ -265,7 +319,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         assert game != null;
 
         // Do fish logic.
-        Ref<EntityStore> fishModelRef = store.getExternalData().getWorld().getEntityRef(minigameFishModelId);
+        Ref<EntityStore> fishModelRef = store.getExternalData().getWorld().getEntityRef(gameModels.get("fish"));
         if(fishModelRef == null) return;
         if(!bobberRef.isValid()) return;
         // Do fish model motion.
@@ -291,11 +345,11 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         // Do Fish rotation.
         float camOffset =  store.getComponent(ownerRef, ModelComponent.getComponentType()).getModel().getEyeHeight();
         Vector3d playerHeadPos = store.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone().add(new Vector3d(0, camOffset,0));
-        TransformUtils.applyBillboardYOnly(minigameFishModelId, newFishPos, playerHeadPos ,new Vector3f(90,0,0), store);
+        TransformUtils.applyBillboardYOnly(gameModels.get("fish"), newFishPos, playerHeadPos ,new Vector3f(90,0,0), store);
 
 
         // Do bar logic.
-        Ref<EntityStore> barModelRef = store.getExternalData().getWorld().getEntityRef(minigameBarModelId);
+        Ref<EntityStore> barModelRef = store.getExternalData().getWorld().getEntityRef(gameModels.get("bar"));
         if(barModelRef == null) return;
 
         // Do bar model motion.
@@ -309,7 +363,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         store.getComponent(barModelRef, TransformComponent.getComponentType()).setPosition(newBarPos);
 
         // Do bar rotation.
-        TransformUtils.applyBillboardYOnly(minigameBarModelId, newBarPos, playerHeadPos, new Vector3f(0,0,0), store);
+        TransformUtils.applyBillboardYOnly(gameModels.get("bar"), newBarPos, playerHeadPos, new Vector3f(0,0,0), store);
 
 
     }
@@ -337,8 +391,8 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
     @Override
     public void applyDifficultyModifer(FishLootManager.MinigameStats stats) {
-        gameConfig.fishMaxVeocity += (float) stats.difficulty / 10;
-        gameConfig.fishChangeDirectionMaxInterval = gameConfig.fishChangeDirectionMaxInterval / ((float) stats.difficulty / 50);
+        gameConfig.fishMaxVeocity += (float) stats.difficulty / 20f;
+        gameConfig.fishChangeDirectionMaxInterval = gameConfig.fishChangeDirectionMaxInterval / ((float) stats.difficulty / 8f);
         AnglersAlmanac.LOGGER.atInfo().log("Applying fish difficulty! stat: %s, fishMaxVelocity: %s", stats.difficulty, gameConfig.fishMaxVeocity);
     }
 
@@ -386,9 +440,13 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     @Override
     public void applyFishStaminaModifer(FishLootManager.MinigameStats stats) {
         // 30 represents standard stamina, with stats higher than 30 increasing time to catch, and stats lower than 30 reducing time to catch.
+        // The stamina difference is dampened to prevent extreme modifications.
         AnglersAlmanac.LOGGER.atInfo().log("Base reelRate = %s", gameConfig.fishReelRate);
-        gameConfig.fishReelRate *= (30f / stats.stamina);
-        AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina! stamina = %s,  reelRate = %s", stats.stamina, gameConfig.fishReelRate);
+        float dampeningFactor = 0.33f;
+        float dampenedStamina = stats.stamina + (30f - stats.stamina) * dampeningFactor;
+        float modifier = 30f / dampenedStamina;
+        gameConfig.fishReelRate *= modifier;
+        AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina! stamina = %s, modifier: %s,  reelRate = %s", stats.stamina,modifier,  gameConfig.fishReelRate);
     }
 
     @Override

@@ -15,7 +15,7 @@ public class MinigameConfig_TensionBar {
     public float fishEscapeRate = 0.3333f; // The progress lost per-second that the fish is not in the catch bar.
     public float fishReelRate = 0.2f; // The progress gain per second when the fish is inside catch bar.
     public float barRadius = 0.1f; // The size of half the bar, used to check if bar is over the fish.
-    public float fishMaxVeocity = 0.8f; // The maximum speed of the fish.
+    public float fishMaxVeocity = 0.5f; // The maximum speed of the fish.
     public float fishMinSpeed = 0f; // Range = 0.0f to 1.0f. The slowest fraction of fishMaxVelocity that fish is allowed to be.
     public float fishChangeDirectionMaxInterval = 0.25f; // The longest amount of time between fish changing direction.
     public float fishBouyancy = 0; // The fishes bias towards floating (positive value) or sinking (negative value).

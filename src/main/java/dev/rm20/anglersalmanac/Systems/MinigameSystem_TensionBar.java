@@ -64,7 +64,11 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 float maxFishVel = game.gameConfig.fishMaxVeocity + game.gameConfig.fishBouyancy;
                 float minFishVel = (game.gameConfig.fishMaxVeocity*-1f) + game.gameConfig.fishBouyancy;
                 float strength = new Random().nextFloat();
-                strength = Math.clamp(strength, game.gameConfig.fishMinSpeed, 1.0f);
+                // Apply minSpeed by pushing strength further away from 0.5 by factor of minSpeed/2.
+                if(strength > 0.5f - (game.gameConfig.fishMinSpeed / 2f) && strength <= 0.5f) strength = 0.5f - (game.gameConfig.fishMinSpeed / 2f);
+                if(strength < 0.5f + game.gameConfig.fishMinSpeed / 2f && strength > 0.5f) strength = 0.5f + (game.gameConfig.fishMinSpeed / 2f);
+
+                //strength = Math.clamp(strength, game.gameConfig.fishMinSpeed, 1.0f);
                 AnglersAlmanac.LOGGER.atInfo().log("minFishVel: %s, maxFishVel: %s, fishMinSpeed: %s, strength: %s", minFishVel, maxFishVel, game.gameConfig.fishMinSpeed, strength);
 
 
@@ -82,7 +86,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 }
 
                 // Calculate random movement based on fish parameters.
-                game.fishVelocity = ((minFishVel) + strength * (maxFishVel - (minFishVel))) - game.gameConfig.fishBouyancy;
+                game.fishVelocity = ((minFishVel) + strength * (maxFishVel - minFishVel));
                 AnglersAlmanac.LOGGER.atInfo().log("FISHMOVE new velocity: %s", game.fishVelocity);
 
                 // Always ensure that fish moves away from edges if near top / bottom.
