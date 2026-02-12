@@ -19,7 +19,7 @@ public class MinigameConfig_TensionBar {
     public float fishMinSpeed = 0f; // Range = 0.0f to 1.0f. The slowest fraction of fishMaxVelocity that fish is allowed to be.
     public float fishChangeDirectionMaxInterval = 0.25f; // The longest amount of time between fish changing direction.
     public float fishBouyancy = 0; // The fishes bias towards floating (positive value) or sinking (negative value).
-    public double minigameModelVerticalOffset = 1f; // The height above bobber to display the minigame elements.
+    public double minigameModelVerticalOffset = 1.0f; // The height above bobber to display the minigame elements.
     public float minigameScaleMin = 1.5f; // Minigame display minimum size.
     public float minigameScaleMax = 14f; // Minigame display maximum size.
     public float minigameScaleMultiplier = 1f; // minigameScale = distance from player * minigame scale multiplier.

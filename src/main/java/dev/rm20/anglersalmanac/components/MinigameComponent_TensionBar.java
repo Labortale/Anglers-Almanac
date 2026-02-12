@@ -101,7 +101,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         holder.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(id));
 
         Vector3d spawnPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
-        holder.addComponent(TransformComponent.getComponentType(), new TransformComponent(spawnPos, Vector3f.ZERO));
+        holder.addComponent(TransformComponent.getComponentType(), new TransformComponent(spawnPos.add(0, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset, 0), Vector3f.ZERO));
 
 
         //  --- Minigame --------
@@ -212,9 +212,9 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
         // Assign transform to minigame and move it above the bobber.
         fishModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
-        Vector3d newPos = bobberPos.clone();
-        newPos = newPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset,0));
-        fishModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newPos);
+        //Vector3d newPos = bobberPos.clone();
+        //newPos = newPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset,0));
+        //fishModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newPos);
         //TransformUtils.applyBillboard(store.getExternalData().getRefFromUUID(fishModelId), ownerRef, new Vector3f(90,0,0), store);
 
         // Add model.
@@ -244,18 +244,18 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
         // Assign transform to minigame and move it above the bobber.
         barModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
-        Vector3d newBarPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        //Vector3d newBarPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
         //newBarPos = newBarPos.add(new Vector3d(0,bobber.minigameModelVerticalOffset,0));
-        Vector3d playerPos = commandBuffer.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
-        newBarPos = newBarPos.add(TransformUtils.moveAwayFrom(newBarPos ,playerPos, 2));
-        barModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newBarPos);
+        //Vector3d playerPos = commandBuffer.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
+        //newBarPos = newBarPos.add(TransformUtils.moveAwayFrom(newBarPos ,playerPos, 2));
+        //barModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newBarPos);
         //HelperTransforms.applyBillboard(barModelEntityId, bobber.ownerID, new Vector3f(90,0,0), store);
 
 
         // Add model.
         ModelAsset barModelAsset = ModelAsset.getAssetMap().getAsset("SSF_FishingBar");
         if (barModelAsset == null) barModelAsset = ModelAsset.DEBUG;
-        Model barModel = Model.createScaledModel(barModelAsset, (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barRadius * 2f) * minigameScale);
+        Model barModel = Model.createScaledModel(barModelAsset, (gameConfig.barRadius* 2f) * minigameScale);
         barModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(barModel.toReference()));
         barModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(barModel));
         barModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(barModel.getBoundingBox()));
@@ -266,37 +266,38 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         frameUpperModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(frameUpperModelEntityId));
         gameModels.put("frameUpper", frameUpperModelEntityId);
 
-        // Assign transform to minigame and move it above the bobber.
         frameUpperModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
-        Vector3d upperFramePos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
-        upperFramePos = upperFramePos.add(TransformUtils.moveAwayFrom(upperFramePos ,playerPos, 2));
-        frameUpperModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(upperFramePos.add(new Vector3d(0, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset + (1.0 * minigameScale),0)));
+        //Vector3d upperFramePos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        //upperFramePos = upperFramePos.add(TransformUtils.moveAwayFrom(upperFramePos ,playerPos, 2));
+        //frameUpperModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(upperFramePos);
+
+
 
         Holder<EntityStore> frameLowerModelEntity = EntityStore.REGISTRY.newHolder();
         UUID frameLowerModelEntityId = UUID.randomUUID();
         frameLowerModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(frameLowerModelEntityId));
-        gameModels.put("frameLower", frameUpperModelEntityId);
+        gameModels.put("frameLower", frameLowerModelEntityId);
 
-        // Assign transform to minigame and move it above the bobber.
         frameLowerModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
-        Vector3d lowerFramePos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
-        lowerFramePos = lowerFramePos.add(TransformUtils.moveAwayFrom(lowerFramePos ,playerPos, 2));
-        frameLowerModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(lowerFramePos);
+        //Vector3d lowerFramePos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        //lowerFramePos = lowerFramePos.add(TransformUtils.moveAwayFrom(lowerFramePos ,playerPos, 2));
+        //frameLowerModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(lowerFramePos);
 
 
 
         // Add model.
         ModelAsset frameModelAsset = ModelAsset.getAssetMap().getAsset("SSF_MinigameFrame");
         if (frameModelAsset == null) frameModelAsset = ModelAsset.DEBUG;
-        Model frameUpperModel = Model.createScaledModel(frameModelAsset, minigameScale);
-        frameUpperModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(frameUpperModel.toReference()));
-        frameUpperModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(frameUpperModel));
-        frameUpperModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(frameUpperModel.getBoundingBox()));
 
-        Model frameLowerModel = Model.createScaledModel(frameModelAsset, minigameScale);
-        frameLowerModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(frameLowerModel.toReference()));
-        frameLowerModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(frameLowerModel));
-        frameLowerModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(frameLowerModel.getBoundingBox()));
+        Model frameModel = Model.createScaledModel(frameModelAsset, minigameScale * 0.5f);
+        frameUpperModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(frameModel.toReference()));
+        frameUpperModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(frameModel));
+        frameUpperModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(frameModel.getBoundingBox()));
+
+        //Model frameLowerModel = Model.createScaledModel(frameModelAsset, minigameScale * 0.5f);
+        frameLowerModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(frameModel.toReference()));
+        frameLowerModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(frameModel));
+        frameLowerModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(frameModel.getBoundingBox()));
 
 
 
@@ -308,6 +309,8 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         // Spawn the model in the world.
         world.execute(() -> {
             commandBuffer.addEntity(barModelEntity, AddReason.SPAWN);
+            commandBuffer.addEntity(frameLowerModelEntity, AddReason.SPAWN);
+            commandBuffer.addEntity(frameUpperModelEntity, AddReason.SPAWN);
             //AnglersAlmanac.LOGGER.atInfo().log("Spawned bar model at: %s", barModelEntity.getComponent(TransformComponent.getComponentType()).getPosition());
         });
 
@@ -318,33 +321,23 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Ref<EntityStore> game = store.getExternalData().getWorld().getEntityRef(selfUUID);
         assert game != null;
 
-        // Do fish logic.
+        Vector3d gamePos = Objects.requireNonNull(store.getComponent(game, TransformComponent.getComponentType())).getPosition();
+        Vector3d playerPos = store.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
+        float camOffset =  store.getComponent(ownerRef, ModelComponent.getComponentType()).getModel().getEyeHeight();
+        Vector3d playerHeadPos = playerPos.clone().add(new Vector3d(0, camOffset,0));
+
+
+        // Do fish logic.3
         Ref<EntityStore> fishModelRef = store.getExternalData().getWorld().getEntityRef(gameModels.get("fish"));
         if(fishModelRef == null) return;
         if(!bobberRef.isValid()) return;
         // Do fish model motion.
 
-        Vector3d newFishPos = Objects.requireNonNull(store.getComponent(game, TransformComponent.getComponentType())).getPosition().clone();
-
-        /*
-        // Move fish to player based on progress.
-        Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(bobber.ownerID);
-        if(playerRef != null) {
-            Vector3d playerPos = store.getComponent(playerRef, TransformComponent.getComponentType()).getPosition().clone();
-            newFishPos = HelperTransforms.moveTowards(newFishPos, playerPos, bobber.fightProgress/100f);
-        }
-
-         */
-
+        Vector3d newFishPos = gamePos.clone();
         // Adjust fish height based on minigame fishPos.
-        newFishPos = newFishPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset + (fishPos * minigameScale),0));
-
-
-
+        newFishPos = newFishPos.add(new Vector3d(0,(fishPos * minigameScale),0));
         store.getComponent(fishModelRef, TransformComponent.getComponentType()).setPosition(newFishPos);
         // Do Fish rotation.
-        float camOffset =  store.getComponent(ownerRef, ModelComponent.getComponentType()).getModel().getEyeHeight();
-        Vector3d playerHeadPos = store.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone().add(new Vector3d(0, camOffset,0));
         TransformUtils.applyBillboardYOnly(gameModels.get("fish"), newFishPos, playerHeadPos ,new Vector3f(90,0,0), store);
 
 
@@ -353,17 +346,36 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         if(barModelRef == null) return;
 
         // Do bar model motion.
-        Vector3d newBarPos = store.getComponent(game, TransformComponent.getComponentType()).getPosition().clone();
-        newBarPos = newBarPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset + (barPos * minigameScale) ,0));
-        Vector3d playerPos = store.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
+        Vector3d newBarPos = gamePos.clone();
+        newBarPos.add(new Vector3d(0,(barPos * minigameScale) ,0));
 
-        Vector3d layering = newBarPos.clone().add(TransformUtils.moveAwayFrom(newBarPos.clone() ,playerPos, 0.2));
+        Vector3d layering = newBarPos.clone().add(TransformUtils.moveAwayFrom(newBarPos.clone() ,playerPos.clone(), 0.2));
         newBarPos = new Vector3d(layering.x, newBarPos.y, layering.z);
 
         store.getComponent(barModelRef, TransformComponent.getComponentType()).setPosition(newBarPos);
 
         // Do bar rotation.
-        TransformUtils.applyBillboardYOnly(gameModels.get("bar"), newBarPos, playerHeadPos, new Vector3f(0,0,0), store);
+        TransformUtils.applyBillboardYOnly(gameModels.get("bar"), newBarPos, playerHeadPos.clone(), new Vector3f(0,0,0), store);
+
+        Ref<EntityStore> lowerFrameRef = store.getExternalData().getWorld().getEntityRef(gameModels.get("frameLower"));
+        if(lowerFrameRef != null) {
+            Vector3d lowerFramePos = gamePos.clone();
+            layering = lowerFramePos.clone().add(TransformUtils.moveAwayFrom(lowerFramePos.clone(), playerPos.clone(), 0.2));
+            lowerFramePos = new Vector3d(layering.x, lowerFramePos.y, layering.z);
+            lowerFramePos.add(new Vector3d(0, -gameConfig.barRadius * minigameScale * 0.75f, 0));
+            store.getComponent(lowerFrameRef, TransformComponent.getComponentType()).setPosition(lowerFramePos);
+            TransformUtils.applyBillboardYOnly(gameModels.get("frameLower"), lowerFramePos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), store);
+        }
+
+        Ref<EntityStore> upperFrameRef = store.getExternalData().getWorld().getEntityRef(gameModels.get("frameUpper"));
+        if(upperFrameRef != null) {
+            Vector3d upperFramePos = gamePos.clone();
+            layering = upperFramePos.clone().add(TransformUtils.moveAwayFrom(upperFramePos.clone(), playerPos.clone(), 0.2));
+            upperFramePos = new Vector3d(layering.x, upperFramePos.y, layering.z);
+            upperFramePos.add(new Vector3d(0, minigameScale + (gameConfig.barRadius * minigameScale * 0.75f), 0));
+            store.getComponent(upperFrameRef, TransformComponent.getComponentType()).setPosition(upperFramePos);
+            TransformUtils.applyBillboardYOnly(gameModels.get("frameUpper"), upperFramePos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), store);
+        }
 
 
     }

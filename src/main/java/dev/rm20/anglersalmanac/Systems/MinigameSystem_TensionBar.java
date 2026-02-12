@@ -181,10 +181,14 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
 
         // Apply bar motion. (Rising is computed in MinigameInteraction by changing barVelocity)
         game.barVelocity = Math.clamp(game.barVelocity - (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity*AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration), -AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed);
-        game.barPos = Math.clamp(game.barPos + (game.barVelocity * deltaTime), 0f, 1.0f);
+        game.barPos = Math.clamp(game.barPos + (game.barVelocity * deltaTime), game.gameConfig.barRadius * 0.5f, 1.0f - (game.gameConfig.barRadius * 0.5f));
 
         // Apply fish movement.
         game.fishPos = Math.clamp(game.fishPos + (game.fishVelocity*deltaTime), 0f, 1.0f);
+
+        // DEBUG
+        //game.fightProgress = 0.5f;
+        //game.fishPos = 1.0f;
 
         game.updateMinigameModelPositions(store);
         game.fishMoveTimer += deltaTime;
