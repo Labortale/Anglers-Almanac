@@ -18,6 +18,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.MinigameManager.SkillCheck.DialEventData;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
+import dev.rm20.anglersalmanac.utils.StampUtil;
 import dev.rm20.anglersalmanac.utils.TextUtils;
 
 import javax.annotation.Nonnull;
@@ -70,12 +71,14 @@ public class FishDataUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
                         .replace("Fish_", "")
                         .replace("_Item", "");
 
-                String Image = "UI/Custom/Pages/Memories/npcs/" + cleanName + ".png";
-                if(FishDataLeft.getRarity().equalsIgnoreCase("common"))
+                String Image = "UI/Custom/Almanac/Fish/Assets/" + cleanName + ".png";
+                String RarityFile = StampUtil.getStamp(cleanName,FishDataLeft.getRarity());
+                if(RarityFile != null)
                 {
-                    uiCommandBuilder.set("#StampImage.AssetPath", "UI/Custom/Almanac/Fish/Stamps/uncommon.png");
-                }
+                    String RarityPath = "UI/Custom/Almanac/Fish/Stamps/"+FishDataLeft.getRarity()+"/"+RarityFile+".png";
+                    uiCommandBuilder.set("#StampImage.AssetPath", RarityPath);
 
+                }
                 uiCommandBuilder.set("#FishImage.AssetPath", Image);
                 uiCommandBuilder.set("#Header.TextSpans", Message.raw(FishDataLeft.getName()));
                 uiCommandBuilder.set("#CountNumber.TextSpans", Message.raw(String.valueOf(fishCount)));
@@ -101,11 +104,13 @@ public class FishDataUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
                         .replace("Fish_", "")
                         .replace("_Item", "");
 
-                String Image = "UI/Custom/Pages/Memories/npcs/" + cleanName + ".png";
-
-                if(FishDataRight.getRarity().equalsIgnoreCase("common"))
+                String Image = "UI/Custom/Almanac/Fish/Assets/" + cleanName + ".png";
+                String RarityFile = StampUtil.getStamp(cleanName,FishDataRight.getRarity());
+                if(RarityFile != null)
                 {
-                    uiCommandBuilder.set("#StampImage2.AssetPath", "UI/Custom/Almanac/Fish/Stamps/uncommon.png");
+                    String RarityPath = "UI/Custom/Almanac/Fish/Stamps/"+FishDataRight.getRarity()+"/"+RarityFile+".png";
+                    uiCommandBuilder.set("#StampImage2.AssetPath", RarityPath);
+
                 }
                 uiCommandBuilder.set("#FishImage2.AssetPath", Image);
                 uiCommandBuilder.set("#Header2.TextSpans", Message.raw(FishDataRight.getName()));

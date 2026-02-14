@@ -76,7 +76,7 @@ public class AnglersAlmanac extends JavaPlugin {
 
         // Register MinigameRodStats asset.
         AssetRegistry.register(HytaleAssetStore.builder(MinigameRodStats.class, new DefaultAssetMap<String, MinigameRodStats>())
-                .setPath("AnglersAlmanac")
+                .setPath("AnglersAlmanacRod")
                 .setCodec(MinigameRodStats.CODEC)
                 .setKeyFunction(MinigameRodStats::getId)
                 .build()
