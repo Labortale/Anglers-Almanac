@@ -86,7 +86,7 @@ Group #AlmanacStats {
       Text: "Collection Progress";
     }
     Group #ProgressContainer {
-      Anchor: (Top: 80, Left: 120, Width: 300, Height: 300);
+      Anchor: (Top: 10, Left: 120, Width: 300, Height: 300);
       Group #Background {
         Anchor: (Width: 300, Height: 300);
         Background: "Assets/BackgroundSignatureAbilityNotReady.png";
@@ -97,11 +97,92 @@ Group #AlmanacStats {
         Background: (TexturePath: "Assets/Earth_Temp.png", Color: #ffffff);
       }
       CircularProgressBar #FishProgress {
-        Value: 0.4;
+        Value: 1;
         Color: #2A5A82;
         MaskTexturePath: "Assets/ProgressBarMask.png";
       }
     }
 
+    Group #Global {
+      Anchor: (Top: 280, Left:40);
+
+      Label #GlobalHeader {
+        Style: (TextColor: #494950, FontSize: 25);
+        Text: "Global Fish Progress";
+      }
+      Label #GlobalHeader {
+        Anchor: (Top: 30);
+        Style: (TextColor: #494950, FontSize: 20);
+        Text: "{GlobalFish}/{GlobalFishTotal}";
+      }
+    }
+    Group #Ocean {
+      Anchor: (Top: 350, Left:40);
+
+      Label #OceanHeader {
+        Style: (TextColor: #494950, FontSize: 25);
+        Text: "Ocean Fish Progress";
+      }
+      Label #OceanHeader {
+        Anchor: (Top: 30);
+        Style: (TextColor: #494950, FontSize: 20);
+        Text: "{OceanFish}/{OceanFishTotal}";
+      }
+    }
+    Group #Zone1 {
+      Anchor: (Top: 420, Left:40);
+
+      Label #Zone1Header {
+        Style: (TextColor: #494950, FontSize: 25);
+        Text: "Zone1 Fish Progress";
+      }
+      Label #Zone1Header {
+        Anchor: (Top: 30);
+        Style: (TextColor: #494950, FontSize: 20);
+        Text: "{Zone1Fish}/{Zone1FishTotal}";
+      }
+    }
+
+    Group #Zone2 {
+      Anchor: (Top: 490, Left:40);
+
+      Label #Zone1Header {
+        Style: (TextColor: #494950, FontSize: 25);
+        Text: "Zone2 Fish Progress";
+      }
+      Label #Zone2Header {
+        Anchor: (Top: 30);
+        Style: (TextColor: #494950, FontSize: 20);
+        Text: "{Zone2Fish}/{Zone2FishTotal}";
+      }
+    }
+
+    Group #Zone3 {
+      Anchor: (Top: 560, Left:40);
+
+      Label #Zone3Header {
+        Style: (TextColor: #494950, FontSize: 25);
+        Text: "Zone3 Fish Progress";
+      }
+      Label #Zone1Header {
+        Anchor: (Top: 30);
+        Style: (TextColor: #494950, FontSize: 20);
+        Text: "{Zone3Fish}/{Zone3FishTotal}";
+      }
+    }
+
+    Group #Zone4 {
+      Anchor: (Top: 630, Left:40);
+
+      Label #Zone4Header {
+        Style: (TextColor: #494950, FontSize: 25);
+        Text: "Zone4 Fish Progress";
+      }
+      Label #Zone2Header {
+        Anchor: (Top: 30);
+        Style: (TextColor: #494950, FontSize: 20);
+        Text: "{Zone4Fish}/{Zone4FishTotal}";
+      }
+    }
   }
 }

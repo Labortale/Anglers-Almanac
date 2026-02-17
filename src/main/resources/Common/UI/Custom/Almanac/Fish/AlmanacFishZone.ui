@@ -1,0 +1,258 @@
+$Common = "Common.ui";
+
+@Background = PatchStyle(TexturePath: "../book_2.png");
+@FishTexture = PatchStyle(TexturePath: "Fish1.png");
+@Fish2Texture = PatchStyle(TexturePath: "Fish2.png");
+@Fish1Stamp = PatchStyle(TexturePath: "Stamps/Fish1_stamp.png");
+@Fish2Stamp = PatchStyle(TexturePath: "Stamps/Fish2_stamp.png");
+
+Group #AlmanacStats {
+  Anchor: (Width: 1200, Height: 872);
+  Group #background {
+    Background: @Background;
+  }
+
+  Group #BookNav
+  {
+    // NAV BUTTONS
+    Button  #PrevPageButton {
+      Anchor: (Bottom: 45, Left: 115, Width: 60, Height: 30);
+      Background: #3A3A3A;
+    }
+
+    Button  #NextPageButton {
+      Anchor: (Bottom: 45, Right: 65, Width: 60, Height: 30);
+      Background: #3A3A3A;
+    }
+  }
+
+  // LEFT PAGE
+  Group #LeftPage {
+    Anchor: (Left: 100, Top: 60, Width: 450, Height: 750);
+
+    Label #Header {
+      Anchor: (Top: 0, Left: 50);
+      Style: (TextColor: #3A3A3A, FontSize: 32, RenderBold: true);
+      Text: "Global Fish";
+    }
+
+    Group #ProgressContainer {
+      Anchor: (Top: 10, Left: 0, Width: 300, Height: 300);
+      Group #Background {
+        Anchor: (Width: 300, Height: 300);
+        Background: "Assets/BackgroundSignatureAbilityNotReady.png";
+      }
+
+      Group #SignatureIcon {
+        Anchor: (Width: 150, Height: 150);
+        Background: (TexturePath: "Assets/Earth_Temp.png", Color: #ffffff);
+      }
+      CircularProgressBar #FishProgress {
+        Value: 1;
+        Color: #2A5A82;
+        MaskTexturePath: "Assets/ProgressBarMask.png";
+      }
+    }
+    Group #ZoneInfo {
+      Anchor: (Top: 60, Left: 275, Width: 200, Height: 300);
+      Label #Header {
+        Style: (TextColor: #2A2A2A, FontSize: 20, Wrap: true);
+        Text: "Those fish can be found in most body of water around orbis.";
+      }
+    }
+    Group #FishItemss {
+      LayoutMode: Top;
+      Anchor: (Top: 300, Left: 10);
+      Group #FishItems1{
+        LayoutMode: Left;
+        Anchor: (Top: 10, Left: 10);
+        ItemIcon #ItemIcon0 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "Fish_Bluegill_Item";
+        }
+        ItemIcon #ItemIcon1 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "Fish_Catfish_Item";
+        }
+        ItemIcon #ItemIcon2 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "Fish_Minnow_Item";
+        }
+        ItemIcon #ItemIcon3 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "Fish_Pufferfish_Item";
+        }
+        ItemIcon #ItemIcon4 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "Fish_Salmon_Item";
+        }
+      }
+      Group #FishItems2{
+        LayoutMode: Left;
+        Anchor: (Top: 10, Left: 10);
+        ItemIcon #ItemIcon5 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "Fish_Trout_Rainbow_Item";
+        }
+        ItemIcon #ItemIcon6 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon7 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon8 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon9 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+      }
+      Group #FishItems3{
+        LayoutMode: Left;
+        Anchor: (Top: 10, Left: 10);
+        ItemIcon #ItemIcon10 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon11 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon12 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon13 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon14 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+      }
+      Group #FishItems4{
+        LayoutMode: Left;
+        Anchor: (Top: 10, Left: 10);
+        ItemIcon #ItemIcon15 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon16 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon17 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon18 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon19 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+      }
+      Group #FishItems5{
+        LayoutMode: Left;
+        Anchor: (Top: 10, Left: 10);
+        ItemIcon #ItemIcon20 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon21 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon22 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon23 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+        ItemIcon #ItemIcon24 {
+          Anchor: (Width: 75, Height: 75, Left: 10);
+          ItemId: "";
+        }
+      }
+    }
+
+
+  }
+
+  // RIGHT PAGE
+  Group #RightPage {
+    Anchor: (Right: 120, Top: 60, Width: 450, Height: 750);
+
+    Label #Header2 {
+      Anchor: (Top: 0, Left: 50);
+      Style: (TextColor: #3A3A3A, FontSize: 32, RenderBold: true);
+      Text: "{Fish2 name}";
+    }
+
+    Group #CounterSection2 {
+      Anchor: (Top: 45, Left: 50, Width: 380, Height: 30);
+      Label #CountLabel2 {
+        Style: (TextColor: #7A6652, FontSize: 18, RenderBold: true);
+        Text: "Total caught:";
+      }
+
+      Label #CountNumber2 {
+        Anchor: (Left: 115);
+        Style: (TextColor: #3A3A3A, FontSize: 18);
+        Text: "{total_catches2}";
+      }
+    }
+
+    Group #FishContainer2 {
+      Anchor: (Top: 100, Left: 50, Width: 250, Height: 250);
+      AssetImage #FishImage2 {}
+    }
+
+    Group #QuickStats2 {
+      Anchor: (Top: 130, Left: 310, Width: 160);
+      Label #FamilyLabel2 {
+        Style: (TextColor: #7A6652, FontSize: 14, RenderBold: true);
+        Text: "Species Class:";
+
+      }
+      Label #Family2 {
+        Anchor: (Top: 20);
+        Style: (TextColor: #5A4D41, FontSize: 20, Wrap: true);
+        Text: "{Fish2 familly}";
+      }
+    }
+
+    Label #Description2 {
+      Anchor: (Top: 340, Left: 40, Width: 400, Height: 200);
+      Style: (TextColor: #494950, FontSize: 19, Wrap: true);
+      Text: "{Fish2_info}";
+    }
+
+    Group #HabitatSection2 {
+      Anchor: (Top: 540, Left: 40, Width: 380);
+      Label #HabitatTitle2 {
+        Style: (TextColor: #2A5A82, FontSize: 18, RenderBold: true);
+        Text: "LURKS WITHIN:";
+      }
+      Label #HabitatList2 {
+        Anchor: (Top: 25);
+        Style: (TextColor: #494950, FontSize: 17);
+        Text: "{Fish_Habitat}";
+      }
+    }
+
+    Group #Stamp2 {
+      Anchor: (Bottom: 50, Right: 0, Width: 180, Height: 180);
+      AssetImage #StampImage2 {}
+    }
+  }
+}

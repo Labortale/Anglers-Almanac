@@ -5,12 +5,12 @@
     "freshwater"
   ],
   "Name": "Bluegill",
-  "Description": "A common sunfish known for the blue-black spot on its gill cover.",
-  "FamilyId": "sunfish_family",
+  "Description": "Identifiable by the navy-black ear flap on its gill cover, the Bluegill is a master of adaptation. Whether it’s a mountain stream or a backyard pond, this fish makes itself at home anywhere. It’s a tiny, shimmering tank with a 360-degree security system, ensuring it sees a snack or a predator long before they see it.",
+  "FamilyId": "sunfishes",
   "Rarity": "Common",
   "IsGlobal": true,
   "Weight": 200,
-  "Size": 20,
+  "Size": 12,
   "Habitats": {
     "Zones": [],
     "Tiers": [],

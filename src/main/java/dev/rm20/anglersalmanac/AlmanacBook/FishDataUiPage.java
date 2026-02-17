@@ -44,7 +44,7 @@ public class FishDataUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
 
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder,
                       @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
-        uiCommandBuilder.append("Almanac/Fish/AlmanacFish.ui");
+        uiCommandBuilder.append("Almanac/Fish/AlmanacFishZone.ui");
         AnglersAlmanac.getInstance().getLogger().atInfo().log(FishDataLeft.getName());
         AnglersAlmanac.getInstance().getLogger().atInfo().log(FishDataRight.getName());
 
@@ -64,34 +64,34 @@ public class FishDataUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
         // Left page
         if (FishDataLeft != null) {
             //check if fish has be found by player
-            if(AnglersAlmanac.getInstance().database.hasPlayerCaught(PlayerUUID, FishDataLeft.getId()))
-            {
-                int fishCount = Stats.getFishCount(FishDataLeft.getId());
-                String cleanName = FishDataLeft.getItemID()
-                        .replace("Fish_", "")
-                        .replace("_Item", "");
-
-                String Image = "UI/Custom/Almanac/Fish/Assets/" + cleanName + ".png";
-                String RarityFile = StampUtil.getStamp(cleanName,FishDataLeft.getRarity());
-                if(RarityFile != null)
-                {
-                    String RarityPath = "UI/Custom/Almanac/Fish/Stamps/"+FishDataLeft.getRarity()+"/"+RarityFile+".png";
-                    uiCommandBuilder.set("#StampImage.AssetPath", RarityPath);
-
-                }
-                uiCommandBuilder.set("#FishImage.AssetPath", Image);
-                uiCommandBuilder.set("#Header.TextSpans", Message.raw(FishDataLeft.getName()));
-                uiCommandBuilder.set("#CountNumber.TextSpans", Message.raw(String.valueOf(fishCount)));
-                uiCommandBuilder.set("#Family.TextSpans", Message.raw(TextUtils.formatDisplayName(FishDataLeft.getFamilyId())));
-                uiCommandBuilder.set("#Description.TextSpans", Message.raw(FishDataLeft.getDescription()));
-            }
-            else
-            {
-                uiCommandBuilder.set("#Header.TextSpans", Message.raw(TextUtils.seededScrambleText(FishDataLeft.getName())));
-                uiCommandBuilder.set("#CountNumber.TextSpans", Message.raw("Not found"));
-                uiCommandBuilder.set("#Family.TextSpans", Message.raw(TextUtils.seededScrambleText(FishDataLeft.getFamilyId())));
-                uiCommandBuilder.set("#Description.TextSpans", Message.raw(TextUtils.seededScrambleText(FishDataLeft.getDescription())));
-            }
+//            if(AnglersAlmanac.getInstance().database.hasPlayerCaught(PlayerUUID, FishDataLeft.getId()))
+//            {
+//                int fishCount = Stats.getFishCount(FishDataLeft.getId());
+//                String cleanName = FishDataLeft.getItemID()
+//                        .replace("Fish_", "")
+//                        .replace("_Item", "");
+//
+//                String Image = "UI/Custom/Almanac/Fish/Assets/" + cleanName + ".png";
+//                String RarityFile = StampUtil.getStamp(cleanName,FishDataLeft.getRarity());
+//                if(RarityFile != null)
+//                {
+//                    String RarityPath = "UI/Custom/Almanac/Fish/Stamps/"+FishDataLeft.getRarity()+"/"+RarityFile+".png";
+//                    uiCommandBuilder.set("#StampImage.AssetPath", RarityPath);
+//
+//                }
+//                uiCommandBuilder.set("#FishImage.AssetPath", Image);
+//                uiCommandBuilder.set("#Header.TextSpans", Message.raw(FishDataLeft.getName()));
+//                uiCommandBuilder.set("#CountNumber.TextSpans", Message.raw(String.valueOf(fishCount)));
+//                uiCommandBuilder.set("#Family.TextSpans", Message.raw(TextUtils.formatDisplayName(FishDataLeft.getFamilyId())));
+//                uiCommandBuilder.set("#Description.TextSpans", Message.raw(FishDataLeft.getDescription()));
+//            }
+//            else
+//            {
+//                uiCommandBuilder.set("#Header.TextSpans", Message.raw(TextUtils.seededScrambleText(FishDataLeft.getName())));
+//                uiCommandBuilder.set("#CountNumber.TextSpans", Message.raw("Not found"));
+//                uiCommandBuilder.set("#Family.TextSpans", Message.raw(TextUtils.seededScrambleText(FishDataLeft.getFamilyId())));
+//                uiCommandBuilder.set("#Description.TextSpans", Message.raw(TextUtils.seededScrambleText(FishDataLeft.getDescription())));
+//            }
         }
 
         // Right page

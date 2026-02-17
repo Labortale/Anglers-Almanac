@@ -4,9 +4,9 @@
     "fish",
     "freshwater"
   ],
-  "Name": "Atlantic Salmon",
-  "Description": "A powerful swimmer prized for its rich flavor and acrobatic leaps.",
-  "FamilyId": "Salmon_family",
+  "Name": "Salmon",
+  "Description": "Known for its acrobatic leaps, this silver scaled traveller is a master of endurance. While it avoids the Ocean, it roams globally through rivers and lakes, using its muscular frame to navigate currents that would sweep lesser fish away. Catching one is a true test of a fisher's skill and patience.",
+  "FamilyId": "Salmonids",
   "Rarity": "Rare",
   "IsGlobal": true,
   "Weight": 115,

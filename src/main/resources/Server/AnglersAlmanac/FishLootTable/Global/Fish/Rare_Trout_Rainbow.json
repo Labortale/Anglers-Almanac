@@ -5,12 +5,12 @@
     "freshwater"
   ],
   "Name": "Rainbow Trout",
-  "Description": "A prize catch for any angler.",
-  "FamilyId": "Trout_family",
+  "Description": "A prize catch for any angler, the Rainbow Trout is a masterpiece of aquatic design. It earns its name from the vibrant, multi-colored stripe that glows along its sides like a fresh oil slick on the water.",
+  "FamilyId": "salmonids",
   "Rarity": "Rare",
   "IsGlobal": true,
   "Weight": 110,
-  "Size": 45,
+  "Size": 60,
   "Habitats": {
     "Zones": [],
     "Tiers": [],

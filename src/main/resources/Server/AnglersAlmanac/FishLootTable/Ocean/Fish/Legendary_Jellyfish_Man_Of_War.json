@@ -9,7 +9,7 @@
   "FamilyId": "Jellyfish_family",
   "Rarity": "Legendary",
   "IsGlobal": false,
-  "Weight": 1000,
+  "Weight": 50,
   "Size": 50,
   "Habitats": {
     "Zones": ["Ocean"],

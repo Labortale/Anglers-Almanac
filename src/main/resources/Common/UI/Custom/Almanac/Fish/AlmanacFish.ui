@@ -69,7 +69,7 @@ Group #AlmanacStats {
     }
 
     Label #Description {
-      Anchor: (Top: 360, Left: 40, Width: 400, Height: 200);
+      Anchor: (Top: 350, Left: 40, Width: 400, Height: 200);
       Style: (TextColor: #494950, FontSize: 19, Wrap: true);
       Text: "{Fish_info}";
     }
@@ -138,7 +138,7 @@ Group #AlmanacStats {
     }
   
     Label #Description2 {
-      Anchor: (Top: 360, Left: 40, Width: 400, Height: 200);
+      Anchor: (Top: 340, Left: 40, Width: 400, Height: 200);
       Style: (TextColor: #494950, FontSize: 19, Wrap: true);
       Text: "{Fish2_info}";
     }
