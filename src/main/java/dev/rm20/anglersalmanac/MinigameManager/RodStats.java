@@ -8,12 +8,12 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 
 public class RodStats{
 
-    float control;
-    float difficulty;
-    float forgiveness;
-    float stamina;
-    float fishWeightMul;
-    float rarityMul;
+    public float control;
+    public float difficulty;
+    public float forgiveness;
+    public float stamina;
+    public float fishWeightMul;
+    public float rarityMul;
 
 
     public RodStats(){

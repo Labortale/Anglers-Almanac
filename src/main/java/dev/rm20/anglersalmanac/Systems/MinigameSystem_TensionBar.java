@@ -35,12 +35,13 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
     @Override
     public void tick(float deltaTime, int i, @NonNull ArchetypeChunk<EntityStore> archetypeChunk, @NonNull Store<EntityStore> store, @NonNull CommandBuffer<EntityStore> commandBuffer) {
 
-        MinigameComponent_TensionBar game = store.getComponent(archetypeChunk.getReferenceTo(i), MinigameComponent_TensionBar.COMPONENT_TYPE);
+        MinigameComponent_TensionBar game = commandBuffer.getComponent(archetypeChunk.getReferenceTo(i), MinigameComponent_TensionBar.COMPONENT_TYPE);
 
         Ref<EntityStore> playerRef = game.ownerRef;
-        Player player = store.getComponent(playerRef, Player.getComponentType());
+
+        Player player = commandBuffer.getComponent(playerRef, Player.getComponentType());
         ItemStack rodItem = player.getInventory().getActiveHotbarItem(); // TODO ensure that this is always actually the rod. (cancel minigame if switched off)
-        Vector3d playerPos = store.getComponent(playerRef, TransformComponent.getComponentType()).getPosition().clone();
+        Vector3d playerPos = commandBuffer.getComponent(playerRef, TransformComponent.getComponentType()).getPosition().clone();
 
         if(rodItem == null)
         {
@@ -123,8 +124,8 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
 
         // Do minigame logic.
 
-        PlayerRef playerRefObj = store.getComponent(playerRef, PlayerRef.getComponentType());
-        AudioPlayerComponent apc = store.getComponent(store.getExternalData().getRefFromUUID(game.audioPlayerId), AudioPlayerComponent.getComponentType());
+        PlayerRef playerRefObj = commandBuffer.getComponent(playerRef, PlayerRef.getComponentType());
+        AudioPlayerComponent apc = commandBuffer.getComponent(commandBuffer.getExternalData().getRefFromUUID(game.audioPlayerId), AudioPlayerComponent.getComponentType());
         apc.autoplayAsRandom = true;
 
         // Check if bar is over the fish and check win state.
@@ -190,7 +191,8 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
         //game.fightProgress = 0.5f;
         //game.fishPos = 1.0f;
 
-        game.updateMinigameModelPositions(store);
+        AnglersAlmanac.LOGGER.atInfo().log("derp");
+        game.updateMinigameModelPositions(commandBuffer);
         game.fishMoveTimer += deltaTime;
 
     }

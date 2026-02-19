@@ -1,5 +1,6 @@
 package dev.rm20.anglersalmanac.utils;
 
+import com.hypixel.hytale.component.ComponentAccessor;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -11,13 +12,14 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.UUID;
 
 /// A helper class for position and rotation calculations.
 public class TransformUtils {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static void applyBillboard(Ref<EntityStore> looker, Ref<EntityStore>  lookAtTarget, Vector3f finalRotationAdjustment, Store<EntityStore> store){
+    public static void applyBillboard(Ref<EntityStore> looker, Ref<EntityStore>  lookAtTarget, Vector3f finalRotationAdjustment, ComponentAccessor<EntityStore> store){
         Vector3f newRotation = new Vector3f();
 
         if(looker == null || lookAtTarget == null){
@@ -36,7 +38,7 @@ public class TransformUtils {
 
     }
 
-    public static void applyBillboard(UUID lookerID, Vector3d lookerPos, Vector3d lookAtTargetPos, Vector3f finalRotationAdjustment, Store<EntityStore> store){
+    public static void applyBillboard(UUID lookerID, Vector3d lookerPos, Vector3d lookAtTargetPos, Vector3f finalRotationAdjustment, ComponentAccessor<EntityStore> store){
         Vector3f newRotation = new Vector3f();
 
         Ref<EntityStore> lookerRef = store.getExternalData().getRefFromUUID(lookerID);
@@ -53,7 +55,7 @@ public class TransformUtils {
         store.getComponent(lookerRef, TransformComponent.getComponentType()).setRotation(newRotation);
 
     }
-    public static void applyBillboardYOnly(UUID lookerID, Vector3d lookerPos, Vector3d lookAtTargetPos, Vector3f finalRotationAdjustment, Store<EntityStore> store){
+    public static void applyBillboardYOnly(UUID lookerID, Vector3d lookerPos, Vector3d lookAtTargetPos, Vector3f finalRotationAdjustment, ComponentAccessor<EntityStore> store){
         Vector3f newRotation = new Vector3f();
 
         Ref<EntityStore> lookerRef = store.getExternalData().getRefFromUUID(lookerID);
@@ -72,7 +74,7 @@ public class TransformUtils {
 
     }
 
-    public static Vector3f billboard(Vector3d lookerPos, Vector3d lookAtTargetPos, Vector3f finalRotationAdjustment, Store<EntityStore> store){
+    public static Vector3f billboard(Vector3d lookerPos, Vector3d lookAtTargetPos, Vector3f finalRotationAdjustment, ComponentAccessor<EntityStore> store){
         Vector3d directionToPlayer = Vector3d.directionTo(lookerPos, lookAtTargetPos);
         Vector3f fishRotation = Vector3f.lookAt(directionToPlayer);
         fishRotation = fishRotation.add(finalRotationAdjustment);
