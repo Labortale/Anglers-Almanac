@@ -45,6 +45,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
 
         if(rodItem == null)
         {
+            AnglersAlmanac.LOGGER.atWarning().log("rodItem is null");
             return;
         }
         FishingRodData rodMeta = rodItem.getFromMetadataOrNull(FishingRodData.KEYED_CODEC);
