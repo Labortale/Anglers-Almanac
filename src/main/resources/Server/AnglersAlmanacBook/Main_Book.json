@@ -12,7 +12,9 @@
               "ContextData": "DO NOT TOUCH Stats"
             }
           ],
-          "UiFile": "Almanac/AlmanacStats.ui"
+          "UiFile": "Almanac/AlmanacStats.ui",
+          "LeftPage": "DO NOT TOUCH Stats",
+          "RightPage": "DO NOT TOUCH Stats"
         }
       ]
     }

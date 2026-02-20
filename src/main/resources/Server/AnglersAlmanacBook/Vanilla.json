@@ -9,46 +9,23 @@
       },
       "Spread": [
         {
-          "Pages": [
-            {
-              "ContextData": "Global"
-            },
-            {
-              "ContextData": "Common_Bluegill"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFishZone.ui"
+          "UiFile": "Almanac/Fish/AlmanacFishZone.ui",
+          "LeftPage": "Global",
+          "RightPage": "Common_Bluegill"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Common_Catfish"
-            },
-            {
-              "ContextData": "Common_minnow"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Common_Catfish",
+          "RightPage": "Common_minnow"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Rare_Pufferfish"
-            },
-            {
-              "ContextData": "Rare_Salmon"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Rare_Pufferfish",
+          "RightPage": "Rare_Salmon"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Rare_Trout_Rainbow"
-            },
-            {}
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Rare_Trout_Rainbow"
         }
       ]
     },
@@ -61,92 +38,44 @@
       },
       "Spread": [
         {
-          "Pages": [
-            {
-              "ContextData": "Ocean"
-            },
-            {
-              "ContextData": "Epic_Jellyfish_Blue"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFishZone.ui"
+          "UiFile": "Almanac/Fish/AlmanacFishZone.ui",
+          "LeftPage": "Ocean",
+          "RightPage": "Epic_Jellyfish_Blue"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Epic_Jellyfish_Cyan"
-            },
-            {
-              "ContextData": "Epic_Jellyfish_Green"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Epic_Jellyfish_Cyan",
+          "RightPage": "Epic_Jellyfish_Green"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Epic_Jellyfish_Red"
-            },
-            {
-              "ContextData": "Epic_Jellyfish_Yellow"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Epic_Jellyfish_Red",
+          "RightPage": "Epic_Jellyfish_Yellow"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Legendary_Crab"
-            },
-            {
-              "ContextData": "Legendary_Jellyfish_Man_Of_War"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Legendary_Crab",
+          "RightPage": "Legendary_Jellyfish_Man_Of_War"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Legendary_Lobster"
-            },
-            {
-              "ContextData": "Legendary_Shark"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Legendary_Lobster",
+          "RightPage": "Legendary_Shark"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Legendary_Whale"
-            },
-            {
-              "ContextData": "Rare_Clownfish"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Legendary_Whale",
+          "RightPage": "Rare_Clownfish"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Uncommon_Tang_Blue"
-            },
-            {
-              "ContextData": "Uncommon_Tang_Chevron"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Uncommon_Tang_Blue",
+          "RightPage": "Uncommon_Tang_Chevron"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Uncommon_Tang_Lemon_Peel"
-            },
-            {
-              "ContextData": "Uncommon_Tang_Sailfin"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Uncommon_Tang_Lemon_Peel",
+          "RightPage": "Uncommon_Tang_Sailfin"
         }
       ]
     },
@@ -159,24 +88,13 @@
       },
       "Spread": [
         {
-          "Pages": [
-            {
-              "ContextData": "Zone1"
-            },
-            {
-              "ContextData": "Legendary_Pike"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFishZone.ui"
+          "UiFile": "Almanac/Fish/AlmanacFishZone.ui",
+          "LeftPage": "Zone1",
+          "RightPage": "Legendary_Pike"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Legendary_Piranha"
-            },
-            {}
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Legendary_Piranha"
         }
       ]
     },
@@ -189,15 +107,9 @@
       },
       "Spread": [
         {
-          "Pages": [
-            {
-              "ContextData": "Zone2"
-            },
-            {
-              "ContextData": "Legendary_Eel_Moray"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFishZone.ui"
+          "UiFile": "Almanac/Fish/AlmanacFishZone.ui",
+          "LeftPage": "Zone2",
+          "RightPage": "Legendary_Eel_Moray"
         }
       ]
     },
@@ -210,24 +122,13 @@
       },
       "Spread": [
         {
-          "Pages": [
-            {
-              "ContextData": "Zone3"
-            },
-            {
-              "ContextData": "Legendary_Frostgill"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFishZone.ui"
+          "UiFile": "Almanac/Fish/AlmanacFishZone.ui",
+          "LeftPage": "Zone3",
+          "RightPage": "Legendary_Frostgill"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Legendary_Snapjaw"
-            },
-            {}
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Legendary_Snapjaw"
         }
       ]
     },
@@ -240,35 +141,18 @@
       },
       "Spread": [
         {
-          "Pages": [
-            {
-              "ContextData": "Zone4"
-            },
-            {
-              "ContextData": "Legendary_Black_Piranha"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFishZone.ui"
+          "UiFile": "Almanac/Fish/AlmanacFishZone.ui",
+          "LeftPage": "Zone4",
+          "RightPage": "Legendary_Black_Piranha"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Legendary_Black_Trilobite"
-            },
-            {
-              "ContextData": "Legendary_Lava_Shellfish"
-            }
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Legendary_Black_Trilobite",
+          "RightPage": "Legendary_Lava_Shellfish"
         },
         {
-          "Pages": [
-            {
-              "ContextData": "Legendary_Trilobite"
-            },
-            {}
-          ],
-          "UiFile": "Almanac/Fish/AlmanacFish.ui"
+          "UiFile": "Almanac/Fish/AlmanacFish.ui",
+          "LeftPage": "Legendary_Trilobite"
         }
       ]
     }

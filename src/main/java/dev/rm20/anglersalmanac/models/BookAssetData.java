@@ -33,14 +33,11 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
             .append(new KeyedCodec<>("ProgressBarColour", Codec.STRING), (z, v) -> z.ProgressBarColour = v, z -> z.ProgressBarColour).add()
             .build();
 
-    public static final BuilderCodec<PageContext> CONTEXT_CODEC = BuilderCodec.builder(PageContext.class, PageContext::new)
-            .append(new KeyedCodec<>("ContextData", Codec.STRING), (c, v) -> c.contextData = v, c -> c.contextData).add()
-            .build();
-
     public static final BuilderCodec<SpreadTemplate> SPREAD_CODEC = BuilderCodec.builder(SpreadTemplate.class, SpreadTemplate::new)
             .append(new KeyedCodec<>("UiFile", Codec.STRING), (s, v) -> s.uiFile = v, s -> s.uiFile).add()
             .append(new KeyedCodec<>("IsDoublePage", Codec.BOOLEAN), (s, v) -> s.isDoublePage = v, s -> s.isDoublePage).add()
-            .append(new KeyedCodec<>("Pages", new ArrayCodec<>(CONTEXT_CODEC, PageContext[]::new)), (s, v) -> s.pages = v, s -> s.pages).add()
+            .append(new KeyedCodec<>("LeftPage", Codec.STRING), (s, v) -> s.LeftPage = v, s -> s.LeftPage).add()
+            .append(new KeyedCodec<>("RightPage", Codec.STRING), (s, v) -> s.RightPage = v, s -> s.RightPage).add()
             .build();
 
     public static final BuilderCodec<habitatsInfo> HABITAT_INFO_CODEC = BuilderCodec.builder(habitatsInfo.class, habitatsInfo::new)
@@ -94,7 +91,8 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     public static class SpreadTemplate {
         public String uiFile;
         public boolean isDoublePage;
-        public PageContext[] pages = new PageContext[0];
+        public String LeftPage;
+        public String RightPage;
     }
 
     public static class ZoneInfo {
@@ -104,10 +102,6 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
         public String ProgressBarColour;
     }
 
-    public static class PageContext {
-        public String contextData;
-    }
-
     public BookAssetData() {
     }
 
@@ -115,9 +109,11 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     public String getId() {
         return id;
     }
+
     public habitatsInfo[] getHabitats() {
         return habitats;
     }
+
     public List<SpreadTemplate> getFlattenedPages() {
         if (habitats == null) return List.of();
 
@@ -128,29 +124,32 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     }
 
 
-    public record FishEntry(String id, boolean isItem) {}
+    public record FishEntry(String id, boolean isItem) {
+    }
+
     private Map<String, List<FishEntry>> habitatCache;
 
     public List<FishEntry> getFishByHabitat(String habitatName) {
         //buildCache();
         if (habitatCache == null) {
             buildCache();
-       }
+        }
         //AnglersAlmanac.getInstance().getLogger().atInfo().log(habitatCache.toString());
         return habitatCache.getOrDefault(habitatName.toLowerCase(), List.of());
     }
+
     private void buildCache() {
         if (habitats == null) return;
-
         habitatCache = new LinkedHashMap<>();
 
         for (habitatsInfo habitat : habitats) {
             if (habitat == null || habitat.ZoneName == null) continue;
 
             List<FishEntry> fishList = Arrays.stream(habitat.pages != null ? habitat.pages : new SpreadTemplate[0])
-                    .flatMap(spread -> Arrays.stream(spread.pages != null ? spread.pages : new PageContext[0]))
-                    .map(context -> context.contextData)
-                    .distinct() // Safety check for duplicates within the same file
+                    .flatMap(spread -> Stream.of(spread.LeftPage, spread.RightPage))
+                    .filter(Objects::nonNull)
+                    .filter(s -> !s.isEmpty())
+                    .distinct()
                     .map(id -> new FishEntry(id, FishLootManager.getFishData(id) != null))
                     .collect(Collectors.toList());
 
@@ -187,14 +186,12 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     public static BookAssetData getMasterMergedBook() {
         BookAssetData master = new BookAssetData();
         master.id = "master_almanac_merged";
-
         Map<String, habitatsInfo> mergedMap = new LinkedHashMap<>();
 
         getAssetStore().getAssetMap().getAssetMap().values().forEach(book -> {
             if (book.getHabitats() == null) return;
             for (habitatsInfo habitat : book.getHabitats()) {
                 String key = habitat.ZoneName.toLowerCase();
-
                 if (!mergedMap.containsKey(key)) {
                     habitat.pages = mergePages(new SpreadTemplate[0], habitat.pages);
                     mergedMap.put(key, habitat);
@@ -204,6 +201,7 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
                 }
             }
         });
+
         master.habitats = mergedMap.values().stream()
                 .sorted(Comparator.comparingInt(h -> getZoneRank(h.ZoneName)))
                 .toArray(habitatsInfo[]::new);
@@ -213,7 +211,7 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     }
 
     private static SpreadTemplate[] mergePages(SpreadTemplate[] existing, SpreadTemplate[] incoming) {
-        Map<String, PageContext> uniqueFish = new LinkedHashMap<>();
+        Set<String> uniqueFishIds = new LinkedHashSet<>();
         List<SpreadTemplate> specialSpreads = new ArrayList<>();
         String standardFishUi = "Almanac/Fish/AlmanacFish.ui";
         String statsUi = "Almanac/AlmanacStats.ui";
@@ -221,36 +219,27 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
         Stream.concat(Arrays.stream(existing), Arrays.stream(incoming)).forEach(spread -> {
             if (!standardFishUi.equals(spread.uiFile)) {
                 boolean alreadyExists = specialSpreads.stream().anyMatch(s -> s.uiFile.equals(spread.uiFile));
-
                 if (!alreadyExists) {
-                    if (statsUi.equals(spread.uiFile)) {
-                        specialSpreads.add(0, spread);
-                    } else {
-                        specialSpreads.add(spread);
-                    }
+                    if (statsUi.equals(spread.uiFile)) specialSpreads.add(0, spread);
+                    else specialSpreads.add(spread);
                 }
                 return;
             }
-            for (PageContext p : spread.pages) {
-                if (p.contextData != null && !p.contextData.isEmpty()) {
-                    uniqueFish.putIfAbsent(p.contextData, p);
-                }
-            }
+            if (spread.LeftPage != null && !spread.LeftPage.isEmpty()) uniqueFishIds.add(spread.LeftPage);
+            if (spread.RightPage != null && !spread.RightPage.isEmpty()) uniqueFishIds.add(spread.RightPage);
         });
-        List<PageContext> sortedFish = uniqueFish.values().stream()
-                .sorted(Comparator.comparingInt(p -> getRarityWeight(p.contextData)))
+
+        List<String> sortedFish = uniqueFishIds.stream()
+                .sorted(Comparator.comparingInt(FishLootManager::getRarityWeight))
                 .toList();
+
         List<SpreadTemplate> result = new ArrayList<>(specialSpreads);
         for (int i = 0; i < sortedFish.size(); i += 2) {
             SpreadTemplate s = new SpreadTemplate();
             s.uiFile = standardFishUi;
             s.isDoublePage = false;
-
-            if (i + 1 < sortedFish.size()) {
-                s.pages = new PageContext[]{ sortedFish.get(i), sortedFish.get(i + 1) };
-            } else {
-                s.pages = new PageContext[]{ sortedFish.get(i), new PageContext() };
-            }
+            s.LeftPage = sortedFish.get(i);
+            s.RightPage = (i + 1 < sortedFish.size()) ? sortedFish.get(i + 1) : "";
             result.add(s);
         }
 

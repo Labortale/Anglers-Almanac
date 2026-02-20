@@ -35,19 +35,20 @@ public class BookPageManager {
             //TODO: 1 context 2 pages
         } else if (UiFile.equalsIgnoreCase("Almanac/Fish/AlmanacFishZone.ui")) {
             FishLootManager FishDataRight = null;
-            if (currentSpread.pages != null && currentSpread.pages.length > 1) {
-                FishDataRight = FishLootManager.getFishData(currentSpread.pages[1].contextData);
+            if (currentSpread.RightPage != null && !currentSpread.RightPage.isEmpty()) {
+                FishDataRight = FishLootManager.getFishData(currentSpread.RightPage);
             }
-            FishZoneUiPage fishZoneUiPage = new FishZoneUiPage(playerRef1, playerUUID, playerName, stats, currentSpread.pages[0].contextData, FishDataRight, page,getCurrentZoneInfo(bookAsset.getHabitats(),page));
+            FishZoneUiPage fishZoneUiPage = new FishZoneUiPage(playerRef1, playerUUID, playerName, stats, currentSpread.LeftPage, FishDataRight, page,getCurrentZoneInfo(bookAsset.getHabitats(),page));
             pageManager.openCustomPage(playerRef, playerRef.getStore(), fishZoneUiPage);
         } else if (UiFile.startsWith("Almanac/Fish/AlmanacFish")) {
             FishLootManager FishDataLeft = null;
-            if (currentSpread.pages != null && currentSpread.pages.length > 0) {
-                FishDataLeft = FishLootManager.getFishData(currentSpread.pages[0].contextData);
+            if (currentSpread.LeftPage != null && !currentSpread.LeftPage.isEmpty()) {
+                FishDataLeft = FishLootManager.getFishData(currentSpread.LeftPage);
             }
+
             FishLootManager FishDataRight = null;
-            if (currentSpread.pages != null && currentSpread.pages.length > 1) {
-                FishDataRight = FishLootManager.getFishData(currentSpread.pages[1].contextData);
+            if (currentSpread.RightPage != null && !currentSpread.RightPage.isEmpty()) {
+                FishDataRight = FishLootManager.getFishData(currentSpread.RightPage);
             }
 
             String uiFile = pages.get(page).uiFile;
