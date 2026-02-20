@@ -102,86 +102,44 @@ Group #AlmanacStats {
         MaskTexturePath: "Assets/ProgressBarMask.png";
       }
     }
+    Group #ZonessInfo
+    {
+      Anchor: (Top: 250, Left:10, Width: 500, Height:400);
+      LayoutMode: TopScrolling;
+      Button #Ocean {
+        Anchor: (Width: 500,Height:40, Left:1, Top:20);
+        Padding:(Left:20, Right:20);
+        LayoutMode: Left;
+        TooltipText: "10/10 -> click to go to page";
+        Label #OceanHeader {
+          Anchor: (Bottom:20);
+          Style: (TextColor: #494950, FontSize: 22);
+          Text: "Ocean Fish Progress:";
+          FlexWeight: 1;
+        }
+        Label #OceanProgress {
+          Anchor: (Bottom:20);
+          Style: (FontSize: 20);
+          Text: "";
+        }
+      }
 
-    Group #Global {
-      Anchor: (Top: 280, Left:40);
-
-      Label #GlobalHeader {
-        Style: (TextColor: #494950, FontSize: 25);
-        Text: "Global Fish Progress";
-      }
-      Label #GlobalHeader {
-        Anchor: (Top: 30);
-        Style: (TextColor: #494950, FontSize: 20);
-        Text: "{GlobalFish}/{GlobalFishTotal}";
-      }
-    }
-    Group #Ocean {
-      Anchor: (Top: 350, Left:40);
-
-      Label #OceanHeader {
-        Style: (TextColor: #494950, FontSize: 25);
-        Text: "Ocean Fish Progress";
-      }
-      Label #OceanHeader {
-        Anchor: (Top: 30);
-        Style: (TextColor: #494950, FontSize: 20);
-        Text: "{OceanFish}/{OceanFishTotal}";
-      }
-    }
-    Group #Zone1 {
-      Anchor: (Top: 420, Left:40);
-
-      Label #Zone1Header {
-        Style: (TextColor: #494950, FontSize: 25);
-        Text: "Zone1 Fish Progress";
-      }
-      Label #Zone1Header {
-        Anchor: (Top: 30);
-        Style: (TextColor: #494950, FontSize: 20);
-        Text: "{Zone1Fish}/{Zone1FishTotal}";
-      }
-    }
-
-    Group #Zone2 {
-      Anchor: (Top: 490, Left:40);
-
-      Label #Zone1Header {
-        Style: (TextColor: #494950, FontSize: 25);
-        Text: "Zone2 Fish Progress";
-      }
-      Label #Zone2Header {
-        Anchor: (Top: 30);
-        Style: (TextColor: #494950, FontSize: 20);
-        Text: "{Zone2Fish}/{Zone2FishTotal}";
-      }
-    }
-
-    Group #Zone3 {
-      Anchor: (Top: 560, Left:40);
-
-      Label #Zone3Header {
-        Style: (TextColor: #494950, FontSize: 25);
-        Text: "Zone3 Fish Progress";
-      }
-      Label #Zone1Header {
-        Anchor: (Top: 30);
-        Style: (TextColor: #494950, FontSize: 20);
-        Text: "{Zone3Fish}/{Zone3FishTotal}";
-      }
-    }
-
-    Group #Zone4 {
-      Anchor: (Top: 630, Left:40);
-
-      Label #Zone4Header {
-        Style: (TextColor: #494950, FontSize: 25);
-        Text: "Zone4 Fish Progress";
-      }
-      Label #Zone2Header {
-        Anchor: (Top: 30);
-        Style: (TextColor: #494950, FontSize: 20);
-        Text: "{Zone4Fish}/{Zone4FishTotal}";
+      Button #Ocean {
+        Anchor: (Width: 500,Height:40, Left:1, Top:20);
+        Padding:(Left:20, Right:20);
+        LayoutMode: Left;
+        TooltipText: "10/10 -> click to go to page";
+        Label #OceanHeader {
+          Anchor: (Bottom:20);
+          Style: (TextColor: #494950, FontSize: 22);
+          Text: "Ocean Fish Progress:";
+          FlexWeight: 1;
+        }
+        Label #OceanProgress2 {
+          Anchor: (Bottom:20);
+          Style: (FontSize: 20);
+          Text: "";
+        }
       }
     }
   }

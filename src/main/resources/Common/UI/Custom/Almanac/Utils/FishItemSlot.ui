@@ -1,0 +1,18 @@
+@FishMissing = "Info/FishMissing.png";
+@FishBorder = "Info/FishBorder.png";
+
+Group #ItemIconBG {
+  Anchor: (Width: 70, Height: 70, Left: 10);
+  Background: @FishBorder;
+
+  ItemIcon #ItemIcon {
+    Anchor: (Width: 65, Height: 65);
+    ItemId: "";
+  }
+
+  Group #ItemIconMissing {
+    Anchor: (Width: 70, Height: 70);
+    Background: @FishMissing;
+    Visible: false;
+  }
+}

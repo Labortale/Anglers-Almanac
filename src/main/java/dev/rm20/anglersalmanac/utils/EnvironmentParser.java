@@ -1,6 +1,6 @@
 package dev.rm20.anglersalmanac.utils;
 
-import dev.rm20.anglersalmanac.models.ZoneInfo;
+import dev.rm20.anglersalmanac.metadata.ZoneInfo;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;

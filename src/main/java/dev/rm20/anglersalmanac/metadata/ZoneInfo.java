@@ -1,4 +1,4 @@
-package dev.rm20.anglersalmanac.models;
+package dev.rm20.anglersalmanac.metadata;
 
 public record ZoneInfo(
         String zone,

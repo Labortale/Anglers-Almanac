@@ -23,8 +23,7 @@ import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.interactions.MinigameInteraction;
 import dev.rm20.anglersalmanac.interactions.OpenBookInteraction;
 import dev.rm20.anglersalmanac.models.BookAssetData;
-import dev.rm20.anglersalmanac.registration.RegisterManager;
-import dev.rm20.anglersalmanac.registration.SystemRegisteration;
+import dev.rm20.anglersalmanac.registration.*;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
 import dev.rm20.anglersalmanac.utils.MinigameRodStats;
 
@@ -58,19 +57,14 @@ public class AnglersAlmanac extends JavaPlugin {
     protected void setup() {
         LOGGER.atInfo().log("Setting up plugin " + this.getName());
         RegisterManager.registerCommands(this);
+        AssetRegisterManager.registerAll(this);
+
 
         // Register FishLoot asset.
         AssetRegistry.register(HytaleAssetStore.builder(FishLootManager.class, new DefaultAssetMap<String, FishLootManager>())
                 .setPath("AnglersAlmanac")
                 .setCodec(FishLootManager.CODEC)
                 .setKeyFunction(FishLootManager::getId)
-                .build()
-        );
-
-        AssetRegistry.register(HytaleAssetStore.builder(BookAssetData.class, new DefaultAssetMap<String, BookAssetData>())
-                .setPath("AnglersAlmanacBook")
-                .setCodec(BookAssetData.CODEC)
-                .setKeyFunction(BookAssetData::getId)
                 .build()
         );
 
@@ -84,17 +78,11 @@ public class AnglersAlmanac extends JavaPlugin {
 
 
         // Register Components
-        bobberComponent = this.getEntityStoreRegistry().registerComponent(BobberComponent.class, BobberComponent::new);
-        MinigameComponent_TensionBar.COMPONENT_TYPE = this.getEntityStoreRegistry().registerComponent(MinigameComponent_TensionBar.class, MinigameComponent_TensionBar::new);
-        AudioPlayerComponent.COMPONENT_TYPE = this.getEntityStoreRegistry().registerComponent(AudioPlayerComponent.class, AudioPlayerComponent::new);
-        ComponentType<EntityStore, PhysicsComponent> type = this.getEntityStoreRegistry().registerComponent(PhysicsComponent.class, PhysicsComponent::new);
-
+        ComponentManager.registerComponent(this);
         // Register Interaction Codecs
-        this.getCodecRegistry(Interaction.CODEC).register("launch_bobber_interaction", LaunchBobberInteraction.class, LaunchBobberInteraction.CODEC);
-        this.getCodecRegistry(Interaction.CODEC).register("minigame_interaction", MinigameInteraction.class, MinigameInteraction.CODEC);
-        this.getCodecRegistry(Interaction.CODEC).register("open_almanac_interaction", OpenBookInteraction.class, OpenBookInteraction.CODEC);
+        InteractionManager.registerInteractions(this);
 
-        PhysicsComponent.setComponentType(type);
+        //System Interaction
         SystemRegisteration.registerSystem(this);
 
         var fishLootManagerStore = FishLootManager.getAssetStore();

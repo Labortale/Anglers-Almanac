@@ -1,0 +1,15 @@
+{
+  "ItemId": "Fish_Eel_Moray_Item",
+  "Name": "Eel Moray",
+  "Rarity": "Legendary",
+  "Description": "An Eel",
+  "FamilyId": "Eel",
+  "Weight": 30,
+  "Habitats": {
+    "Zones": [
+      "2"
+    ],
+    "Min_depth": 3
+  },
+  "Size": 250
+}

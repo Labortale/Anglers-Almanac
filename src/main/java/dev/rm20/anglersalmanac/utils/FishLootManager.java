@@ -10,12 +10,16 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
-import com.hypixel.hytale.logger.HytaleLogger;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
-import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
-import dev.rm20.anglersalmanac.models.FishingContext;
+import dev.rm20.anglersalmanac.metadata.FishingContext;
+import dev.rm20.anglersalmanac.registration.HytaleAsset;
 
 import java.util.*;
+
+//TODO: Move to models
+//@HytaleAsset(
+//        path = "AnglersAlmanac"
+//)
 
 public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap<String, FishLootManager>> {
 
@@ -24,6 +28,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     public static final BuilderCodec<BookInfo> Book_CODEC = BuilderCodec.builder(BookInfo.class, BookInfo::new)
             .append(new KeyedCodec<>("Image_Path", Codec.STRING), (h, v) -> h.image_file = v, h -> h.image_file).add()
             .append(new KeyedCodec<>("Habitat_Info", Codec.STRING), (h, v) -> h.habitat_info = v, h -> h.habitat_info).add()
+            .append(new KeyedCodec<>("Page_File_Ui", Codec.STRING), (h, v) -> h.PageFileUI = v, h -> h.PageFileUI).add()
             .build();
 
     public static final BuilderCodec<Quantity> Quantity_CODEC = BuilderCodec.builder(Quantity.class, Quantity::new)
@@ -202,6 +207,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     public static class BookInfo {
         public String image_file;
         public String habitat_info;
+        public String PageFileUI;
     }
 
     // Reward logic
@@ -238,9 +244,11 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
 
     public static FishLootManager getFishData(String id) {
         if (id == null) return null;
-        return getAllLoot().stream()
-                .filter(loot -> loot.id.equalsIgnoreCase(id)).toList().getFirst();
 
+        return getAllLoot().stream()
+                .filter(loot -> loot.id.equalsIgnoreCase(id))
+                .findFirst()
+                .orElse(null);
     }
 
     private static boolean isEligible(FishLootManager loot, FishingContext ctx) {
@@ -330,5 +338,22 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
 
     public MinigameStats getMinigameStats() {
         return minigameStats;
+    }
+
+
+
+
+    public static int getRarityWeight(String fishId) {
+        var data = FishLootManager.getFishData(fishId);
+        if (data == null) return 99;
+
+        return switch (data.getRarity().toLowerCase()) {
+            case "common" -> 0;
+            case "uncommon" -> 1;
+            case "rare" -> 2;
+            case "epic" -> 3;
+            case "legendary" -> 4;
+            default -> 99; // Default weight for unknown rarities
+        };
     }
 }

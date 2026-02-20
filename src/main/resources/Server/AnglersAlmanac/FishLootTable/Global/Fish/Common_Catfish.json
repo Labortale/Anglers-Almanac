@@ -39,6 +39,7 @@
     "Stamina": 40
   },
   "Book_info": {
-    "Habitat_Info": "• Everywhere|  Expect Oceans"
+    "Habitat_Info": "• Everywhere|  Expect Oceans",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage1.ui"
   }
 }

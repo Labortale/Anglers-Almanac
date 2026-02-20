@@ -1,6 +1,5 @@
-package dev.rm20.anglersalmanac.models;
+package dev.rm20.anglersalmanac.metadata;
 
-import com.hypixel.hytale.server.core.universe.world.WorldMapTracker;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 
 public record FishingContext(

@@ -1,14 +1,8 @@
-package dev.rm20.anglersalmanac.models;
+package dev.rm20.anglersalmanac.metadata;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
-import org.bson.types.Code;
-
-import java.util.UUID;
 
 public class BookData {
     public static final String KEY = "AnglersAlmanacBookOwner";

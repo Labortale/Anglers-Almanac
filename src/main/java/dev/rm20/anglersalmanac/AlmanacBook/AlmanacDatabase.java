@@ -176,24 +176,25 @@ public class AlmanacDatabase {
     }
 
     public boolean hasPlayerCaught(String playerUUID, String fishId) {
-        if (this.connection == null) {
-            init();
-            if (this.connection == null) return false;
-        }
-
-        String sql = "SELECT 1 FROM catches WHERE player_uuid = ? AND fish_id = ? LIMIT 1";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, playerUUID);
-            ps.setString(2, fishId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return true;
+//        if (this.connection == null) {
+//            init();
+//            if (this.connection == null) return false;
+//        }
+//
+//        String sql = "SELECT 1 FROM catches WHERE player_uuid = ? AND fish_id = ? LIMIT 1";
+//
+//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setString(1, playerUUID);
+//            ps.setString(2, fishId);
+//
+//            try (ResultSet rs = ps.executeQuery()) {
+//                return rs.next();
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
     }
 
     public Map<String, Integer> getAllFishCounts(String playerUUID) {
