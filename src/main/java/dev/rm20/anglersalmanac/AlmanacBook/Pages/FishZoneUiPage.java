@@ -28,7 +28,7 @@ import java.util.Objects;
 
 import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.OpenPage;
 
-public class FishZoneUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGuiData> {
+public class FishZoneUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData> {
     private final String PlayerUUID;
     private final String PlayerName;
     private final AlmanacDatabase.PlayerStatsData Stats;
@@ -38,7 +38,7 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
     private final BookAssetData.ZoneInfo zoneInfo;
 
     public FishZoneUiPage(PlayerRef playerRef, String playerUUID, String playerName, AlmanacDatabase.PlayerStatsData stats, String zoneName, FishLootManager fishDataRight, int page, BookAssetData.ZoneInfo ZoneInfo) {
-        super(playerRef, CustomPageLifetime.CanDismiss, StatUiPage.AlmanacGuiData.CODEC);
+        super(playerRef, CustomPageLifetime.CanDismiss, pageUtils.AlmanacGuiData.CODEC);
         PlayerUUID = playerUUID;
         PlayerName = playerName;
         Stats = stats;
@@ -51,32 +51,31 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Almanac/Fish/AlmanacFishZone.ui");
-        uiEventBuilder.addEventBinding(
-                CustomUIEventBindingType.Activating,
-                "#NextPageButton",
-                EventData.of(StatUiPage.AlmanacGuiData.KEY_BUTTON, "NextPage"),
-                false
-        );
-        uiEventBuilder.addEventBinding(
-                CustomUIEventBindingType.Activating,
-                "#PrevPageButton",
-                EventData.of(StatUiPage.AlmanacGuiData.KEY_BUTTON, "PrevPage"),
-                false
-        );
+        pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder,Page);
+
+
         BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
-        ;
         List<BookAssetData.FishEntry> Fish = bookAsset.getFishByHabitat(ZoneName);
         //AnglersAlmanac.getInstance().getLogger().atInfo().log(Fish.toString());
-        uiCommandBuilder.set("#Header.Text", ZoneName + " Fish");
-        uiCommandBuilder.set("#ZoneHeader.Text", zoneInfo.zoneDescription);
-        uiCommandBuilder.set("#ZoneIconImage.AssetPath", zoneInfo.ZoneImage);
-        if (zoneInfo.ProgressBarColour != null) {
-            uiCommandBuilder.set("#FishProgress.Color", zoneInfo.ProgressBarColour);
+        String name = ZoneName;
+
+        if (zoneInfo != null && zoneInfo.displayName != null && !zoneInfo.displayName.isEmpty()) {
+            name = zoneInfo.displayName;
+        }
+
+        uiCommandBuilder.set("#Header.Text", name + "'s Fish");
+        if(zoneInfo !=null)
+        {
+            uiCommandBuilder.set("#ZoneHeader.Text", zoneInfo.zoneDescription);
+            uiCommandBuilder.set("#ZoneIconImage.AssetPath", zoneInfo.ZoneImage);
+            if (zoneInfo.ProgressBarColour != null) {
+                uiCommandBuilder.set("#FishProgress.Color", zoneInfo.ProgressBarColour);
+            }
         }
         List<BookAssetData.FishEntry> validFishItems = Fish.stream()
                 .filter(BookAssetData.FishEntry::isItem)
                 .toList();
-        buildDynamicFishGrid(validFishItems, PlayerUUID, uiCommandBuilder);
+        buildDynamicFishGrid(validFishItems, PlayerUUID, uiCommandBuilder, uiEventBuilder);
         Map<String, BookAssetData.HabitatProgress> progressMap = bookAsset.getAllHabitatProgress(PlayerUUID);
         BookAssetData.HabitatProgress zoneProgress = progressMap.getOrDefault(ZoneName, new BookAssetData.HabitatProgress(0, 0));
         uiCommandBuilder.set("#FishProgress.Value", Math.min(1.0f, zoneProgress.getPercentage()));
@@ -96,7 +95,7 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
     }
 
     @Override
-    public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull StatUiPage.AlmanacGuiData data) {
+    public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull pageUtils.AlmanacGuiData data) {
         super.handleDataEvent(ref, store, data);
 
         Player player = store.getComponent(ref, Player.getComponentType());
@@ -111,10 +110,18 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
             }
             OpenPage(player, newPage, PlayerUUID, PlayerName);
         }
+
+        if (data.getButton().startsWith("OpenFish:")) {
+            String fishId = data.getButton().split(":")[1];
+            int targetPage = BookPageManager.getPageIndexForFish(fishId);
+            if (targetPage != -1) {
+                BookPageManager.OpenPage(player, targetPage, PlayerUUID, PlayerName);
+            }
+        }
     }
 
 
-    private void buildDynamicFishGrid(List<BookAssetData.FishEntry> validFishItems, String playerUUID, @Nonnull UICommandBuilder uiCommandBuilder) {
+    private void buildDynamicFishGrid(List<BookAssetData.FishEntry> validFishItems, String playerUUID, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder) {
         uiCommandBuilder.clear("#FishGridContainer");
 
         int itemsPerRow = 5;
@@ -129,21 +136,31 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGu
                         "Group " + rowId + " { LayoutMode: Left; Anchor: (Top: 10, Left: 10); }");
             }
             uiCommandBuilder.append(rowId, "Almanac/Utils/FishItemSlot.ui");
-            AnglersAlmanac.LOGGER.atInfo().log(uiCommandBuilder.toString());
             String slotPath = rowId + "[" + colIndex + "]";
 
             BookAssetData.FishEntry currentFish = validFishItems.get(i);
             FishLootManager actualItem = FishLootManager.getFishData(currentFish.id());
+
+            uiEventBuilder.addEventBinding(
+                    CustomUIEventBindingType.Activating,
+                    slotPath + " #FishButton",
+                    EventData.of(pageUtils.AlmanacGuiData.KEY_BUTTON, "OpenFish:" + currentFish.id()),
+                    false
+            );
+
             boolean hasCaught = AnglersAlmanac.getInstance().database.hasPlayerCaught(playerUUID, currentFish.id());
 
             if (hasCaught && actualItem != null) {
                 uiCommandBuilder.set(slotPath + " #ItemIcon.ItemId", actualItem.getItemID());
-                uiCommandBuilder.set(slotPath + " #ItemIcon.TooltipText", actualItem.getName());
+                uiCommandBuilder.set(slotPath + " #FishButton.TooltipText", actualItem.getName());
                 uiCommandBuilder.set(slotPath + " #ItemIconMissing.Visible", false);
+                uiCommandBuilder.set(slotPath+ " #ItemGradient.Background",FishLootManager.getRarityColour(actualItem.getRarity()));
             } else {
                 uiCommandBuilder.set(slotPath + " #ItemIcon.ItemId", "");
                 uiCommandBuilder.set(slotPath + " #ItemIconMissing.Visible", true);
-                uiCommandBuilder.set(slotPath + " #ItemIconMissing.TooltipText", "Unknown Fish");
+                uiCommandBuilder.set(slotPath + " #FishButton.TooltipText", "Unknown Fish");
+                uiCommandBuilder.set(slotPath+ " #ItemGradient.Visible",false);
+
             }
         }
     }

@@ -1,4 +1,4 @@
-$Common = "Common.ui";
+
 
 @Background = PatchStyle(TexturePath: "../book_2.png");
 @FishTexture = PatchStyle(TexturePath: "Fish1.png");
@@ -11,19 +11,9 @@ Group #AlmanacStats {
   Group #background {
     Background: @Background;
   }
-
   Group #BookNav
   {
-    // NAV BUTTONS
-    Button  #PrevPageButton {
-      Anchor: (Bottom: 45, Left: 115, Width: 60, Height: 30);
-      Background: #3A3A3A;
-    }
-
-    Button  #NextPageButton {
-      Anchor: (Bottom: 45, Right: 65, Width: 60, Height: 30);
-      Background: #3A3A3A;
-    }
+    Anchor:(Bottom: 40);
   }
 
   Group #LeftPageSlot { Anchor: (Left: 100, Top: 60, Width: 450, Height: 750); }

@@ -20,26 +20,33 @@ import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.MinigameManager.Minigame;
 import dev.rm20.anglersalmanac.models.BookAssetData;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
+import dev.rm20.anglersalmanac.utils.pageUtils;
 
 import javax.annotation.Nonnull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.OpenPage;
+import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.getPageIndexForZone;
+import static dev.rm20.anglersalmanac.models.BookAssetData.getZoneRank;
 
 
-public class StatUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGuiData> {
+public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData> {
 
     private final String PlayerUUID;
     private final String PlayerName;
     private final AlmanacDatabase.PlayerStatsData stats;
-    public StatUiPage(PlayerRef playerRef, String playerUUID, String playerName,AlmanacDatabase.PlayerStatsData stats) {
-        super(playerRef, CustomPageLifetime.CanDismiss, AlmanacGuiData.CODEC);
+
+    public StatUiPage(PlayerRef playerRef, String playerUUID, String playerName, AlmanacDatabase.PlayerStatsData stats) {
+        super(playerRef, CustomPageLifetime.CanDismiss, pageUtils.AlmanacGuiData.CODEC);
         PlayerUUID = playerUUID;
         PlayerName = playerName;
         this.stats = stats;
     }
+
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder,
                       @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
@@ -50,12 +57,7 @@ public class StatUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGuiDat
         //AlmanacDatabase db = AnglersAlmanac.getInstance().database;
         //AlmanacDatabase.PlayerStatsData stats = db.getPlayerStats(this.PlayerUUID);
 
-        uiEventBuilder.addEventBinding(
-                CustomUIEventBindingType.Activating,
-                "#NextPageButton",
-                EventData.of(AlmanacGuiData.KEY_BUTTON, "NextPage"),
-                false
-        );
+        pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder, 0);
 
         uiCommandBuilder.set("#TotalFish.TextSpans", Message.raw("Total fish: " + stats.totalCatches));
         uiCommandBuilder.set("#LegendaryCount.TextSpans", Message.raw("Legendary fish: " + stats.legendaryCount));
@@ -63,9 +65,9 @@ public class StatUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGuiDat
         uiCommandBuilder.set("#PerfectCount.TextSpans", Message.raw("Perfects: " + perfects));
         int great = stats.getRatingCount(Minigame.PerformanceRating.GREAT);
         uiCommandBuilder.set("#GreatCount.TextSpans", Message.raw("Great: " + great));
-        uiCommandBuilder.set("#OwnerInfo.TextSpans", Message.raw("Property of: " + (this.PlayerName != null ? this.PlayerName : "Unknown")));
+        uiCommandBuilder.set("#Header.TextSpans", Message.raw( (this.PlayerName != null ? this.PlayerName : "Unknown")+" Stats:" ));
 
-        String topFish = (stats.topFish != null && !stats.topFish.isEmpty()) ?FishLootManager.getFishData(stats.topFish.get(0).name()).getName() : "None yet!";
+        String topFish = (stats.topFish != null && !stats.topFish.isEmpty()) ? FishLootManager.getFishData(stats.topFish.get(0).name()).getName() : "None yet!";
         uiCommandBuilder.set("#MostFound.TextSpans", Message.raw("Most found: " + topFish));
 
 
@@ -88,92 +90,87 @@ public class StatUiPage extends InteractiveCustomUIPage<StatUiPage.AlmanacGuiDat
         int globalCaught = progress.values().stream().mapToInt(p -> p.caught()).sum();
         int globalTotal = progress.values().stream().mapToInt(p -> p.total()).sum();
         float globalPercent = (globalTotal > 0) ? (float) globalCaught / globalTotal : 0;
-        uiCommandBuilder.set("#FishProgress.Value",globalPercent );
-        CreateList(uiCommandBuilder,uiEventBuilder,bookAsset);
+        uiCommandBuilder.set("#FishProgress.Value", globalPercent);
+        CreateList(uiCommandBuilder, uiEventBuilder, bookAsset);
     }
+
     @Override
-    public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull AlmanacGuiData data) {
+    public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull pageUtils.AlmanacGuiData data) {
         super.handleDataEvent(ref, store, data);
 
         Player player = store.getComponent(ref, Player.getComponentType());
         if (player == null || data.getButton() == null) return;
-        AnglersAlmanac.LOGGER.atInfo().log(data.getButton());
         if (data.getButton().equals("NextPage")) {
             OpenPage(player, 1, PlayerUUID, PlayerName);
         }
         // Zone click
         else if (data.getButton().startsWith("OpenZone:")) {
             String zoneName = data.getButton().split(":")[1];
-            AnglersAlmanac.LOGGER.atInfo().log(zoneName);
+            OpenPage(player, getPageIndexForZone(zoneName), PlayerUUID, PlayerName);
         }
     }
-    public static class AlmanacGuiData {
-        static final String KEY_BUTTON = "Button";
 
-        public static final BuilderCodec<AlmanacGuiData> CODEC = BuilderCodec.builder(AlmanacGuiData.class, AlmanacGuiData::new)
-                .append(new KeyedCodec<>(KEY_BUTTON, Codec.STRING),
-                        (data, val) -> data.button = val,
-                        data -> data.button)
-                .add()
-                .build();
-
-        private String button;
-
-        public String getButton() {
-            return button;
-        }
-    }
 
     public Message createProgressBar(int caught, int total) {
         int barWidth = 15;
         int filledCount = (total > 0) ? (int) ((float) caught / total * barWidth) : 0;
 
         Message bar = Message.raw("[").color("#494950");
-        Message filledPart = Message.raw("|".repeat(filledCount)).color("#3498DB");
-        Message emptyPart = Message.raw("-".repeat(barWidth - filledCount)).color("#494950");
+        Message filledPart = Message.raw("=".repeat(filledCount)).color("#3498DB");
+        Message emptyPart = Message.raw("_".repeat(barWidth - filledCount)).color("#494950");
         Message closingBracket = Message.raw("]").color("#494950");
 
-        return bar.insertAll(filledPart, emptyPart, closingBracket);
+        return bar.insertAll(filledPart, emptyPart, closingBracket).monospace(true);
     }
 
-    public void CreateList(UICommandBuilder uiCommandBuilder, UIEventBuilder uiEventBuilder, BookAssetData bookAsset)
-    {
+    public void CreateList(UICommandBuilder uiCommandBuilder, UIEventBuilder uiEventBuilder, BookAssetData bookAsset) {
         uiCommandBuilder.clear("#ZonessInfo");
-        // 1. Get progress for all habitats
         Map<String, BookAssetData.HabitatProgress> allProgress = bookAsset.getAllHabitatProgress(PlayerUUID);
         List<String> sortedZones = allProgress.keySet().stream()
                 .sorted((a, b) -> {
-                    if (a.equalsIgnoreCase("Ocean")) return -1; // Ocean always first
-                    if (b.equalsIgnoreCase("Ocean")) return 1;
-                    return a.compareToIgnoreCase(b); // Others alphabetical (Zone1, Zone2, etc.)
+                    int rankA = getZoneRank(a);
+                    int rankB = getZoneRank(b);
+                    if (rankA != rankB) {
+                        return Integer.compare(rankA, rankB);
+                    }
+                    return a.compareToIgnoreCase(b);
                 })
                 .toList();
         int index = 0;
         for (String zoneName : sortedZones) {
+            if (Objects.equals(zoneName, "almanacstats")) {
+                continue;
+            }
+            BookAssetData.habitatsInfo habitatData = Arrays.stream(bookAsset.getHabitats())
+                    .filter(h -> h.ZoneName.equalsIgnoreCase(zoneName))
+                    .findFirst()
+                    .orElse(null);
+
             BookAssetData.HabitatProgress habitat = allProgress.get(zoneName);
-
-            // 2. Append the template to the scrolling group
             uiCommandBuilder.append("#ZonessInfo", "Almanac/Utils/HabitatEntry.ui");
-
-            // 3. Target the specific element by its index in the container
             String basePath = "#ZonessInfo[" + index + "]";
 
-            // Set the Name and the ASCII Progress Bar
-            uiCommandBuilder.set(basePath + " #HabitatHeader.Text", zoneName + " Progress:");
+            // Set name + bar
+            String name = zoneName;
+            if(habitatData !=null)
+            {
+                if (habitatData.zoneInfo != null && habitatData.zoneInfo.displayName != null && !habitatData.zoneInfo.displayName.isEmpty()) {
+                    name = habitatData.zoneInfo.displayName;
+                }
+            }
+
+            uiCommandBuilder.set(basePath + " #HabitatHeader.Text", name + ":");
 
             Message progressBar = createProgressBar(habitat.caught(), habitat.total());
             uiCommandBuilder.set(basePath + " #HabitatProgressText.TextSpans", progressBar);
-
-            // Add Tooltip (e.g., "12/20 -> Click to view")
+            // Add Tooltip
             uiCommandBuilder.set(basePath + " #HabitatButton.TooltipText",
                     habitat.caught() + "/" + habitat.total() + " -> Click to view");
-
-            // 4. Add Event Binding to open that specific zone's page
-            // We send the zone name as the event data
+            // Make button work
             uiEventBuilder.addEventBinding(
                     CustomUIEventBindingType.Activating,
                     basePath + " #HabitatButton",
-                    EventData.of(AlmanacGuiData.KEY_BUTTON, "OpenZone:" + zoneName),
+                    EventData.of(pageUtils.AlmanacGuiData.KEY_BUTTON, "OpenZone:" + zoneName),
                     false
             );
 

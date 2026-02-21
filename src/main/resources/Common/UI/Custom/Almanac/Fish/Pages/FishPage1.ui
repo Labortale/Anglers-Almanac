@@ -8,14 +8,14 @@ Group #FPageContent {
   }
 
   Group #HabitatSection {
-    Anchor: (Top: 10, Left: 275, Width: 200);
+    Anchor: (Top: 10, Left: 240, Width: 235);
     Label #HabitatTitle {
       Style: (TextColor: #2A5A82, FontSize: 18, RenderBold: true);
       Text: "Habitat:";
     }
     Label #HabitatList {
       Anchor: (Top: 0, Left: 75);
-      Style: (TextColor: #494950, FontSize: 18);
+      Style: (TextColor: #494950, FontSize: 18, Wrap: true);
       Text: "{Fish_Habitat}";
     }
   }
@@ -27,7 +27,7 @@ Group #FPageContent {
   }
 
   Group #QuickStatsRow {
-    Anchor: (Top: 300, Left: 40, Width: 400, Height: 60);
+    Anchor: (Top: 325, Left: 40, Width: 400, Height: 60);
 
     Label #CountLabel {
       Anchor: (Top: 0, Left: 0);
@@ -47,19 +47,19 @@ Group #FPageContent {
     }
     Label #Family {
       Anchor: (Top: 20, Left: 270);
-      Style: (TextColor: #3A3A3A, FontSize: 18);
+      Style: (TextColor: #3A3A3A, FontSize: 18,Wrap: true);
       Text: "{Fish familly}";
     }
   }
 
   Label #Description {
-    Anchor: (Top: 360, Left: 40, Width: 380);
+    Anchor: (Top: 385, Left: 40, Width: 380);
     Style: (TextColor: #494950, FontSize: 20, Wrap: true);
     Text: "{Fish_info}";
   }
 
   Group #Stamp {
-    Anchor: (Bottom: 20, Right: 20, Width: 140, Height: 140);
+    Anchor: (Bottom: 10, Right: 0, Width: 180, Height: 180);
     AssetImage #StampImage {
     }
   }

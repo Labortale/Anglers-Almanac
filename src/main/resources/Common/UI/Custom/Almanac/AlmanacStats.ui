@@ -7,10 +7,9 @@ Group #AlmanacStats {
     Background: @Background;
   }
   // --- NAVIGATION BUTTONS ---
-
-  Button  #NextPageButton {
-    Anchor: (Bottom: 45, Right: 65, Width: 60, Height: 30);
-    Background: #3A3A3A;
+  Group #BookNav
+  {
+    Anchor:(Bottom: 40);
   }
 
   // --- LEFT PAGE CONTENT ---
@@ -69,12 +68,6 @@ Group #AlmanacStats {
     Label #Fish8  { Anchor: (Top: 490, Left: 30); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_8} : {fish_8_count}"; }
     Label #Fish9  { Anchor: (Top: 520, Left: 30); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_9} : {fish_9_count}"; }
     Label #Fish10 { Anchor: (Top: 550, Left: 30); Style: (TextColor: #494950, FontSize: 22); Text: "- {fish_10} : {fish_10_count}"; }
-
-    Label #OwnerInfo {
-      Anchor: (Top: 725, Right:0 );
-      Style: (TextColor: #1c1c25, FontSize: 18, HorizontalAlignment: End);
-      Text: "Property of: {owner_name}";
-    }
   }
 
   Group #RightPage {
@@ -85,26 +78,28 @@ Group #AlmanacStats {
       Style: (TextColor: #494950, FontSize: 30);
       Text: "Collection Progress";
     }
-    Group #ProgressContainer {
-      Anchor: (Top: 10, Left: 120, Width: 300, Height: 300);
-      Group #Background {
-        Anchor: (Width: 300, Height: 300);
-        Background: "Assets/BackgroundSignatureAbilityNotReady.png";
-      }
 
-      Group #SignatureIcon {
-        Anchor: (Width: 150, Height: 150);
-        Background: (TexturePath: "Assets/Earth_Temp.png", Color: #ffffff);
+    Group #ProgressContainer {
+      Anchor: (Top: 10, Left: 100, Width: 300, Height: 300);
+      Group #ProgressBackground {
+        Anchor: (Width: 300, Height: 300);
+        Background: "Fish/Assets/BackgroundSignatureAbilityNotReady.png";
       }
       CircularProgressBar #FishProgress {
         Value: 1;
         Color: #2A5A82;
-        MaskTexturePath: "Assets/ProgressBarMask.png";
+        MaskTexturePath: "Fish/Assets/ProgressBarMask.png";
+      }
+
+      Group #ZoneIcon {
+        Anchor: (Width: 250, Height: 250,Left:15, Top:20);
+        Background: (TexturePath: "Fish/Assets/Orbis_2.png", Color: #ffffff);
       }
     }
+
     Group #ZonessInfo
     {
-      Anchor: (Top: 250, Left:10, Width: 500, Height:400);
+      Anchor: (Top: 290, Left:10, Width: 500, Height:400);
       LayoutMode: TopScrolling;
       Button #Ocean {
         Anchor: (Width: 500,Height:40, Left:1, Top:20);

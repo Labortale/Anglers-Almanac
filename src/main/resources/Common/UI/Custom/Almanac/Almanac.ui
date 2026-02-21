@@ -7,14 +7,9 @@ Group #Almanac {
   Group #background { Background: @Background; }
 
   // --- NAVIGATION BUTTONS ---
-  Button #PrevPage {
-    TooltipText: "Prev page";
-    Anchor: (Bottom: 40, Left: 50, Width: 100, Height: 50);
-  }
-
-  Button #NextPage {
-    TooltipText: "Next page";
-    Anchor: (Bottom: 40, Right: 50, Width: 100, Height: 50);
+  Group #BookNav
+  {
+    Anchor:(Bottom: 40);
   }
 
   // --- PAGE CONTENT CONTAINERS ---

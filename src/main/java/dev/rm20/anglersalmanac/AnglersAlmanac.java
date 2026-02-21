@@ -4,24 +4,15 @@ import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
-import com.hypixel.hytale.server.core.asset.type.item.config.Item;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.server.core.util.Config;
-import dev.rm20.anglersalmanac.AlmanacBook.AlmanacBook;
 import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
-import dev.rm20.anglersalmanac.components.AudioPlayerComponent;
 import dev.rm20.anglersalmanac.components.BobberComponent;
-import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
-import dev.rm20.anglersalmanac.components.PhysicsComponent;
 import dev.rm20.anglersalmanac.config.AnglersAlmanacConfig;
 import dev.rm20.anglersalmanac.config.MinigameConfig_TensionBar;
-import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
-import dev.rm20.anglersalmanac.interactions.MinigameInteraction;
-import dev.rm20.anglersalmanac.interactions.OpenBookInteraction;
 import dev.rm20.anglersalmanac.models.BookAssetData;
 import dev.rm20.anglersalmanac.registration.*;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
@@ -57,8 +48,8 @@ public class AnglersAlmanac extends JavaPlugin {
     protected void setup() {
         LOGGER.atInfo().log("Setting up plugin " + this.getName());
         RegisterManager.registerCommands(this);
+        RegisterManager.registerEvents(this);
         AssetRegisterManager.registerAll(this);
-
 
         // Register FishLoot asset.
         AssetRegistry.register(HytaleAssetStore.builder(FishLootManager.class, new DefaultAssetMap<String, FishLootManager>())
@@ -106,6 +97,15 @@ public class AnglersAlmanac extends JavaPlugin {
 
         //AlmanacBook.registerAlmanacBase();
 
+    }
+
+
+    @Override
+    protected void shutdown() {
+        super.shutdown();
+        if (this.database != null) {
+            this.database.close();
+        }
     }
 
 

@@ -85,4 +85,28 @@ public class BookPageManager {
         return null;
     }
 
+    public static int getPageIndexForZone(String zoneName) {
+        BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
+        int pageIndex = 0;
+        for (BookAssetData.habitatsInfo habitat : bookAsset.getHabitats()) {
+            if (habitat.zoneInfo != null && habitat.ZoneName.equalsIgnoreCase(zoneName)) {
+                return pageIndex;
+            }
+            pageIndex += habitat.pages.length;
+        }
+        return 0;
+    }
+
+    public static int getPageIndexForFish(String fishId) {
+        BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
+        List<BookAssetData.SpreadTemplate> pages = bookAsset.getFlattenedPages();
+        for (int i = 0; i < pages.size(); i++) {
+            BookAssetData.SpreadTemplate spread = pages.get(i);
+            if (fishId.equals(spread.LeftPage) || fishId.equals(spread.RightPage)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 }

@@ -38,6 +38,20 @@ public class AlmanacDatabase {
         }
     }
 
+    public void close() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                if (!connection.getAutoCommit()) {
+                    connection.commit();
+                }
+                connection.close();
+                AnglersAlmanac.getInstance().getLogger().atInfo().log("Almanac database connection closed safely.");
+            }
+        } catch (SQLException e) {
+            AnglersAlmanac.getInstance().getLogger().atSevere().withCause(e).log("Failed to close Almanac database!");
+        }
+    }
+
     private void createTables() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             // Player's overall stats
@@ -176,25 +190,61 @@ public class AlmanacDatabase {
     }
 
     public boolean hasPlayerCaught(String playerUUID, String fishId) {
-        return true;
-//        if (this.connection == null) {
-//            init();
-//            if (this.connection == null) return false;
-//        }
-//
-//        String sql = "SELECT 1 FROM catches WHERE player_uuid = ? AND fish_id = ? LIMIT 1";
-//
-//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-//            ps.setString(1, playerUUID);
-//            ps.setString(2, fishId);
-//
-//            try (ResultSet rs = ps.executeQuery()) {
-//                return rs.next();
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            return false;
-//        }
+        if (this.connection == null) {
+            init();
+            if (this.connection == null) return false;
+        }
+
+        String sql = "SELECT 1 FROM catches WHERE player_uuid = ? AND fish_id = ? LIMIT 1";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, playerUUID);
+            ps.setString(2, fishId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void addFishEntry(String uuid, String fishId) {
+        if (this.connection == null) {
+            init();
+            if (this.connection == null) return;
+        }
+
+        String sql = "INSERT OR IGNORE INTO catches(player_uuid, fish_id, count) VALUES(?, ?, 0)";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, uuid);
+            ps.setString(2, fishId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeFishEntry(String uuid, String fishId) {
+        if (this.connection == null) {
+            init();
+            if (this.connection == null) return;
+        }
+        String sql = fishId.equals("*")
+                ? "DELETE FROM catches WHERE player_uuid = ?"
+                : "DELETE FROM catches WHERE player_uuid = ? AND fish_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, uuid);
+            if (!fishId.equals("*")) {
+                ps.setString(2, fishId);
+            }
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public Map<String, Integer> getAllFishCounts(String playerUUID) {

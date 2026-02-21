@@ -1,5 +1,7 @@
 package dev.rm20.anglersalmanac.models;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.assetstore.AssetStore;
@@ -15,6 +17,8 @@ import dev.rm20.anglersalmanac.registration.HytaleAsset;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,6 +31,7 @@ import static dev.rm20.anglersalmanac.utils.FishLootManager.getRarityWeight;
 public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<String, BookAssetData>> {
 
     public static final BuilderCodec<ZoneInfo> ZONE_INFO_CODEC = BuilderCodec.builder(ZoneInfo.class, ZoneInfo::new)
+            .append(new KeyedCodec<>("DisplayName", Codec.STRING), (z, v) -> z.displayName = v, z -> z.displayName).add()
             .append(new KeyedCodec<>("ZoneDescription", Codec.STRING), (z, v) -> z.zoneDescription = v, z -> z.zoneDescription).add()
             .append(new KeyedCodec<>("ZoneImage", Codec.STRING), (z, v) -> z.ZoneImage = v, z -> z.ZoneImage).add()
             .append(new KeyedCodec<>("ProgressBarImage", Codec.STRING), (z, v) -> z.ProgressBarImage = v, z -> z.ProgressBarImage).add()
@@ -96,6 +101,7 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     }
 
     public static class ZoneInfo {
+        public String displayName;
         public String zoneDescription;
         public String ZoneImage;
         public String ProgressBarImage;
@@ -127,34 +133,39 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     public record FishEntry(String id, boolean isItem) {
     }
 
-    private Map<String, List<FishEntry>> habitatCache;
+    //HabitatCache
+    private static final Cache<String, Map<String, List<FishEntry>>> habitatCache = Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build();
 
     public List<FishEntry> getFishByHabitat(String habitatName) {
-        //buildCache();
-        if (habitatCache == null) {
-            buildCache();
-        }
-        //AnglersAlmanac.getInstance().getLogger().atInfo().log(habitatCache.toString());
-        return habitatCache.getOrDefault(habitatName.toLowerCase(), List.of());
+        Map<String, List<FishEntry>> cache = habitatCache.get("all_habitats", k -> buildCache());
+        if (cache == null) return List.of();
+        return cache.getOrDefault(habitatName.toLowerCase(), List.of());
     }
 
-    private void buildCache() {
-        if (habitats == null) return;
-        habitatCache = new LinkedHashMap<>();
-
+    private Map<String, List<FishEntry>> buildCache() {
+        if (habitats == null) return Collections.emptyMap();
+        Map<String, List<FishEntry>> newCache = new LinkedHashMap<>();
+        Set<String> fishUiFiles = Set.of(
+                "Almanac/Fish/AlmanacFish.ui",
+                "Almanac/Fish/AlmanacFishZone.ui"
+        );
         for (habitatsInfo habitat : habitats) {
             if (habitat == null || habitat.ZoneName == null) continue;
 
             List<FishEntry> fishList = Arrays.stream(habitat.pages != null ? habitat.pages : new SpreadTemplate[0])
-                    .flatMap(spread -> Stream.of(spread.LeftPage, spread.RightPage))
                     .filter(Objects::nonNull)
-                    .filter(s -> !s.isEmpty())
+                    .filter(spread -> fishUiFiles.contains(spread.uiFile))
+                    .flatMap(spread -> Stream.of(spread.LeftPage, spread.RightPage))
+                    .filter(id -> id != null && !id.isEmpty())
                     .distinct()
                     .map(id -> new FishEntry(id, FishLootManager.getFishData(id) != null))
                     .collect(Collectors.toList());
 
-            habitatCache.put(habitat.ZoneName.toLowerCase(), fishList);
+            newCache.put(habitat.ZoneName.toLowerCase(), Collections.unmodifiableList(fishList));
         }
+        return Collections.unmodifiableMap(newCache);
     }
 
 
@@ -165,25 +176,46 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     }
 
     public Map<String, HabitatProgress> getAllHabitatProgress(String playerUUID) {
-        if (habitatCache == null) buildCache();
+        Map<String, List<FishEntry>> cache = habitatCache.get("all_habitats", k -> buildCache());
+        if (cache == null) return Collections.emptyMap();
 
         Map<String, HabitatProgress> globalProgress = new HashMap<>();
+        var database = AnglersAlmanac.getInstance().database;
 
-        habitatCache.forEach((zoneName, fishList) -> {
+        cache.forEach((zoneName, fishList) -> {
             List<String> validItemIds = fishList.stream()
                     .filter(FishEntry::isItem)
                     .map(FishEntry::id)
                     .toList();
+
+            if (validItemIds.isEmpty()) {
+                globalProgress.put(zoneName, new HabitatProgress(0, 0));
+                return;
+            }
             long caughtCount = validItemIds.stream()
-                    .filter(id -> AnglersAlmanac.getInstance().database.hasPlayerCaught(playerUUID, id))
+                    .filter(id -> database.hasPlayerCaught(playerUUID, id))
                     .count();
+
             globalProgress.put(zoneName, new HabitatProgress((int) caughtCount, validItemIds.size()));
         });
-
         return globalProgress;
     }
 
+    private static final Cache<String, BookAssetData> MasterMergeCache = Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build();
+    private static final String MASTER_KEY = "master_almanac_merged";
     public static BookAssetData getMasterMergedBook() {
+        return MasterMergeCache.get(MASTER_KEY, k -> buildMasterMergedBook());
+    }
+
+    public static void invalidateCache() {
+        MasterMergeCache.invalidateAll();
+        habitatCache.invalidateAll();
+    }
+
+
+    private static BookAssetData buildMasterMergedBook() {
         BookAssetData master = new BookAssetData();
         master.id = "master_almanac_merged";
         Map<String, habitatsInfo> mergedMap = new LinkedHashMap<>();
@@ -207,16 +239,20 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
                 .toArray(habitatsInfo[]::new);
 
         master.buildCache();
+        //AnglersAlmanac.getInstance().getLogger().atInfo().log("Built book with "+ master.habitats.length+ " Habitats");
         return master;
     }
 
     private static SpreadTemplate[] mergePages(SpreadTemplate[] existing, SpreadTemplate[] incoming) {
+        SpreadTemplate[] Existing = (existing == null) ? new SpreadTemplate[0] : existing;
+        SpreadTemplate[] Incoming = (incoming == null) ? new SpreadTemplate[0] : incoming;
         Set<String> uniqueFishIds = new LinkedHashSet<>();
         List<SpreadTemplate> specialSpreads = new ArrayList<>();
         String standardFishUi = "Almanac/Fish/AlmanacFish.ui";
         String statsUi = "Almanac/AlmanacStats.ui";
 
-        Stream.concat(Arrays.stream(existing), Arrays.stream(incoming)).forEach(spread -> {
+        Stream.concat(Arrays.stream(Existing), Arrays.stream(Incoming)).forEach(spread -> {
+            if (spread == null) return;
             if (!standardFishUi.equals(spread.uiFile)) {
                 boolean alreadyExists = specialSpreads.stream().anyMatch(s -> s.uiFile.equals(spread.uiFile));
                 if (!alreadyExists) {
@@ -246,7 +282,7 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
         return result.toArray(new SpreadTemplate[0]);
     }
 
-    private static int getZoneRank(String name) {
+    public static int getZoneRank(String name) {
         return switch (name.toLowerCase()) {
             case "almanacstats" -> 0;
             case "global" -> 1;
