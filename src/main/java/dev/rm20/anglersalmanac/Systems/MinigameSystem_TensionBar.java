@@ -189,10 +189,9 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
         game.fishPos = Math.clamp(game.fishPos + (game.fishVelocity*deltaTime), 0f, 1.0f);
 
         // DEBUG
-        //game.fightProgress = 0.5f;
-        //game.fishPos = 1.0f;
+        game.fightProgress = 0.5f;
+        game.fishPos = 0.5f;
 
-        AnglersAlmanac.LOGGER.atInfo().log("derp");
         game.updateMinigameModelPositions(commandBuffer);
         game.fishMoveTimer += deltaTime;
 

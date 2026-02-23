@@ -1,0 +1,29 @@
+{
+  "Model": "VFX/Fishing/AA_TensionBar_Mid.blockymodel",
+  "Texture": "VFX/Fishing/AA_TensionBar.png",
+  "HitBox": {
+    "Min": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "Max": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    }
+  },
+  "Icon": "Icons/ModelsGenerated/AA_TensionBar_Mid.png",
+  "IconProperties": {
+    "Scale": 2,
+    "Rotation": [
+      0,
+      -45,
+      0
+    ],
+    "Translation": [
+      0,
+      0
+    ]
+  }
+}
