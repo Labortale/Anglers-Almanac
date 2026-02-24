@@ -50,7 +50,7 @@
                           @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
             uiCommandBuilder.append(UiFile);
             pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder,Page);
-
+            pageUtils.buildTabs(uiCommandBuilder, uiEventBuilder, Page);
             //Left side
             if (FishDataLeft != null) {
                 uiCommandBuilder.clear("#LeftPageSlot");

@@ -36,6 +36,8 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
             .append(new KeyedCodec<>("ZoneImage", Codec.STRING), (z, v) -> z.ZoneImage = v, z -> z.ZoneImage).add()
             .append(new KeyedCodec<>("ProgressBarImage", Codec.STRING), (z, v) -> z.ProgressBarImage = v, z -> z.ProgressBarImage).add()
             .append(new KeyedCodec<>("ProgressBarColour", Codec.STRING), (z, v) -> z.ProgressBarColour = v, z -> z.ProgressBarColour).add()
+            .append(new KeyedCodec<>("TabIcon", Codec.STRING), (z, v) -> z.tabIcon = v, z -> z.tabIcon).add()
+            .append(new KeyedCodec<>("TabColour", Codec.STRING), (z, v) -> z.tabColour = v, z -> z.tabColour).add()
             .build();
 
     public static final BuilderCodec<SpreadTemplate> SPREAD_CODEC = BuilderCodec.builder(SpreadTemplate.class, SpreadTemplate::new)
@@ -106,6 +108,8 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
         public String ZoneImage;
         public String ProgressBarImage;
         public String ProgressBarColour;
+        public String tabIcon;
+        public String tabColour;
     }
 
     public BookAssetData() {
@@ -290,6 +294,36 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
         return result.toArray(new SpreadTemplate[0]);
     }
 
+
+    public record BookTab(
+            String zoneName,
+            String icon,
+            int startPage,
+            boolean isToTheLeft,
+            boolean isActive
+    ) {}
+    public List<BookTab> getTabsForCurrentPage(int currentPageIndex) {
+        List<BookTab> tabs = new ArrayList<>();
+        int pageCounter = 0;
+
+        for (habitatsInfo habitat : habitats) {
+            if (habitat.pages == null || habitat.pages.length == 0) continue;
+            int habitatStartPage = pageCounter;
+            int habitatEndPage = pageCounter + habitat.pages.length - 1;
+            boolean isActive = (currentPageIndex >= habitatStartPage && currentPageIndex <= habitatEndPage);
+            boolean isToTheLeft = currentPageIndex > habitatEndPage;
+            tabs.add(new BookTab(
+                    habitat.ZoneName,
+                    habitat.zoneInfo != null ? habitat.zoneInfo.tabIcon : "",
+                    habitatStartPage,
+                    isToTheLeft,
+                    isActive
+            ));
+
+            pageCounter += habitat.pages.length;
+        }
+        return tabs;
+    }
     public static int getZoneRank(String name) {
         return switch (name.toLowerCase()) {
             case "almanacstats" -> 0;

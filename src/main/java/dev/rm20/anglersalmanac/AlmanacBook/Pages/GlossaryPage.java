@@ -39,6 +39,7 @@ public class GlossaryPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiDa
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Almanac/Fish/AlamanacGlossary.ui");
         pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder,Page);
+        pageUtils.buildTabs(uiCommandBuilder, uiEventBuilder, Page);
 
         BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
         List<BookAssetData.FishEntry> Fish = bookAsset.getAllFish();

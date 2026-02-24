@@ -52,8 +52,7 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGui
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Almanac/Fish/AlmanacFishZone.ui");
         pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder,Page);
-
-
+        pageUtils.buildTabs(uiCommandBuilder, uiEventBuilder, Page);
         BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
         List<BookAssetData.FishEntry> Fish = bookAsset.getFishByHabitat(ZoneName);
         //AnglersAlmanac.getInstance().getLogger().atInfo().log(Fish.toString());

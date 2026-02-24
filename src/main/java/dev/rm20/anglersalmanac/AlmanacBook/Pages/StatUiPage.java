@@ -63,7 +63,7 @@ public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData
 
         //AlmanacDatabase db = AnglersAlmanac.getInstance().database;
         //AlmanacDatabase.PlayerStatsData stats = db.getPlayerStats(this.PlayerUUID);
-
+        pageUtils.buildTabs(uiCommandBuilder, uiEventBuilder, 0);
         pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder, 0);
 
         uiCommandBuilder.set("#TotalFish.TextSpans", Message.raw("Total fish: " + stats.totalCatches));

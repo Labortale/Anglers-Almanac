@@ -1,11 +1,33 @@
 
-@BookBackground = PatchStyle(TexturePath: "../book_2.png");
+@BookBackgroundImage = PatchStyle(TexturePath: "../book_2.png");
+@BookFrontImage = PatchStyle(TexturePath: "../book_2_Front.png");
+
 @FishMissing = "Info/FishMissing.png";
 @FishBorder = "Info/FishBorder.png";
+
 Group #AlmanacStats {
   Anchor: (Width: 1200, Height: 872);
-  Group #background {
-    Background: @BookBackground;
+  Group #BookBackground {
+    Background: @BookBackgroundImage;
+  }
+
+  Group #LeftTabGutter {
+    Anchor: (Left: -10, Top: 30, Width: 60, Height: 700);
+    LayoutMode: Top;
+  }
+
+  Group #RightTabGutter {
+    Anchor: (Right: -25, Top: 30, Width: 60, Height: 700);
+    LayoutMode: Top;
+  }
+
+  Group #BookFront {
+    Background: @BookFrontImage;
+  }
+
+  Group #LeftTabActive {
+     Anchor: (Left: 0, Top: 30, Width: 60, Height: 700);
+     LayoutMode: Top;
   }
 
   Group #BookNav

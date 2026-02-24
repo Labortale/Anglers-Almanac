@@ -12,7 +12,9 @@ import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
 import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
 import dev.rm20.anglersalmanac.AlmanacBook.Pages.StatUiPage;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
+import dev.rm20.anglersalmanac.models.BookAssetData;
 
+import java.util.List;
 import java.util.Objects;
 
 public class pageUtils {
@@ -101,6 +103,48 @@ public class pageUtils {
 
     }
 
+    public static void buildTabs(UICommandBuilder ui, UIEventBuilder events, int currentPageIndex) {
+        BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
+        List<BookAssetData.BookTab> tabs = bookAsset.getTabsForCurrentPage(currentPageIndex);
+        ui.clear("#LeftTabGutter");
+        ui.clear("#RightTabGutter");
+        ui.clear("#LeftTabActive");
+
+        int leftCount = 0;
+        int rightCount = 0;
+
+        for (BookAssetData.BookTab tab : tabs) {
+            String name = tab.zoneName();
+            if (name.equalsIgnoreCase("almanacstats") || name.equalsIgnoreCase("almanacglossary")) {
+                continue;
+            }
+            String targetGutter;
+            String template;
+
+            if (tab.isActive()) {
+                targetGutter = "#LeftTabActive";
+                template = "Almanac/Utils/LeftBookTabsSlot.ui";
+                leftCount++;
+            } else if (tab.isToTheLeft()) {
+                targetGutter = "#LeftTabGutter";
+                template = "Almanac/Utils/LeftBookTabsSlot.ui";
+                leftCount++;
+            } else {
+                targetGutter = "#RightTabGutter";
+                template = "Almanac/Utils/RightBookTabsSlot.ui";
+                rightCount++;
+            }
+
+            ui.append(targetGutter, template);
+            String tabPath = targetGutter + "[" + (tab.isToTheLeft() ? (leftCount-1) : (rightCount-1)) + "] ";
+//            events.addEventBinding(
+//                    CustomUIEventBindingType.Activating,
+//                    tabPath + "#TabIcon",
+//                    EventData.of(pageUtils.AlmanacGuiData.KEY_BUTTON, "OpenZone:" + tab.zoneName()),
+//                    false
+//            );
+        }
+    }
 
     public static class AlmanacGuiData {
         public static final String KEY_BUTTON = "Button";

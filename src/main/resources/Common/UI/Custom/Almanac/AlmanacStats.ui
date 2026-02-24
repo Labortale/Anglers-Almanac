@@ -1,11 +1,63 @@
-@Background = PatchStyle(TexturePath: "book_2.png");
+@BookBackgroundImage = PatchStyle(TexturePath: "book_2.png");
+@BookFrontImage = PatchStyle(TexturePath: "book_2_Front.png");
+@StatsTabImage = PatchStyle(TexturePath: "Utils/Assets/Tabs/Sextant_Tab.png");
+@GlossaryTabImage = PatchStyle(TexturePath: "Utils/Assets/Tabs/Fish_tab.png");
 
 Group #AlmanacStats {
   Anchor: (Width: 1200, Height: 872);
 
-  Group #background {
-    Background: @Background;
+  Group #BookBackground {
+    Background: @BookBackgroundImage;
   }
+
+  Group #LeftTabGutter {
+    Anchor: (Left: -10, Top: 30, Width: 60, Height: 700);
+    LayoutMode: Top;
+  }
+
+  Group #RightTabGutter {
+    Anchor: (Right: -25, Top: 30, Width: 60, Height: 700);
+    LayoutMode: Top;
+  }
+  Group #TopTabGutter {
+    Anchor: (Left: -10, Top: -30, Width: 1200, Height: 60);
+    Group #GlossaryTab2 {
+      Anchor: (Right:30, Width: 70, Height: 130,Top: -30);
+      Group #GlossaryTabBackground {
+        Background: #A67691;
+        TooltipText: "Go to Glossary Page";
+      }
+
+      Button #GlossaryTabIcon {
+        Anchor: (Top:5, Width: 65, Height:65);
+        Background: @GlossaryTabImage;
+      }
+    }
+  }
+  Group #BookFront {
+    Background: @BookFrontImage;
+  }
+
+  Group #LeftTabActive {
+     Anchor: (Left: 0, Top: 30, Width: 60, Height: 700);
+     LayoutMode: Top;
+  }
+
+  Group #TopActiveTabGutter {
+    Anchor: (Left: -10, Top: -30, Width: 1200, Height: 60);
+    Group #StatsTab {
+      Anchor: (Left:100, Width: 70, Height: 130,Top: -30);
+      Group #StatsTabBackground {
+        Background: #6b987f;
+      }
+
+      Group #StatsTabIcon {
+        Anchor: (Top:5, Width: 65, Height:65);
+        Background: @StatsTabImage;
+      }
+    }
+  }
+
   // --- NAVIGATION BUTTONS ---
   Group #BookNav
   {

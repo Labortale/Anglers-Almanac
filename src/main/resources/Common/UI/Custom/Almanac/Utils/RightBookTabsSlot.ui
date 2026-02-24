@@ -1,0 +1,11 @@
+Group #RightTabTemplate {
+  Anchor: (Width: 120, Height: 50,Top: 10);
+  Group #TabBackground {
+    Background: #ffffff;
+  }
+
+  Button #TabIcon {
+    Anchor: (Right:0, Width: 50);
+    Background: #ff5962;
+  }
+}
