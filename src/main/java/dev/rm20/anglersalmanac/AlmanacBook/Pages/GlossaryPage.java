@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.OpenPage;
+import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.getPageIndexForZone;
 
 public class GlossaryPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData> {
     private final String PlayerUUID;
@@ -38,7 +39,7 @@ public class GlossaryPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiDa
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Almanac/Fish/AlamanacGlossary.ui");
-        pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder,Page);
+        pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder, Page);
         pageUtils.buildTabs(uiCommandBuilder, uiEventBuilder, Page);
 
         BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
@@ -82,12 +83,12 @@ public class GlossaryPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiDa
                 uiCommandBuilder.set(slotPath + " #ItemIcon.ItemId", actualItem.getItemID());
                 uiCommandBuilder.set(slotPath + " #FishButton.TooltipText", actualItem.getName());
                 uiCommandBuilder.set(slotPath + " #ItemIconMissing.Visible", false);
-                uiCommandBuilder.set(slotPath+ " #ItemGradient.Background",FishLootManager.getRarityColour(actualItem.getRarity()));
+                uiCommandBuilder.set(slotPath + " #ItemGradient.Background", FishLootManager.getRarityColour(actualItem.getRarity()));
             } else {
                 uiCommandBuilder.set(slotPath + " #ItemIcon.ItemId", "");
                 uiCommandBuilder.set(slotPath + " #ItemIconMissing.Visible", true);
                 uiCommandBuilder.set(slotPath + " #FishButton.TooltipText", "Unknown Fish");
-                uiCommandBuilder.set(slotPath+ " #ItemGradient.Visible",false);
+                uiCommandBuilder.set(slotPath + " #ItemGradient.Visible", false);
 
             }
         }
@@ -118,6 +119,13 @@ public class GlossaryPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiDa
                 BookPageManager.OpenPage(player, targetPage, PlayerUUID, PlayerName);
             }
         }
+
+        // Zone click
+        else if (data.getButton().startsWith("OpenZone:")) {
+            String zoneName = data.getButton().split(":")[1];
+            OpenPage(player, getPageIndexForZone(zoneName), PlayerUUID, PlayerName);
+        }
+
     }
 
 }

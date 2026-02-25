@@ -25,6 +25,7 @@
     import java.util.Objects;
 
     import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.OpenPage;
+    import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.getPageIndexForZone;
 
     public class FishDataUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData> {
         private final String PlayerUUID;
@@ -92,6 +93,12 @@
                     return;
                 }
                 OpenPage(player, newPage, PlayerUUID, PlayerName);
+            }
+
+            // Zone click
+            else if (data.getButton().startsWith("OpenZone:")) {
+                String zoneName = data.getButton().split(":")[1];
+                OpenPage(player, getPageIndexForZone(zoneName), PlayerUUID, PlayerName);
             }
         }
 
