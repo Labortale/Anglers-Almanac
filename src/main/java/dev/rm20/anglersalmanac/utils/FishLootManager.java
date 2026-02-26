@@ -1,5 +1,7 @@
 package dev.rm20.anglersalmanac.utils;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.assetstore.AssetStore;
@@ -15,6 +17,8 @@ import dev.rm20.anglersalmanac.metadata.FishingContext;
 import dev.rm20.anglersalmanac.registration.HytaleAsset;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 //TODO: Move to models
 //@HytaleAsset(
@@ -215,90 +219,146 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
         return getAssetStore().getAssetMap().getAssetMap().values();
     }
 
+
+    //Cache system
+    public record GeoKey(String biome, String region, String zone, int tier) {
+    }
+
+    private static final LoadingCache<GeoKey, List<FishLootManager>> geoLootCache = Caffeine.newBuilder().expireAfterAccess(15, TimeUnit.MINUTES).softValues().build(key -> {
+        return getAllLoot().stream().filter(loot -> isEligible(loot, key)).toList();
+    });
+
+    public static void invalidateCache() {
+        geoLootCache.invalidateAll();
+    }
+
     public static FishLootManager getRandomWeightedLoot(FishingContext ctx) {
-        List<FishLootManager> possibleLoot = getAllLoot().stream()
-                .filter(loot -> isEligible(loot, ctx))
-                .filter(loot -> loot.getExclusionWeight(loot, ctx) > 0)
-                .toList();
+        GeoKey key = new GeoKey(ctx.biome(), ctx.region(), ctx.zone(), ctx.tier());
+        List<FishLootManager> geoPossible = geoLootCache.get(key);
+
+        List<FishLootManager> possibleLoot = new ArrayList<>();
+        int totalWeight = 0;
+        for (FishLootManager loot : geoPossible) {
+            if (checkEnvironment(loot, ctx)) {
+                int w = loot.getExclusionWeight(loot, ctx);
+                if (w > 0) {
+                    possibleLoot.add(loot);
+                    totalWeight += w;
+                }
+            }
+        }
 
         if (possibleLoot.isEmpty()) {
             AnglersAlmanac.getInstance().getLogger().atInfo().log("No eligible fish found for this context!");
             return null;
         }
 
-//        int totalWeight = possibleLoot.stream().mapToInt(FishLootManager::getWeight).sum();
-        int totalWeight = possibleLoot.stream().mapToInt(l -> l.getExclusionWeight(l, ctx)).sum();
-        if (totalWeight <= 0) return possibleLoot.getFirst();
-
-        int randomIndex = new Random().nextInt(totalWeight);
+        int randomIndex = ThreadLocalRandom.current().nextInt(totalWeight);
         int currentSum = 0;
 
-        for (FishLootManager entry : possibleLoot) {
-            currentSum += entry.getExclusionWeight(entry, ctx);
-            if (randomIndex < currentSum) {
-                return entry;
-            }
+        for (FishLootManager loot : possibleLoot) {
+            currentSum += loot.getExclusionWeight(loot, ctx);
+            if (randomIndex < currentSum) return loot;
         }
         return possibleLoot.get(0);
+    }
+
+    public static List<FishLootManager> getFishInArea(FishingContext ctx) {
+        GeoKey key = new GeoKey(ctx.biome(), ctx.region(), ctx.zone(), ctx.tier());
+        return geoLootCache.get(key);
     }
 
     public static FishLootManager getFishData(String id) {
         if (id == null) return null;
 
-        return getAllLoot().stream()
-                .filter(loot -> loot.id.equalsIgnoreCase(id))
-                .findFirst()
-                .orElse(null);
+        return getAllLoot().stream().filter(loot -> loot.id.equalsIgnoreCase(id)).findFirst().orElse(null);
     }
 
-    private static boolean isEligible(FishLootManager loot, FishingContext ctx) {
+    private static boolean isEligible(FishLootManager loot, GeoKey key) {
         Habitats hab = loot.getHabitats();
-        if (hab == null) return true;
+        if (hab == null) {
+            //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + " is has no habitat info");
+            return true;
+        }
 
-        if (!checkEnvironment(hab, ctx)) return false;
-        if (loot.isGlobal()) return true;
+
+        //Check exclude_biomes and checks if weight is 0 incase
+        if (containsIgnoreCase(hab.exclude_biomes, key.biome()) && hab.weight_multiplier == 0) {
+            return false;
+        }
+
+        if (containsIgnoreCase(hab.exclude_regions, key.region()) && hab.weight_multiplier == 0) {
+            return false;
+        }
+
+        if (containsIgnoreCase(hab.exclude_zones, key.zone()) && hab.weight_multiplier == 0) {
+            return false;
+        }
+
+        if (loot.isGlobal()) {
+            //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + " is global fish");
+            return true;
+        }
+
         boolean hasRequirement = false;
         boolean matchedAny = false;
-
         if (hab.biomes != null && hab.biomes.length > 0) {
             hasRequirement = true;
-            if (Arrays.asList(hab.biomes).contains(ctx.biome())) matchedAny = true;
-        }
-
-        if (!matchedAny && hab.regions != null && hab.regions.length > 0) {
-            hasRequirement = true;
-            if (Arrays.asList(hab.regions).contains(ctx.region())) matchedAny = true;
-        }
-
-
-        if (!matchedAny && hab.zones != null && hab.zones.length > 0) {
-            hasRequirement = true;
-            if (Arrays.asList(hab.zones).contains(ctx.zone())) {
-                // If zone matches, still respect the tier requirement if it exists
-                if (hab.tier == null || hab.tier.length == 0 || Arrays.stream(hab.tier).anyMatch(t -> t != null && t == ctx.tier())) {
+            for (String b : hab.biomes) {
+                if (b.equalsIgnoreCase(key.biome())) {
+                    //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + "found at biome: "+ key.biome());
                     matchedAny = true;
+                    break;
                 }
             }
         }
 
+        if (!matchedAny && hab.regions != null && hab.regions.length > 0) {
+            hasRequirement = true;
+            for (String r : hab.regions) {
+                if (r.equalsIgnoreCase(key.region())) {
+                    //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + "found at region: "+ key.region());
+                    matchedAny = true;
+                    break;
+                }
+            }
+        }
+
+        if (!matchedAny && hab.zones != null && hab.zones.length > 0) {
+            hasRequirement = true;
+            for (String z : hab.zones) {
+                if (z.equalsIgnoreCase(key.zone())) {
+                    // If zone matches, still respect the tier requirement if it exists
+                    if (hab.tier == null || hab.tier.length == 0 || Arrays.stream(hab.tier).anyMatch(t -> t == key.tier())) {
+                        //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + "found at zone and tier: "+ key.zone() + " : "+ key.tier());
+                        matchedAny = true;
+                    }
+                    break;
+                }
+            }
+        }
         return !hasRequirement || matchedAny;
     }
 
-    private static boolean checkEnvironment(Habitats hab, FishingContext ctx) {
+    private static boolean checkEnvironment(FishLootManager loot, FishingContext ctx) {
+        Habitats hab = loot.getHabitats();
+        if (hab == null) return true;
+        // Time of day
         if (hab.time_of_day != null && hab.time_of_day.length > 0) {
-            boolean match = Arrays.stream(hab.time_of_day)
-                    .anyMatch(t -> t != null && (t.equalsIgnoreCase("any") || t.equalsIgnoreCase(ctx.time())));
+            boolean match = Arrays.stream(hab.time_of_day).anyMatch(t -> t != null && (t.equalsIgnoreCase("any") || t.equalsIgnoreCase(ctx.time())));
             if (!match) return false;
         }
-
+        // Weather
         if (hab.required_weather != null && hab.required_weather.length > 0) {
-            boolean match = Arrays.stream(hab.required_weather)
-                    .anyMatch(w -> w != null && (w.equalsIgnoreCase("any") || w.equalsIgnoreCase(ctx.weather())));
+            boolean match = Arrays.stream(hab.required_weather).anyMatch(w -> w != null && (w.equalsIgnoreCase("any") || w.equalsIgnoreCase(ctx.weather())));
             if (!match) return false;
         }
 
+        // Moon phase
         if (hab.moon_phase != -1 && hab.moon_phase != ctx.moonPhase()) return false;
+        // Water
         if (ctx.waterDepth() < hab.min_depth) return false;
+        // Y level
         if (hab.height != null) {
             if (ctx.yPos() < hab.height.min_y) return false;
             return hab.height.max_y == -1 || !(ctx.yPos() > hab.height.max_y);
@@ -310,24 +370,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     public int getExclusionWeight(FishLootManager loot, FishingContext ctx) {
         if (loot.habitats == null) return this.weight;
 
-        boolean isExcluded = false;
-
-        // Check Biome
-        if (loot.habitats.exclude_biomes != null && Arrays.asList(loot.habitats.exclude_biomes).contains(ctx.biome())) {
-            isExcluded = true;
-        }
-        // Check Region
-        else if (loot.habitats.exclude_regions != null && Arrays.asList(loot.habitats.exclude_regions).contains(ctx.region())) {
-            isExcluded = true;
-        }
-        // Check Zone
-        else if (loot.habitats.exclude_zones != null && Arrays.asList(loot.habitats.exclude_zones).contains(ctx.zone())) {
-            isExcluded = true;
-        }
-        // Check Tier
-        else if (loot.habitats.exclude_tiers != null && Arrays.stream(loot.habitats.exclude_tiers).anyMatch(t -> t != null && t == ctx.tier())) {
-            isExcluded = true;
-        }
+        boolean isExcluded = containsIgnoreCase(loot.habitats.exclude_biomes, ctx.biome()) || containsIgnoreCase(loot.habitats.exclude_regions, ctx.region()) || containsIgnoreCase(loot.habitats.exclude_zones, ctx.zone()) || Arrays.asList(loot.habitats.exclude_tiers).contains(ctx.tier());
 
         if (isExcluded) {
             return Math.round(this.weight * loot.habitats.weight_multiplier);
@@ -341,7 +384,13 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     }
 
 
-
+    private static boolean containsIgnoreCase(String[] array, String value) {
+        if (array == null || value == null) return false;
+        for (String s : array) {
+            if (value.equalsIgnoreCase(s)) return true;
+        }
+        return false;
+    }
 
     public static int getRarityWeight(String fishId) {
         var data = FishLootManager.getFishData(fishId);

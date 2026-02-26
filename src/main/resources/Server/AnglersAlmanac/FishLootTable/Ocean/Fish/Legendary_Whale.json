@@ -8,7 +8,7 @@
   "Description": "A true titan of the salt, this gentle giant is more like a floating island than a fish. It spends its days singing songs that carry for miles through the current and breaching the surface with enough force to swamp a small boat. They don't actually have teeth; instead, they use giant plates of baleen to filter out tiny krill, meaning they’re the biggest eaters in the sea despite having some of the smallest prey.",
   "FamilyId": "Balaenopteridae",
   "Rarity": "Legendary",
-  "IsGlobal": true,
+  "IsGlobal": false,
   "Weight": 25,
   "Size": 3000,
   "Habitats": {
