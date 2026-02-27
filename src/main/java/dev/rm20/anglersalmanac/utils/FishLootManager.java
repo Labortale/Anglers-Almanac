@@ -16,6 +16,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.metadata.FishingContext;
+import dev.rm20.anglersalmanac.utils.Validator.CustomAssetValidator;
 import dev.rm20.anglersalmanac.utils.Validator.TimePeriod;
 
 import java.util.*;
@@ -61,6 +62,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
 //            .build();
 
     public static final BuilderCodec<Habitats> HABITATS_CODEC = BuilderCodec.builder(Habitats.class, Habitats::new)
+            .documentation("Set what area and conditions to give the item.")
             .append(new KeyedCodec<>("Zones", new ArrayCodec<>(Codec.STRING, String[]::new)), (h, v) -> h.zones = v, h -> h.zones)
             .addValidator(Validators.uniqueInArray()).add()
             .append(new KeyedCodec<>("Tiers", new ArrayCodec<>(Codec.INTEGER, Integer[]::new)), (h, v) -> h.tier = v, h -> h.tier)
@@ -117,7 +119,8 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
             .addValidator(Validators.nonEmptyString()).add()
             .appendInherited(new KeyedCodec<>("Weight", Codec.INTEGER), (t, v) -> t.weight = v, t -> t.weight, (t, p) -> t.weight = p.weight)
             .addValidator(Validators.min(0)).add()
-            .appendInherited(new KeyedCodec<>("Size", Codec.INTEGER), (t, v) -> t.size = v, t -> t.size, (t, p) -> t.size = p.size).add()
+            .appendInherited(new KeyedCodec<>("Size", Codec.INTEGER), (t, v) -> t.size = v, t -> t.size, (t, p) -> t.size = p.size)
+            .addValidator(Validators.min(0)).add()
             .appendInherited(new KeyedCodec<>("Quantity", Quantity_CODEC), (t, v) -> t.quantity = v, t -> t.quantity, (t, p) -> t.quantity = p.quantity).add()
             .appendInherited(new KeyedCodec<>("IsGlobal", Codec.BOOLEAN), (t, v) -> t.isGlobal = v, t -> t.isGlobal, (t, p) -> t.isGlobal = p.isGlobal).add()
             .appendInherited(new KeyedCodec<>("Habitats", HABITATS_CODEC), (t, v) -> t.habitats = v, t -> t.habitats, (t, p) -> t.habitats = p.habitats).add()

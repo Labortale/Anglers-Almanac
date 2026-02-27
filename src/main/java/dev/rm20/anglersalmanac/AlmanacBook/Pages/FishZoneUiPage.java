@@ -16,10 +16,7 @@ import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
 import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.models.BookAssetData;
-import dev.rm20.anglersalmanac.utils.FishLootManager;
-import dev.rm20.anglersalmanac.utils.StampUtil;
-import dev.rm20.anglersalmanac.utils.TextUtils;
-import dev.rm20.anglersalmanac.utils.pageUtils;
+import dev.rm20.anglersalmanac.utils.*;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -69,7 +66,7 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGui
             uiCommandBuilder.set("#ZoneHeader.Text", zoneInfo.zoneDescription);
             uiCommandBuilder.set("#ZoneIconImage.AssetPath", zoneInfo.ZoneImage);
             if (zoneInfo.ProgressBarColour != null) {
-                uiCommandBuilder.set("#FishProgress.Color", zoneInfo.ProgressBarColour);
+                uiCommandBuilder.set("#FishProgress.Color", ColourUtils.toHex(zoneInfo.ProgressBarColour));
             }
         }
         List<BookAssetData.FishEntry> validFishItems = Fish.stream()

@@ -12,10 +12,16 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.hypixel.hytale.codec.validation.Validators;
+import com.hypixel.hytale.protocol.Color;
+import com.hypixel.hytale.server.core.codec.ProtocolCodecs;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.registration.HytaleAsset;
+import dev.rm20.anglersalmanac.utils.ColourUtils;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
+import dev.rm20.anglersalmanac.utils.Validator.CustomAssetValidator;
 
+import javax.xml.validation.Validator;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,11 +39,12 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
     public static final BuilderCodec<ZoneInfo> ZONE_INFO_CODEC = BuilderCodec.builder(ZoneInfo.class, ZoneInfo::new)
             .append(new KeyedCodec<>("DisplayName", Codec.STRING), (z, v) -> z.displayName = v, z -> z.displayName).add()
             .append(new KeyedCodec<>("ZoneDescription", Codec.STRING), (z, v) -> z.zoneDescription = v, z -> z.zoneDescription).add()
-            .append(new KeyedCodec<>("ZoneImage", Codec.STRING), (z, v) -> z.ZoneImage = v, z -> z.ZoneImage).add()
-            .append(new KeyedCodec<>("ProgressBarImage", Codec.STRING), (z, v) -> z.ProgressBarImage = v, z -> z.ProgressBarImage).add()
-            .append(new KeyedCodec<>("ProgressBarColour", Codec.STRING), (z, v) -> z.ProgressBarColour = v, z -> z.ProgressBarColour).add()
-            .append(new KeyedCodec<>("TabIcon", Codec.STRING), (z, v) -> z.tabIcon = v, z -> z.tabIcon).add()
-            .append(new KeyedCodec<>("TabColour", Codec.STRING), (z, v) -> z.tabColour = v, z -> z.tabColour).add()
+            .append(new KeyedCodec<>("ZoneImage", Codec.STRING), (z, v) -> z.ZoneImage = v, z -> z.ZoneImage)
+            .addValidator(CustomAssetValidator.UI_ZONE_VALIDATOR).add()
+            .append(new KeyedCodec<>("ProgressBarColour", ProtocolCodecs.COLOR), (z, v) -> z.ProgressBarColour = v, z -> z.ProgressBarColour).add()
+            .append(new KeyedCodec<>("TabIcon", Codec.STRING), (z, v) -> z.tabIcon = v, z -> z.tabIcon)
+            .addValidator(CustomAssetValidator.UI_TAB_VALIDATOR).add()
+            .append(new KeyedCodec<>("TabColour", ProtocolCodecs.COLOR), (z, v) -> z.tabColour = v, z -> z.tabColour).add()
             .build();
 
     public static final BuilderCodec<SpreadTemplate> SPREAD_CODEC = BuilderCodec.builder(SpreadTemplate.class, SpreadTemplate::new)
@@ -106,10 +113,9 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
         public String displayName;
         public String zoneDescription;
         public String ZoneImage;
-        public String ProgressBarImage;
-        public String ProgressBarColour;
+        public Color ProgressBarColour;
         public String tabIcon;
-        public String tabColour;
+        public Color tabColour;
     }
 
     public BookAssetData() {
@@ -317,13 +323,12 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
             boolean isToTheLeft = currentPageIndex > habitatStartPage;
             tabs.add(new BookTab(
                     habitat.ZoneName,
-                    habitat.zoneInfo != null ? habitat.zoneInfo.tabIcon : "",
-                    habitat.zoneInfo != null ? habitat.zoneInfo.tabColour : "",
+                    habitat.zoneInfo != null && habitat.zoneInfo.tabIcon != null ? habitat.zoneInfo.tabIcon : "",
+                    habitat.zoneInfo != null && habitat.zoneInfo.tabColour != null ? ColourUtils.toHex(habitat.zoneInfo.tabColour) : "#ffffff",
                     habitatStartPage,
                     isToTheLeft,
                     isActive
             ));
-
             pageCounter += habitat.pages.length;
         }
         return tabs;
