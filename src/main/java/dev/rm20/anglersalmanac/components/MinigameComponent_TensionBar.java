@@ -60,6 +60,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     public float nextFishMoveTime = 0.5f; // The time until the next fish movement.
     public float fishMoveTimer = 0f; // Counts up until next fish move.
     public float fishVelocity = 0f; // The movement of the fish.
+    public float fishTargetVelocity = 0f; // The desired movement of the fish.
     public Ref<EntityStore> ownerRef;
     public Ref<EntityStore> bobberRef;
     public UUID selfUUID;
@@ -233,7 +234,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         World world = commandBuffer.getExternalData().getWorld();
         world.execute(() -> {
             commandBuffer.addEntity(fishModelEntity, AddReason.SPAWN);
-            AnglersAlmanac.LOGGER.atInfo().log("Spawned fish model at: %s", fishModelEntity.getComponent(TransformComponent.getComponentType()).getPosition());
+            //AnglersAlmanac.LOGGER.atInfo().log("Spawned fish model at: %s", fishModelEntity.getComponent(TransformComponent.getComponentType()).getPosition());
         });
 
 
@@ -243,7 +244,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         if(barSizeMinusEnds < 0) barSizeMinusEnds = 0;
         int numSections = Math.round(barSizeMinusEnds * 64.0f) + 2;
 
-        AnglersAlmanac.LOGGER.atInfo().log("barRadius: %s, numSections %s", gameConfig.barRadius, numSections);
+        //AnglersAlmanac.LOGGER.atInfo().log("barRadius: %s, numSections %s", gameConfig.barRadius, numSections);
 
         for(int i = 0; i < numSections; i++) {
             // For amount needed.
@@ -374,7 +375,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
         Ref<EntityStore> game = commandBuffer.getExternalData().getWorld().getEntityRef(selfUUID);
         assert game != null;
-        AnglersAlmanac.LOGGER.atInfo().log("game: %s", game.toString());
+        //AnglersAlmanac.LOGGER.atInfo().log("game: %s", game.toString());
         Vector3d gamePos = Objects.requireNonNull(commandBuffer.getComponent(game, TransformComponent.getComponentType())).getPosition();
         Vector3d playerPos = commandBuffer.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
         float camOffset =  commandBuffer.getComponent(ownerRef, ModelComponent.getComponentType()).getModel().getEyeHeight();
@@ -398,7 +399,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         TransformUtils.applyBillboardYOnly(gameModels.get("fish"), newFishPos, playerHeadPos ,new Vector3f(90,0,0), commandBuffer);
 
 
-        AnglersAlmanac.LOGGER.atInfo().log("gamePos: %s", gamePos);
+        //AnglersAlmanac.LOGGER.atInfo().log("gamePos: %s", gamePos);
 
 
         // -------- TENSION BAR --------------------------------
@@ -466,7 +467,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         //Move bar up.
         barVelocity = Math.clamp(barVelocity + (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed * AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration)
                 + (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity*AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration)
-                , AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed);
+                , -AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed);
     }
 
 

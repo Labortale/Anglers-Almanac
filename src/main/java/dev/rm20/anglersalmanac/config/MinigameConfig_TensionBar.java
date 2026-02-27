@@ -12,10 +12,11 @@ public class MinigameConfig_TensionBar {
     public static final String KEY = "MinigameConfig_TensionBar";
     // Config:
     public float maxHookTime = 6f; // The longest that it can take to hook a fish in seconds.
-    public float fishEscapeRate = 0.3333f; // The progress lost per-second that the fish is not in the catch bar.
-    public float fishReelRate = 0.2f; // The progress gain per second when the fish is inside catch bar.
+    public float fishEscapeRate = 0.2f; // The progress lost per-second that the fish is not in the catch bar.
+    public float fishReelRate = 0.15f; // The progress gain per second when the fish is inside catch bar.
     public float barRadius = 0.1f; // The size of half the bar, used to check if bar is over the fish.
-    public float fishMaxVeocity = 0.5f; // The maximum speed of the fish.
+    public float fishMaxVeocity = 0.3f; // The maximum speed of the fish.
+    public float fishAcceleration = 0.15f; // The rate at which the fish comes up to full speed.
     public float fishMinSpeed = 0f; // Range = 0.0f to 1.0f. The slowest fraction of fishMaxVelocity that fish is allowed to be.
     public float fishChangeDirectionMaxInterval = 0.25f; // The longest amount of time between fish changing direction.
     public float fishBouyancy = 0; // The fishes bias towards floating (positive value) or sinking (negative value).
@@ -24,9 +25,9 @@ public class MinigameConfig_TensionBar {
     public float minigameScaleMax = 14f; // Minigame display maximum size.
     public float minigameScaleMultiplier = 1f; // minigameScale = distance from player * minigame scale multiplier.
     public float castCooldown = 0.5f; // Seconds before rod can be cast or reeled.
-    public float barGravity = 0.7f; // How fast the bar falls when not being risen. Should be close to fish max velocity.
-    public float barSpeed = 1.0f; // How fast the bar rises when right click is held. Should be faster than fish max velocity.
-    public float barAcceleration = 0.4f; // The rate at which the bar accelerates multiplied by the speed of its direction.
+    public float barGravity = 0.65f; // How fast the bar falls when not being risen. Should be close to fish max velocity.
+    public float barSpeed = 0.6f; // How fast the bar rises when right click is held. Should be faster than fish max velocity.
+    public float barAcceleration = 0.27f; // The rate at which the bar accelerates multiplied by the speed of its direction.
 
     // Builds the codec for plugin configuration.
     public static final BuilderCodec CODEC = BuilderCodec.builder(MinigameConfig_TensionBar.class, MinigameConfig_TensionBar::new)
@@ -109,9 +110,15 @@ public class MinigameConfig_TensionBar {
                 ,(config) -> config.fishChangeDirectionMaxInterval)
                 .documentation("The longest amount of time between fish changing direction.")
                 .add()
+        .append(new KeyedCodec<Float>("FishAcceleration", Codec.FLOAT)
+                ,(config, value) -> config.fishAcceleration = value
+                ,(config) -> config.fishAcceleration)
+                .documentation("The rate at which the fish reaches target velocity")
+                .add()
         .append(new KeyedCodec("FishBouyancy", Codec.FLOAT)
                 ,(config, value) -> config.fishBouyancy = value
-                ,(config) -> config.fishBouyancy).documentation("The fishes bias towards floating (positive value) or sinking (negative value).")
+                ,(config) -> config.fishBouyancy)
+                .documentation("The fishes bias towards floating (positive value) or sinking (negative value).")
                 .add()
         .build();
 

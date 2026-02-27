@@ -71,30 +71,30 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 if(strength < 0.5f + game.gameConfig.fishMinSpeed / 2f && strength > 0.5f) strength = 0.5f + (game.gameConfig.fishMinSpeed / 2f);
 
                 //strength = Math.clamp(strength, game.gameConfig.fishMinSpeed, 1.0f);
-                AnglersAlmanac.LOGGER.atInfo().log("minFishVel: %s, maxFishVel: %s, fishMinSpeed: %s, strength: %s", minFishVel, maxFishVel, game.gameConfig.fishMinSpeed, strength);
+                //AnglersAlmanac.LOGGER.atInfo().log("minFishVel: %s, maxFishVel: %s, fishMinSpeed: %s, strength: %s", minFishVel, maxFishVel, game.gameConfig.fishMinSpeed, strength);
 
 
                 // Override parameters for fish with "darting" behaviour.
                 if(game.fishHooked.getMinigameStats().behavior.equals("darting")){
                     // Toggle between max speed and stopped.
-                    if(Math.abs(game.fishVelocity) >= game.gameConfig.fishMaxVeocity ){
+                    if(Math.abs(game.fishTargetVelocity) >= game.gameConfig.fishMaxVeocity ){
                         maxFishVel = game.gameConfig.fishMaxVeocity * 0.1f;
                         minFishVel = -game.gameConfig.fishMaxVeocity * 0.1f;
-                        AnglersAlmanac.LOGGER.atInfo().log("Darting fish is calm");
+                        //AnglersAlmanac.LOGGER.atInfo().log("Darting fish is calm");
                     }else{
                         strength = 1.0f;
-                        AnglersAlmanac.LOGGER.atInfo().log("Darting fish go brrr");
+                        //AnglersAlmanac.LOGGER.atInfo().log("Darting fish go brrr");
                     }
                 }
 
                 // Calculate random movement based on fish parameters.
-                game.fishVelocity = ((minFishVel) + strength * (maxFishVel - minFishVel));
-                AnglersAlmanac.LOGGER.atInfo().log("FISHMOVE new velocity: %s", game.fishVelocity);
+                game.fishTargetVelocity = ((minFishVel) + strength * (maxFishVel - minFishVel));
+                //AnglersAlmanac.LOGGER.atInfo().log("FISHMOVE new velocity: %s", game.fishTargetVelocity);
 
                 // Always ensure that fish moves away from edges if near top / bottom.
-                AnglersAlmanac.LOGGER.atInfo().log("fishPos: %s", game.fishPos);
-                if(game.fishPos <= 0.1){game.fishVelocity = Math.abs(game.fishVelocity); AnglersAlmanac.LOGGER.atInfo().log("Forcing up");}
-                if(game.fishPos >= 0.9){ game.fishVelocity = Math.abs(game.fishVelocity) * -1f; AnglersAlmanac.LOGGER.atInfo().log("Forcing down");}
+                //AnglersAlmanac.LOGGER.atInfo().log("fishPos: %s", game.fishPos);
+                if(game.fishPos <= 0.1){game.fishTargetVelocity = Math.abs(game.fishTargetVelocity); }
+                if(game.fishPos >= 0.9){ game.fishTargetVelocity = Math.abs(game.fishTargetVelocity) * -1f; }
 
                 game.stateTrigger = MinigameComponent_TensionBar.Trigger.NOTRIGGER;
                 break;
@@ -130,8 +130,8 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
         apc.autoplayAsRandom = true;
 
         // Check if bar is over the fish and check win state.
-        if(game.fishPos < game.barPos +  AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barRadius && game.fishPos > game.barPos - AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barRadius){
-            game.fightProgress += AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().fishReelRate * deltaTime;
+        if(game.fishPos < game.barPos +  game.gameConfig.barRadius && game.fishPos > game.barPos - game.gameConfig.barRadius){
+            game.fightProgress += game.gameConfig.fishReelRate * deltaTime;
 
             // Remove escape audio
             if(apc.hasSound(game.escapeSounds[0])) {
@@ -153,7 +153,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 return;
             }
         }else{
-            game.fightProgress -= AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().fishEscapeRate * deltaTime;
+            game.fightProgress -= game.gameConfig.fishEscapeRate * deltaTime;
 
             // Remove escape audio
             if(apc.hasSound(game.reelInSounds[0])) {
@@ -181,16 +181,17 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
             game.stateTrigger = MinigameComponent_TensionBar.Trigger.FISHMOVE;
         }
 
-        // Apply bar motion. (Rising is computed in MinigameInteraction by changing barVelocity)
-        game.barVelocity = Math.clamp(game.barVelocity - (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity*AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration), -AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed);
+        // Apply bar gravity motion. (Rising is computed in MinigameInteraction by changing barVelocity)
+        game.barVelocity = Math.clamp(game.barVelocity - (game.gameConfig.barGravity*game.gameConfig.barAcceleration), -game.gameConfig.barGravity, game.gameConfig.barSpeed);
         game.barPos = Math.clamp(game.barPos + (game.barVelocity * deltaTime), game.gameConfig.barRadius * 0.5f, 1.0f - (game.gameConfig.barRadius * 0.5f));
 
         // Apply fish movement.
+        game.fishVelocity = Math.clamp(game.fishVelocity + (game.fishTargetVelocity * game.gameConfig.fishAcceleration), -game.gameConfig.fishMaxVeocity, game.gameConfig.fishMaxVeocity);
         game.fishPos = Math.clamp(game.fishPos + (game.fishVelocity*deltaTime), 0f, 1.0f);
 
         // DEBUG
-        game.fightProgress = 0.5f;
-        game.fishPos = 0.5f;
+        //game.fightProgress = 0.5f;
+        //game.fishPos = 0.5f;
 
         game.updateMinigameModelPositions(commandBuffer);
         game.fishMoveTimer += deltaTime;

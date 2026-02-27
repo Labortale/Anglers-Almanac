@@ -13,6 +13,7 @@ import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.server.core.util.Config;
 import dev.rm20.anglersalmanac.AlmanacBook.AlmanacBook;
 import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
+import dev.rm20.anglersalmanac.MinigameManager.RodStats;
 import dev.rm20.anglersalmanac.components.AudioPlayerComponent;
 import dev.rm20.anglersalmanac.components.BobberComponent;
 import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
@@ -76,11 +77,12 @@ public class AnglersAlmanac extends JavaPlugin {
 
         // Register MinigameRodStats asset.
         AssetRegistry.register(HytaleAssetStore.builder(MinigameRodStats.class, new DefaultAssetMap<String, MinigameRodStats>())
-                .setPath("AnglersAlmanac")
+                .setPath("AnglersAlmanacRodStats")
                 .setCodec(MinigameRodStats.CODEC)
                 .setKeyFunction(MinigameRodStats::getId)
                 .build()
         );
+
 
 
         // Register Components

@@ -1,7 +1,7 @@
 {
-  "AA_RodStats": {
-    "Difficulty": 1,
+  "Stats": {
     "Control": 1,
+    "Difficulty": 1,
     "Forgiveness": 1,
     "Stamina": 1,
     "FishWeightMul": 1,
