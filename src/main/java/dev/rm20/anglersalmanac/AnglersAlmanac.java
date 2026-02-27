@@ -46,7 +46,7 @@ public class AnglersAlmanac extends JavaPlugin {
 
     @Override
     protected void setup() {
-        LOGGER.atInfo().log("Setting up plugin " + this.getName());
+        LOGGER.atInfo().log("Setting up plugin " + this.getName()+":"+getManifest().getVersion().toString());
         RegisterManager.registerCommands(this);
         RegisterManager.registerEvents(this);
         AssetRegisterManager.registerAll(this);
@@ -76,19 +76,6 @@ public class AnglersAlmanac extends JavaPlugin {
         //System Interaction
         SystemRegisteration.registerSystem(this);
 
-        var fishLootManagerStore = FishLootManager.getAssetStore();
-        if (fishLootManagerStore != null && fishLootManagerStore.getAssetMap() != null) {
-            int fishCount = fishLootManagerStore.getAssetMap().getAssetCount();
-            LOGGER.atInfo().log("FishLootManager registered. Currently " + fishCount + " assets in store (Assets load asynchronously).");
-        } else {
-            LOGGER.atInfo().log("FishLootManager registered via Builder. Assets will be loaded during the asset phase.");
-        }
-
-        var BookStore = BookAssetData.getAssetStore();
-        if (BookStore != null && BookStore.getAssetMap() != null) {
-            LOGGER.atInfo().log("BookAssetData registered");
-        }
-
 
         //start database
         this.database = new AlmanacDatabase();
@@ -97,6 +84,8 @@ public class AnglersAlmanac extends JavaPlugin {
 
         //AlmanacBook.registerAlmanacBase();
 
+        // Plugin Mod Analytics
+        new HStats("55078602-d7a1-4794-b30c-f42529f3d1d4", getManifest().getVersion().toString());
     }
 
 
