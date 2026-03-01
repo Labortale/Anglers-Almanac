@@ -514,7 +514,9 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
         Vector3d force = dirToTargetPos.scale(distToTargetPos * 20.0 * deltaTime);
         commandBuffer.getComponent(bobberRef, Velocity.getComponentType()).addForce(force);
-        //commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).setPosition(bobberPos.clone());
+
+        // Add a little extra movement bypassing physics to fix bobber stuck on things.
+        commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).setPosition(bobberPos.clone().add(force.scale(0.1)));
     }
 
     public void DoInteraction(@NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler){
