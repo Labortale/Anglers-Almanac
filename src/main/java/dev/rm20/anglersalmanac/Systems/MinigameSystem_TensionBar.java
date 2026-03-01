@@ -19,6 +19,7 @@ import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
 //import dev.rm20.anglersalmanac.models.FishingRodData;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
 import dev.rm20.anglersalmanac.utils.SoundUtils;
+import dev.rm20.anglersalmanac.utils.TransformUtils;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntPredicate;
 import dev.rm20.anglersalmanac.metadata.FishingRodData;
@@ -186,7 +187,8 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
         game.barPos = Math.clamp(game.barPos + (game.barVelocity * deltaTime), game.gameConfig.barRadius * 0.5f, 1.0f - (game.gameConfig.barRadius * 0.5f));
 
         // Apply fish movement.
-        game.fishVelocity = Math.clamp(game.fishVelocity + (game.fishTargetVelocity * game.gameConfig.fishAcceleration), -game.gameConfig.fishMaxVeocity, game.gameConfig.fishMaxVeocity);
+        float fishAccelStep = game.gameConfig.fishAcceleration * deltaTime * 10f;
+        game.fishVelocity = TransformUtils.lerp(game.fishVelocity, game.fishTargetVelocity, fishAccelStep);
         game.fishPos = Math.clamp(game.fishPos + (game.fishVelocity*deltaTime), 0f, 1.0f);
 
         // DEBUG
