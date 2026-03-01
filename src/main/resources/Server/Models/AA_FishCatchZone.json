@@ -1,0 +1,11 @@
+{
+  "Model": "VFX/Fishing/AA_FishCatchZone.blockymodel",
+  "Texture": "VFX/Fishing/AA_FishCatchZone.png",
+  "HitBox": {
+    "Max": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    }
+  }
+}

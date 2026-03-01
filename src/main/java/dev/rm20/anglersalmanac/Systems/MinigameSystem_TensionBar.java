@@ -193,7 +193,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
         //game.fightProgress = 0.5f;
         //game.fishPos = 0.5f;
 
-        game.updateMinigameModelPositions(commandBuffer);
+        game.updateMinigameModelPositions(commandBuffer, deltaTime);
         game.fishMoveTimer += deltaTime;
 
     }

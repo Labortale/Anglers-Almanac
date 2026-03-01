@@ -20,6 +20,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.component.*;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
+import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
@@ -281,7 +282,10 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
             world.execute(() -> {commandBuffer.addEntity(barModelEntity, AddReason.SPAWN);});
         }
 
+
+
         // DEBUG BAR
+        /*
         Holder<EntityStore> barModelEntity = EntityStore.REGISTRY.newHolder();
         UUID barModelEntityId = UUID.randomUUID();
         barModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(barModelEntityId));
@@ -307,6 +311,8 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         barModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
 
         world.execute(() -> {commandBuffer.addEntity(barModelEntity, AddReason.SPAWN);});
+
+         */
 
 
         //---------- Frame MODEL -----------------------------------------------------
@@ -367,9 +373,47 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
             commandBuffer.addEntity(frameUpperModelEntity, AddReason.SPAWN);
         });
 
+
+        // ------ Catch Zone ------------------
+        Holder<EntityStore> catchZoneEntity = EntityStore.REGISTRY.newHolder();
+        UUID catchZoneEntityId = UUID.randomUUID();
+        catchZoneEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(catchZoneEntityId));
+        gameModels.put("catchZone", catchZoneEntityId);
+
+        Vector3d catchZonePos = gamePos.clone();
+        // Place at first water block from player and bobber.
+        Vector3d dirToBobber = bobberPos.clone().subtract(playerPos.clone()).normalize();
+        double distToBobber = playerPos.clone().distanceTo(bobberPos.clone());
+        //Vector3d underfootBlockPos = playerPos.clone().subtract(new Vector3d(0, 1, 0));
+        AnglersAlmanac.LOGGER.atInfo().log("underfootPos: %s", playerPos.clone());
+        for(double i = 0.0; i < distToBobber; i+= 0.5){
+            Vector3d checkPos = playerPos.clone().add(dirToBobber.clone().scale(i));
+            AnglersAlmanac.LOGGER.atInfo().log("i: %s, stepping: %s",i, checkPos.clone());
+            if(TransformUtils.isInFluid(checkPos.toVector3i(), world)){
+                catchZonePos = checkPos.toVector3i().toVector3d().add(new Vector3d(0.5, 1.0, 0.5));
+                AnglersAlmanac.LOGGER.atInfo().log("in water: %s", catchZonePos.clone());
+                break;
+            }
+        }
+
+        catchZoneEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
+        catchZoneEntity.getComponent(TransformComponent.getComponentType()).setPosition(catchZonePos.clone());
+
+        ModelAsset catchZoneModelAsset = ModelAsset.getAssetMap().getAsset("AA_FishCatchZone");
+        Model catchZoneModel = Model.createScaledModel(catchZoneModelAsset, 2f);
+        catchZoneEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(catchZoneModel.toReference()));
+        catchZoneEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(catchZoneModel));
+        catchZoneEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(catchZoneModel.getBoundingBox()));
+
+        catchZoneEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
+
+        world.execute(() -> {
+            commandBuffer.addEntity(catchZoneEntity, AddReason.SPAWN);
+        });
+
     }
 
-    public void updateMinigameModelPositions(CommandBuffer<EntityStore> commandBuffer){
+    public void updateMinigameModelPositions(CommandBuffer<EntityStore> commandBuffer, float deltaTime){
 
         World world = commandBuffer.getExternalData().getWorld();
 
@@ -427,6 +471,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
 
         // DEBUG BAR MOVEMENT
+        /*
         Vector3d debugBarPos = gamePos.clone();
         debugBarPos.add(new Vector3d(0.4 * minigameScale,(barPos * minigameScale) ,0));
         Vector3d debugLayering = debugBarPos.clone().add(TransformUtils.moveAwayFrom(debugBarPos.clone() ,playerPos.clone(), 0.2));
@@ -434,7 +479,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Ref<EntityStore> barModelRef = commandBuffer.getExternalData().getWorld().getEntityRef(gameModels.get("bar_DEBUG"));
         commandBuffer.getComponent(barModelRef, TransformComponent.getComponentType()).setPosition(debugBarPos.clone());
         TransformUtils.applyBillboardYOnly(gameModels.get("bar_DEBUG"), debugBarPos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), commandBuffer);
-
+        */
 
 
         // --------- FRAME -------------------------------
@@ -459,6 +504,17 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         }
 
 
+        // ----- Bobber -------------
+        Vector3d catchZonePos = commandBuffer.getComponent(commandBuffer.getExternalData().getRefFromUUID(gameModels.get("catchZone")), TransformComponent.getComponentType()).getPosition().clone();
+        Vector3d bobberPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        Vector3d vecToCatchZone = catchZonePos.clone().subtract(gamePos.clone());
+        Vector3d bobberTargetPos = gamePos.clone().add(vecToCatchZone.scale(fightProgress));
+        Vector3d dirToTargetPos = bobberTargetPos.clone().subtract(bobberPos.clone()).normalize();
+        double distToTargetPos = bobberPos.distanceTo(bobberTargetPos);
+
+        Vector3d force = dirToTargetPos.scale(distToTargetPos * 20.0 * deltaTime);
+        commandBuffer.getComponent(bobberRef, Velocity.getComponentType()).addForce(force);
+        //commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).setPosition(bobberPos.clone());
     }
 
     public void DoInteraction(@NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler){
