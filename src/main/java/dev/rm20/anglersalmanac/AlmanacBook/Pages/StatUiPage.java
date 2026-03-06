@@ -85,6 +85,10 @@ public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData
             if (stats.topFish != null && i < stats.topFish.size()) {
                 AlmanacDatabase.FishEntry entry = stats.topFish.get(i);
                 FishLootManager loot = FishLootManager.getFishData(entry.name());
+                if(loot == null)
+                {
+                    continue;
+                }
                 uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.count()));
             } else {
                 uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- ??? : 0"));
