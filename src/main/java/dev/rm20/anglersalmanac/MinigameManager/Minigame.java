@@ -1,7 +1,7 @@
 package dev.rm20.anglersalmanac.MinigameManager;
 
-import dev.rm20.anglersalmanac.metadata.FishingRodData;
-import dev.rm20.anglersalmanac.utils.FishLootManager;
+import dev.rm20.anglersalmanac.Metadata.RodStats;
+import dev.rm20.anglersalmanac.Models.FishLootManager;
 
 public abstract class Minigame {
 

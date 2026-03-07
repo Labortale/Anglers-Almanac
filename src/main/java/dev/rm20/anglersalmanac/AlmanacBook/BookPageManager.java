@@ -10,8 +10,8 @@ import dev.rm20.anglersalmanac.AlmanacBook.Pages.FishZoneUiPage;
 import dev.rm20.anglersalmanac.AlmanacBook.Pages.GlossaryPage;
 import dev.rm20.anglersalmanac.AlmanacBook.Pages.StatUiPage;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
-import dev.rm20.anglersalmanac.models.BookAssetData;
-import dev.rm20.anglersalmanac.utils.FishLootManager;
+import dev.rm20.anglersalmanac.Models.BookAssetData;
+import dev.rm20.anglersalmanac.Models.FishLootManager;
 
 import java.util.List;
 

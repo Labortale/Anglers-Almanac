@@ -11,12 +11,11 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
 import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
-import dev.rm20.anglersalmanac.models.BookAssetData;
-import dev.rm20.anglersalmanac.utils.FishLootManager;
-import dev.rm20.anglersalmanac.utils.pageUtils;
+import dev.rm20.anglersalmanac.Models.BookAssetData;
+import dev.rm20.anglersalmanac.Models.FishLootManager;
+import dev.rm20.anglersalmanac.Utils.pageUtils;
 
 import javax.annotation.Nonnull;
 import java.util.List;

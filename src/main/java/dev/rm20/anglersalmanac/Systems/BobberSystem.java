@@ -16,10 +16,9 @@ import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.rm20.anglersalmanac.AnglersAlmanac;
-import dev.rm20.anglersalmanac.components.BobberComponent;
-import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
-import dev.rm20.anglersalmanac.metadata.FishingRodData;
+import dev.rm20.anglersalmanac.Components.BobberComponent;
+import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
+import dev.rm20.anglersalmanac.Metadata.FishingRodData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

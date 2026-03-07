@@ -5,11 +5,8 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.rm20.anglersalmanac.components.AudioPlayerComponent;
-import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
+import dev.rm20.anglersalmanac.Components.AudioPlayerComponent;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

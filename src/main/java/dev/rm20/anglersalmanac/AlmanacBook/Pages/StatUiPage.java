@@ -1,8 +1,5 @@
 package dev.rm20.anglersalmanac.AlmanacBook.Pages;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
@@ -16,12 +13,10 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
-import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
-import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.MinigameManager.Minigame;
-import dev.rm20.anglersalmanac.models.BookAssetData;
-import dev.rm20.anglersalmanac.utils.FishLootManager;
-import dev.rm20.anglersalmanac.utils.pageUtils;
+import dev.rm20.anglersalmanac.Models.BookAssetData;
+import dev.rm20.anglersalmanac.Models.FishLootManager;
+import dev.rm20.anglersalmanac.Utils.pageUtils;
 
 import javax.annotation.Nonnull;
 
@@ -32,7 +27,7 @@ import java.util.Objects;
 
 import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.OpenPage;
 import static dev.rm20.anglersalmanac.AlmanacBook.BookPageManager.getPageIndexForZone;
-import static dev.rm20.anglersalmanac.models.BookAssetData.getZoneRank;
+import static dev.rm20.anglersalmanac.Models.BookAssetData.getZoneRank;
 
 
 public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData> {

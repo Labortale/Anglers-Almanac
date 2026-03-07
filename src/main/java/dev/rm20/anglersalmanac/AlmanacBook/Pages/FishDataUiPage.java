@@ -4,7 +4,6 @@
     import com.hypixel.hytale.component.Store;
     import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
     import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
-    import com.hypixel.hytale.server.core.Message;
     import com.hypixel.hytale.server.core.entity.entities.Player;
     import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
     import com.hypixel.hytale.server.core.ui.builder.EventData;
@@ -14,11 +13,8 @@
     import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
     import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
     import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
-    import dev.rm20.anglersalmanac.AnglersAlmanac;
-    import dev.rm20.anglersalmanac.utils.FishLootManager;
-    import dev.rm20.anglersalmanac.utils.StampUtil;
-    import dev.rm20.anglersalmanac.utils.TextUtils;
-    import dev.rm20.anglersalmanac.utils.pageUtils;
+    import dev.rm20.anglersalmanac.Models.FishLootManager;
+    import dev.rm20.anglersalmanac.Utils.pageUtils;
 
     import javax.annotation.Nonnull;
 

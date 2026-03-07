@@ -1,22 +1,18 @@
 package dev.rm20.anglersalmanac;
 
-import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.server.core.util.Config;
 import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
-import dev.rm20.anglersalmanac.components.BobberComponent;
-import dev.rm20.anglersalmanac.config.AnglersAlmanacConfig;
-import dev.rm20.anglersalmanac.config.MinigameConfig_TensionBar;
-import dev.rm20.anglersalmanac.models.BookAssetData;
-import dev.rm20.anglersalmanac.registration.*;
-import dev.rm20.anglersalmanac.utils.FishLootManager;
-import dev.rm20.anglersalmanac.utils.MinigameRodStats;
+import dev.rm20.anglersalmanac.Components.BobberComponent;
+import dev.rm20.anglersalmanac.Config.AnglersAlmanacConfig;
+import dev.rm20.anglersalmanac.Config.MinigameConfig_TensionBar;
+import dev.rm20.anglersalmanac.Models.BookAssetData;
+import dev.rm20.anglersalmanac.Registration.*;
+import dev.rm20.anglersalmanac.Models.FishLootManager;
 
 
 import javax.annotation.Nonnull;
@@ -52,20 +48,20 @@ public class AnglersAlmanac extends JavaPlugin {
         AssetRegisterManager.registerAll(this);
 
         // Register FishLoot asset.
-        AssetRegistry.register(HytaleAssetStore.builder(FishLootManager.class, new DefaultAssetMap<String, FishLootManager>())
-                .setPath("AnglersAlmanac")
-                .setCodec(FishLootManager.CODEC)
-                .setKeyFunction(FishLootManager::getId)
-                .build()
-        );
-
-        // Register MinigameRodStats asset.
-        AssetRegistry.register(HytaleAssetStore.builder(MinigameRodStats.class, new DefaultAssetMap<String, MinigameRodStats>())
-                .setPath("AnglersAlmanacRodStats")
-                .setCodec(MinigameRodStats.CODEC)
-                .setKeyFunction(MinigameRodStats::getId)
-                .build()
-        );
+//        AssetRegistry.register(HytaleAssetStore.builder(FishLootManager.class, new DefaultAssetMap<String, FishLootManager>())
+//                .setPath("AnglersAlmanac")
+//                .setCodec(FishLootManager.CODEC)
+//                .setKeyFunction(FishLootManager::getId)
+//                .build()
+//        );
+//
+//        // Register MinigameRodStats asset.
+//        AssetRegistry.register(HytaleAssetStore.builder(MinigameRodStats.class, new DefaultAssetMap<String, MinigameRodStats>())
+//                .setPath("AnglersAlmanacRodStats")
+//                .setCodec(MinigameRodStats.CODEC)
+//                .setKeyFunction(MinigameRodStats::getId)
+//                .build()
+//        );
 
 
 

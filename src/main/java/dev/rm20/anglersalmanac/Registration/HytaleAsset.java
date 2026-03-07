@@ -1,0 +1,12 @@
+package dev.rm20.anglersalmanac.Registration;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface HytaleAsset {
+    String path();;
+}
