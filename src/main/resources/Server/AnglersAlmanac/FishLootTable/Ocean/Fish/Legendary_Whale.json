@@ -5,24 +5,22 @@
     "saltwater"
   ],
   "Name": "Humpback Whale",
-  "Description": "A titan of the sea.",
-  "FamilyId": "Whale_family",
+  "Description": "A true titan of the salt, this gentle giant is more like a floating island than a fish. It spends its Days singing songs that carry for miles through the current and breaching the surface with enough force to swamp a small boat. They don't actually have teeth; instead, they use giant plates of baleen to filter out tiny krill, meaning they’re the biggest eaters in the sea despite having some of the smallest prey.",
+  "FamilyId": "Balaenopteridae",
   "Rarity": "Legendary",
-  "IsGlobal": true,
+  "IsGlobal": false,
   "Weight": 25,
-  "Size": 1500,
+  "Size": 3000,
   "Habitats": {
-    "Zones": ["Ocean"],
+    "Zones": [
+      "Ocean"
+    ],
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "Any"
-    ],
-    "Required_weather": [
-      "Any"
-    ],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 20,
     "Height": {
       "Min_y": 0,
@@ -33,5 +31,9 @@
     "Difficulty": 15,
     "Behavior": "heavy_sinker",
     "Stamina": 500
+  },
+  "Book_info": {
+    "Habitat_Info": "• Open Ocean",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage6.ui"
   }
 }

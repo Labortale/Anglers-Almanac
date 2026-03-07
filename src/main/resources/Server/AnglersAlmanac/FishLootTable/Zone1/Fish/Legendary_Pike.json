@@ -5,12 +5,12 @@
     "freshwater"
   ],
   "Name": "Pike",
-  "Description": "An apex predator of the reeds, often called the 'Water Wolf.'",
-  "FamilyId": "Pike_family",
+  "Description": "Also known as the \"Water Wolf,\" this freshwater monster is pure muscle and teeth. It lurks in the reeds like a coiled spring, ready to spring forth at anything that moves with a quick snap of its needle-filled jaws. If you ever experience a sudden, violent tug on your line in the shallows, you’ve probably hooked a Pike.",
+  "FamilyId": "Esocidae",
   "Rarity": "Legendary",
   "IsGlobal": false,
   "Weight": 30,
-  "Size": 120,
+  "Size": 80,
   "Habitats": {
     "Zones": [
       "1"
@@ -18,13 +18,9 @@
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "any"
-    ],
-    "Required_weather": [
-      "any"
-    ],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,
@@ -39,5 +35,9 @@
     "Difficulty": 10,
     "Behavior": "aggressive",
     "Stamina": 100
+  },
+  "Book_info": {
+    "Habitat_Info": "• Emerald Wilds:|    Expect Swamps",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage7.ui"
   }
 }

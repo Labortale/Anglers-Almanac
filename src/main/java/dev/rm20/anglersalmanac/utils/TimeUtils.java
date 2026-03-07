@@ -1,9 +1,23 @@
 package dev.rm20.anglersalmanac.utils;
 
+import dev.rm20.anglersalmanac.utils.Validator.TimePeriod;
+
 import java.time.ZonedDateTime;
 
 public class TimeUtils {
 
+    public static TimePeriod getTimePeriod(String hytaleTimestamp)
+    {
+        try {
+            ZonedDateTime time = ZonedDateTime.parse(hytaleTimestamp);
+            int hour = time.getHour();
+            return TimePeriod.fromHour(hour);
+        }
+        catch (Exception e) {
+            //fall back to day
+            return TimePeriod.ANY;
+        }
+    }
     /**
      * @param hytaleTimestamp worldTimeResource.getGameTime().toString();
      * @return dawn, day, dusk, night

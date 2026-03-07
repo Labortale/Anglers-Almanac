@@ -5,7 +5,7 @@
     "freshwater"
   ],
   "Name": "Bluegill",
-  "Description": "Identifiable by the navy-black ear flap on its gill cover, the Bluegill is a master of adaptation. Whether it’s a mountain stream or a backyard pond, this fish makes itself at home anywhere. It’s a tiny, shimmering tank with a 360-degree security system, ensuring it sees a snack or a predator long before they see it.",
+  "Description": "It can be spotted by the navy-black flap on the ear of its gill cover, but the Bluegill is a chameleon of fish. Whether it’s a mountain stream or a pound, this fish will make itself right at home. It’s a miniature, sparkling tank with a 360-degree security system, seeing a meal or a predator before they ever lay eyes on it.",
   "FamilyId": "sunfishes",
   "Rarity": "Common",
   "IsGlobal": true,
@@ -16,13 +16,6 @@
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "day"
-    ],
-    "Required_weather": [
-      "any"
-    ],
-    "Moon_phase": -1,
     "Min_depth": 2,
     "Height": {
       "Min_y": 0,
@@ -39,6 +32,7 @@
     "Stamina": 20
   },
   "Book_info": {
-    "Habitat_Info": "• Everywhere|  Expect Oceans"
+    "Habitat_Info": "• Everywhere:|    Expect Oceans",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage7.ui"
   }
 }

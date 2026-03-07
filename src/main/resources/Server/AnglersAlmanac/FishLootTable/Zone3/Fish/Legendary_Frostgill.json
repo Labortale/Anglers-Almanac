@@ -6,8 +6,8 @@
     "arctic"
   ],
   "Name": "Frostgill",
-  "Description": "A ice-cold fish with scales like frosted glass.",
-  "FamilyId": "Frostgill_family",
+  "Description": "A serrated terror of the arctic ice, this fish has scales like frosted glass and teeth which can bite through a frozen line. It doesn’t just live in the cold; it thrives in it, swimming in the slush like a ghost made of winter. Catching this fish is the true test of a fisherman’s mettle, as this fish has a temperament as sharp as its fins.",
+  "FamilyId": "Channichthyidae",
   "Rarity": "Legendary",
   "IsGlobal": false,
   "Weight": 20,
@@ -17,11 +17,9 @@
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "Any"
-    ],
-    "Required_weather": ["Any"],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,
@@ -32,5 +30,8 @@
     "Difficulty": 14,
     "Behavior": "aggressive",
     "Stamina": 180
+  },
+  "Book_info": {
+    "Habitat_Info": "• Whisperfrost Frontiers"
   }
 }

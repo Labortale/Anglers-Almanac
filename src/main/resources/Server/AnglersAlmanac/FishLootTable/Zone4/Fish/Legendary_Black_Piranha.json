@@ -1,5 +1,5 @@
 {
-  "ItemId": "Fish_Black_Piranha_Item",
+  "ItemId": "Fish_Piranha_Black_Item",
   "Category": [
     "fish",
     "freshwater"
@@ -16,13 +16,9 @@
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "any"
-    ],
-    "Required_weather": [
-      "any"
-    ],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,

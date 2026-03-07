@@ -5,8 +5,8 @@
     "freshwater"
   ],
   "Name": "Piranha",
-  "Description": "A legendary terror of the murky depths.",
-  "FamilyId": "Piranha_family",
+  "Description": "Don't let its size fool you; this blue-scaled devil is a legendary terror of the murky swamps. It’s got a set of razor-sharp, interlocking teeth that can strip a catch to the bone before you even finish reeling it in. They usually hunt in schools, but a lone one is just as aggressive and won't hesitate to take a chunk out of anything that splashes in its territory.",
+  "FamilyId": "Serrasalmidae",
   "Rarity": "Legendary",
   "IsGlobal": false,
   "Weight": 35,
@@ -18,13 +18,9 @@
     "Biomes": [
       "Forest_Swamp"
     ],
-    "Time_of_day": [
-      "any"
-    ],
-    "Required_weather": [
-      "any"
-    ],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,
@@ -35,5 +31,9 @@
     "Difficulty": 10,
     "Behavior": "aggressive",
     "Stamina": 85
+  },
+  "Book_info": {
+    "Habitat_Info": "• Emerald Wilds's Swamps",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage3.ui"
   }
 }

@@ -5,24 +5,24 @@
     "saltwater"
   ],
   "Name": "Red Jellyfish",
-  "Description": "Its glow is mesmerizing.",
-  "FamilyId": "Jellyfish_family",
+  "Description": "A crimson bell that looks like a warning light floating in the deep. You’ve gotta be careful even after you’ve landed one; those tentacles are loaded with spring-loaded needles that can still sting you long after the creature has given up the ghost.",
+  "FamilyId": "Ulmaridae",
   "Rarity": "Epic",
   "IsGlobal": false,
   "Weight": 75,
   "Size": 50,
   "Habitats": {
-    "Zones": ["Ocean"],
+    "Zones": [
+      "Ocean"
+    ],
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
     "Time_of_day": [
-      "night"
+      "Night"
     ],
-    "Required_weather": [
-      "Any"
-    ],
-    "Moon_phase": -1,
+
+   
     "Min_depth": 5,
     "Height": {
       "Min_y": 0,
@@ -33,5 +33,9 @@
     "Difficulty": 7,
     "Behavior": "erratic",
     "Stamina": 120
+  },
+  "Book_info": {
+    "Habitat_Info": "• Ocean:|• Night",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage3.ui"
   }
 }

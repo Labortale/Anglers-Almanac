@@ -13,12 +13,13 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldMapTracker;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
-import dev.rm20.anglersalmanac.models.FishingContext;
-import dev.rm20.anglersalmanac.models.ZoneInfo;
+import dev.rm20.anglersalmanac.metadata.FishingContext;
+import dev.rm20.anglersalmanac.metadata.ZoneInfo;
 import dev.rm20.anglersalmanac.registration.CommandInfo;
 import dev.rm20.anglersalmanac.utils.EnvironmentParser;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
 import dev.rm20.anglersalmanac.utils.TimeUtils;
+import dev.rm20.anglersalmanac.utils.Validator.TimePeriod;
 
 import javax.annotation.Nonnull;
 
@@ -39,7 +40,7 @@ public class SimulateFishingCommand extends AbstractPlayerCommand {
         double y = (transform != null) ? transform.getPosition().getY() : 0;
 
         WorldTimeResource timeResource = store.getResource(WorldTimeResource.getResourceType());
-        String timeKeyword = TimeUtils.getTimeKeyword(timeResource.getGameTime().toString());
+        TimePeriod timeKeyword = TimeUtils.getTimePeriod(timeResource.getGameTime().toString());
 
         WorldMapTracker worldMapTracker = player.getWorldMapTracker();
         WorldMapTracker.ZoneDiscoveryInfo currentZone = worldMapTracker.getCurrentZone();
@@ -79,7 +80,7 @@ public class SimulateFishingCommand extends AbstractPlayerCommand {
         StringBuilder sb = new StringBuilder();
         sb.append("\n === FISHING SIMULATION (n=").append(total).append(") ===");
         sb.append("\n Location: ").append(ctx.biome()).append(" | Tier: ").append(ctx.tier());
-        sb.append("\n Depth: 20 | Time: ").append(ctx.time());
+        sb.append("\n Depth: 20 | Time: ").append(ctx.time().getKeyword());
         sb.append("\n-------------------------------------------");
         results.forEach((id, count) -> {
             sb.append(String.format("\n- %-25s : %d%% (%d)", id, (count * 100 / total),count));

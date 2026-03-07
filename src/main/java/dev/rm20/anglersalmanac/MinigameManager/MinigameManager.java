@@ -22,17 +22,17 @@ import com.hypixel.hytale.server.npc.util.InventoryHelper;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.interactions.LaunchBobberInteraction;
-import dev.rm20.anglersalmanac.models.FishingContext;
+import dev.rm20.anglersalmanac.metadata.FishingContext;
 import dev.rm20.anglersalmanac.metadata.FishingRodData;
-import dev.rm20.anglersalmanac.models.ZoneInfo;
+import dev.rm20.anglersalmanac.metadata.ZoneInfo;
 import dev.rm20.anglersalmanac.utils.EnvironmentParser;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
 import dev.rm20.anglersalmanac.utils.TimeUtils;
+import dev.rm20.anglersalmanac.utils.Validator.TimePeriod;
 import org.jspecify.annotations.NonNull;
 
 import java.awt.*;
 import java.util.Random;
-import java.util.UUID;
 
 import static com.hypixel.hytale.server.core.universe.world.WorldConfig.formatDisplayName;
 import static dev.rm20.anglersalmanac.MinigameManager.Minigame.PerformanceRating.NIL;
@@ -134,7 +134,7 @@ public class MinigameManager {
 
         // Combine
         FishingContext LocationInfo = new FishingContext(
-                timeKeyword,
+                TimeUtils.getTimePeriod(gameTime),
                 moonPhase,
                 zone,
                 tier,

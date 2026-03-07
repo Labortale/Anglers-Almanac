@@ -12,6 +12,11 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import dev.rm20.anglersalmanac.MinigameManager.RodStats;
 import dev.rm20.anglersalmanac.metadata.FishingRodData;
 
+//TODO: Move to models
+//@HytaleAsset(
+//        path = "AnglersAlmanacRod"
+//)
+
 public class MinigameRodStats implements JsonAssetWithMap<String, DefaultAssetMap<String, MinigameRodStats>> {
 
     public String id;

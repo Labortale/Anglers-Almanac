@@ -5,24 +5,24 @@
     "saltwater"
   ],
   "Name": "Man Of War",
-  "Description": "Its glow is mesmerizing.",
-  "FamilyId": "Jellyfish_family",
+  "Description": "Don't be fooled by that purple light and get close to it. It’s not a single creature, but a whole colony of horrors disguised as a jellyfish. Its tentacles can extend long and hidden in the waves, with a sting that will make a grown man wish he had stayed on the pier. It sails the winds using a gas-filled float, which means it goes wherever the ocean's mood takes it.",
+  "FamilyId": "Cystonectae",
   "Rarity": "Legendary",
   "IsGlobal": false,
   "Weight": 50,
-  "Size": 50,
+  "Size": 300,
   "Habitats": {
-    "Zones": ["Ocean"],
+    "Zones": [
+      "Ocean"
+    ],
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
     "Time_of_day": [
-      "night"
+      "Night"
     ],
-    "Required_weather": [
-      "Any"
-    ],
-    "Moon_phase": -1,
+
+   
     "Min_depth": 5,
     "Height": {
       "Min_y": 0,
@@ -33,5 +33,9 @@
     "Difficulty": 7,
     "Behavior": "erratic",
     "Stamina": 120
+  },
+  "Book_info": {
+    "Habitat_Info": "• Ocean:|• Night",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage3.ui"
   }
 }

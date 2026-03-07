@@ -5,7 +5,7 @@
     "freshwater"
   ],
   "Name": "Minnow",
-  "Description": "A small, silver-scaled fish found in almost any body of water, it is the ultimate global traveler of the shallows. With a sleek, metallic finish that catches the light as it darts through the reeds.",
+  "Description": "A small fish with scales of silver, found in any body of water, it is the ultimate world traveler of the shallows. Its sleek, metallic finish glints in the sunlight as it moves through the reeds.",
   "FamilyId": "cyprinidae",
   "Rarity": "Common",
   "IsGlobal": true,
@@ -16,13 +16,9 @@
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "any"
-    ],
-    "Required_weather": [
-      "any"
-    ],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 2,
     "Height": {
       "Min_y": 0,
@@ -37,5 +33,8 @@
     "Difficulty": 2,
     "Behavior": "steady",
     "Stamina": 15
+  },
+  "Book_info": {
+    "Habitat_Info": "• Everywhere:|    Expect Oceans"
   }
 }

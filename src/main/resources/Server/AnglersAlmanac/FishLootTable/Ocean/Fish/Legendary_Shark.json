@@ -5,24 +5,22 @@
     "saltwater"
   ],
   "Name": "Hammerhead Shark",
-  "Description": "An apex predator.",
-  "FamilyId": "Shark_family",
+  "Description": "This brute is the ultimate hunter, with a head like a sledgehammer to hold down its prey against the seafloor. And them eyes on the ends of its head give it a complete field of vision, so there ain't no place you can hide that it won't spot you. It can detect the smallest electrical impulses of a beating heart buried under the sand, so if it gets your scent, you'd better hold on to your pole for dear life.",
+  "FamilyId": "Sphyrnidae",
   "Rarity": "Legendary",
   "IsGlobal": false,
   "Weight": 15,
   "Size": 1500,
   "Habitats": {
-    "Zones": ["Ocean"],
+    "Zones": [
+      "Ocean"
+    ],
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "Any"
-    ],
-    "Required_weather": [
-      "Any"
-    ],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 20,
     "Height": {
       "Min_y": 0,
@@ -33,5 +31,9 @@
     "Difficulty": 13,
     "Behavior": "aggressive",
     "Stamina": 250
+  },
+  "Book_info": {
+    "Habitat_Info": "• Open Ocean",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage5.ui"
   }
 }

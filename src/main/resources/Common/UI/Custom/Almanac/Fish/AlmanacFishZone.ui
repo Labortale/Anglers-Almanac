@@ -1,287 +1,110 @@
-$Common = "Common.ui";
 
-@BookBackground = PatchStyle(TexturePath: "../book_2.png");
+@BookBackgroundImage = PatchStyle(TexturePath: "../book_2.png");
+@BookFrontImage = PatchStyle(TexturePath: "../book_2_Front.png");
+@StatsTabImage = PatchStyle(TexturePath: "../Utils/Assets/Tabs/Sextant_Tab.png");
+@GlossaryTabImage = PatchStyle(TexturePath: "../Utils/Assets/Tabs/Fish_tab.png");
+
+
 @FishMissing = "Info/FishMissing.png";
 @FishBorder = "Info/FishBorder.png";
 Group #AlmanacStats {
-  Anchor: (Width: 1200, Height: 872);
-  Group #background {
-    Background: @BookBackground;
+  Anchor: (Width: 1240, Height: 932);
+  Group #BookBackground {
+    Anchor: (Left: 20, Top: 60, Width: 1200, Height: 872);
+    Background: @BookBackgroundImage;
   }
 
-  Group #BookNav
-  {
-    // NAV BUTTONS
-    Button  #PrevPageButton {
-      Anchor: (Bottom: 45, Left: 115, Width: 60, Height: 30);
-      Background: #3A3A3A;
-    }
 
-    Button  #NextPageButton {
-      Anchor: (Bottom: 45, Right: 65, Width: 60, Height: 30);
-      Background: #3A3A3A;
-    }
+  Group #LeftTabGutter {
+    Anchor: (Left: 15, Top: 100, Width: 60, Height: 700);
   }
 
-  // LEFT PAGE
-  Group #LeftPage {
-    Anchor: (Left: 100, Top: 60, Width: 450, Height: 750);
+  Group #RightTabGutter {
+    Anchor: (Right: 0, Top: 100, Width: 60, Height: 700);
+  }
 
-    Label #Header {
-      Anchor: (Top: 0, Left: 50);
-      Style: (TextColor: #3A3A3A, FontSize: 32, RenderBold: true);
-      Text: "Global Fish";
-    }
-
-    Group #ProgressContainer {
-      Anchor: (Top: 10, Left: 0, Width: 300, Height: 300);
-      Group #ProgressBackground {
-        Anchor: (Width: 300, Height: 300);
-        Background: "Assets/BackgroundSignatureAbilityNotReady.png";
-      }
-      CircularProgressBar #FishProgress {
-        Value: 1;
-        Color: #2A5A82;
-        MaskTexturePath: "Assets/ProgressBarMask.png";
+  Group #TopTabGutter {
+    Anchor: (Left: 20, Top: 0, Width: 1200, Height: 60);
+    Group #StatsTab {
+      Anchor: (Left:100, Width: 70, Height: 130,Top: 0);
+      Group #StatsTabBackground {
+        Background: #6b987f;
       }
 
-      Group #ZoneIcon {
-        Anchor: (Width: 250, Height: 250,Left:15, Top:20);
-        AssetImage #ZoneIconImage {}
+      Button #StatsTabIcon {
+        Anchor: (Top:5, Left:5, Width: 65, Height:65);
+        Background: @StatsTabImage;
+        TooltipText: "Go to Stats Page";
       }
     }
-    Group #ZoneInfo {
-      Anchor: (Top: 60, Left: 275, Width: 200, Height: 300);
-      Label #ZoneHeader {
-        Style: (TextColor: #2A2A2A, FontSize: 20, Wrap: true);
-        Text: "Those fish can be found in most body of water around orbis.";
-      }
-    }
-    Group #FishItemss {
-      LayoutMode: Top;
-      Anchor: (Top: 300, Left: 10);
 
-      Group #FishItems1 {
-        LayoutMode: Left;
-        Anchor: (Top: 10, Left: 10);
-        Group #ItemIcon0BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Group #ItemIcon0Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: false;
-          }
-          ItemIcon #ItemIcon0 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "Fish_Bluegill_Item";
-          }
-        }
-
-        Group #ItemIcon1BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Group #ItemIcon1Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: false;
-          }
-          ItemIcon #ItemIcon1 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "Fish_Catfish_Item";
-          }
-        }
-
-        Group #ItemIcon2BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Group #ItemIcon2Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: false;
-          }
-          ItemIcon #ItemIcon2 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "Fish_Minnow_Item";
-          }
-        }
-
-        Group #ItemIcon3BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Group #ItemIcon3Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: false;
-          }
-          ItemIcon #ItemIcon3 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "Fish_Pufferfish_Item";
-          }
-        }
-
-        Group #ItemIcon4BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Group #ItemIcon4Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: false;
-          }
-          ItemIcon #ItemIcon4 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "Fish_Salmon_Item";
-          }
-        }
+    Group #GlossaryTab2 {
+      Anchor: (Right:30, Width: 70, Height: 130,Top: 0);
+      Group #GlossaryTabBackground {
+        Background: #A67691;
       }
 
-      Group #FishItems2 {
-        LayoutMode: Left;
-        Anchor: (Top: 10, Left: 10);
-
-        Group #ItemIcon5BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Group #ItemIcon5Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: false;
-          }
-          ItemIcon #ItemIcon5 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "Fish_Trout_Rainbow_Item";
-          }
-        }
-
-        Group #ItemIcon6BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Visible: false;
-          Group #ItemIcon6Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: true;
-          }
-          ItemIcon #ItemIcon6 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "";
-          }
-        }
-
-        Group #ItemIcon7BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Visible: false;
-          Group #ItemIcon7Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: true;
-          }
-          ItemIcon #ItemIcon7 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "";
-          }
-        }
-
-        Group #ItemIcon8BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Visible: false;
-          Group #ItemIcon8Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: true;
-          }
-          ItemIcon #ItemIcon8 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "";
-          }
-        }
-
-        Group #ItemIcon9BG {
-          Anchor: (Width: 70, Height: 70, Left: 10);
-          Background: @FishBorder;
-          Visible: false;
-          Group #ItemIcon9Missing {
-            Anchor: (Width: 70, Height: 70);
-            Background: @FishMissing;
-            Visible: true;
-          }
-          ItemIcon #ItemIcon9 {
-            Anchor: (Width: 65, Height: 65);
-            ItemId: "";
-          }
-        }
+      Button #GlossaryTabIcon {
+        Anchor: (Top:5, Left:5, Width: 65, Height:65);
+        Background: @GlossaryTabImage;
+        TooltipText: "Go to Glossary Page";
       }
     }
   }
 
 
-  // RIGHT PAGE
-  Group #RightPage {
-    Anchor: (Right: 120, Top: 60, Width: 450, Height: 750);
-
-    Label #Header2 {
-      Anchor: (Top: 0, Left: 50);
-      Style: (TextColor: #3A3A3A, FontSize: 32, RenderBold: true);
-      Text: "{Fish2 name}";
+  Group #BookContentpages {
+    Anchor: (Left: 20, Top: 60, Width: 1200, Height: 872);
+    Group #BookFront {
+      Background: @BookFrontImage;
     }
 
-    Group #CounterSection2 {
-      Anchor: (Top: 45, Left: 50, Width: 380, Height: 30);
-      Label #CountLabel2 {
-        Style: (TextColor: #7A6652, FontSize: 18, RenderBold: true);
-        Text: "Total caught:";
-      }
-
-      Label #CountNumber2 {
-        Anchor: (Left: 115);
-        Style: (TextColor: #3A3A3A, FontSize: 18);
-        Text: "{total_catches2}";
-      }
+    Group #LeftTabActive {
+      Anchor: (Left: 0, Top: 40, Width: 60, Height: 700);
+    } 
+    Group #BookNav {
+      Anchor:(Bottom: 40);
     }
 
-    Group #FishContainer2 {
-      Anchor: (Top: 100, Left: 50, Width: 250, Height: 250);
-      AssetImage #FishImage2 {}
-    }
-
-    Group #QuickStats2 {
-      Anchor: (Top: 130, Left: 310, Width: 160);
-      Label #FamilyLabel2 {
-        Style: (TextColor: #7A6652, FontSize: 14, RenderBold: true);
-        Text: "Species Class:";
-
+    Group #LeftPage { 
+      Anchor: (Left: 100, Top: 60, Width: 450, Height: 750); 
+      Label #Header {
+        Anchor: (Top: 0, Left: 50);
+        Style: (TextColor: #3A3A3A, FontSize: 32, RenderBold: true);
+        Text: "Global Fish";
       }
-      Label #Family2 {
-        Anchor: (Top: 20);
-        Style: (TextColor: #5A4D41, FontSize: 20, Wrap: true);
-        Text: "{Fish2 familly}";
+      Group #ProgressContainer {
+        Anchor: (Top: 10, Left: 0, Width: 300, Height: 300);
+        Group #ProgressBackground {
+          Anchor: (Width: 300, Height: 300);
+          Background: "Assets/BackgroundSignatureAbilityNotReady.png";
+        }
+        CircularProgressBar #FishProgress {
+          Value: 1;
+          Color: #2A5A82;
+          MaskTexturePath: "Assets/ProgressBarMask.png";
+        }
+
+        Group #ZoneIcon {
+          Anchor: (Width: 250, Height: 250,Left:15, Top:20);
+          AssetImage #ZoneIconImage {}
+        }
+        Group #ZoneInfo {
+          Anchor: (Top: 60, Left: 275, Width: 200, Height: 300);
+          Label #ZoneHeader {
+            Style: (TextColor: #2A2A2A, FontSize: 20, Wrap: true);
+          Text: "Those fish can be found in most body of water around orbis.";
+        }
       }
     }
-
-    Label #Description2 {
-      Anchor: (Top: 340, Left: 40, Width: 400, Height: 200);
-      Style: (TextColor: #494950, FontSize: 19, Wrap: true);
-      Text: "{Fish2_info}";
-    }
-
-    Group #HabitatSection2 {
-      Anchor: (Top: 540, Left: 40, Width: 380);
-      Label #HabitatTitle2 {
-        Style: (TextColor: #2A5A82, FontSize: 18, RenderBold: true);
-        Text: "LURKS WITHIN:";
-      }
-      Label #HabitatList2 {
-        Anchor: (Top: 25);
-        Style: (TextColor: #494950, FontSize: 17);
-        Text: "{Fish_Habitat}";
+      Group #FishGridContainer {
+        LayoutMode: Top;
+        Anchor: (Top: 300, Left: 10);
       }
     }
 
-    Group #Stamp2 {
-      Anchor: (Bottom: 50, Right: 0, Width: 180, Height: 180);
-      AssetImage #StampImage2 {}
-    }
+
+    Group #RightPageSlot { Anchor: (Right: 100, Top: 60, Width: 450, Height: 750); }
+
   }
 }

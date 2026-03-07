@@ -5,12 +5,12 @@
     "saltwater"
   ],
   "Name": "Lobster",
-  "Description": "Lobster",
-  "FamilyId": "Crab_family",
+  "Description": "A real king of the sea floor, this red-plated behemoth is more of a tank than a fish. With claws as heavy as a boat's railing and armor as thick as a hull, it’s a legendary fighter that has seen more years in the deep trenches than most sailors have seen land. What’s more, these giants do not really age like us; they just keep growing and growing every time they shed their massive shell.",
+  "FamilyId": "Crustacean",
   "Rarity": "Legendary",
   "IsGlobal": false,
   "Weight": 40,
-  "Size": 150,
+  "Size": 160,
   "Habitats": {
     "Zones": [],
     "Tiers": [],
@@ -20,13 +20,9 @@
       "Shore",
       "Beach"
     ],
-    "Time_of_day": [
-      "Any"
-    ],
-    "Required_weather": [
-      "Any"
-    ],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,
@@ -37,5 +33,9 @@
     "Difficulty": 12,
     "Behavior": "heavy_sinker",
     "Stamina": 150
+  },
+  "Book_info": {
+    "Habitat_Info": "•Shores and Beaches|•Trenches",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage4.ui"
   }
 }

@@ -2,8 +2,8 @@
   "ItemId": "Fish_Tang_Lemon_Peel_Item",
   "Category": ["fish", "saltwater"],
   "Name": "Lemon Peel Tang",
-  "Description": "Tang",
-  "FamilyId": "Tang_family",
+  "Description": "As bright as the sun at noon, this yellow guy is a real spark plug on the reef. It has a distinctive blue ring around its eyes that gives it a look like it’s wearing fancy spectacles, although it uses those eyes only to locate the best spots of algae before its neighbors.",
+  "FamilyId": "Acanthuridae",
   "Rarity": "Uncommon",
   "IsGlobal": false,
   "Weight": 150,
@@ -19,9 +19,9 @@
       "Shore",
       "Beach"
     ],
-    "Time_of_day": ["Any"],
-    "Required_weather": ["Any"],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,
@@ -32,5 +32,8 @@
     "Difficulty": 4,
     "Behavior": "darting",
     "Stamina": 40
+  },
+  "Book_info": {
+    "Habitat_Info": "• Oceans|• Shores and Beaches|• Active at all hours"
   }
 }

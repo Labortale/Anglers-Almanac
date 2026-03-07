@@ -5,7 +5,7 @@
     "freshwater"
   ],
   "Name": "Rainbow Trout",
-  "Description": "A prize catch for any angler, the Rainbow Trout is a masterpiece of aquatic design. It earns its name from the vibrant, multi-colored stripe that glows along its sides like a fresh oil slick on the water.",
+  "Description": "A prize catch for any fisherman, the Rainbow Trout is a work of art in water design. It gets its name from the bright, multi-coloured stripe that shines along its sides like a new oil slick on the water's surface.",
   "FamilyId": "salmonids",
   "Rarity": "Rare",
   "IsGlobal": true,
@@ -16,13 +16,9 @@
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "any"
-    ],
-    "Required_weather": [
-      "any"
-    ],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 2,
     "Height": {
       "Min_y": 0,
@@ -33,5 +29,8 @@
     "Difficulty": 5,
     "Behavior": "darting",
     "Stamina": 45
+  },
+  "Book_info": {
+    "Habitat_Info": "• Everywhere"
   }
 }

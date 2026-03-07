@@ -6,22 +6,22 @@
     "arctic"
   ],
   "Name": "Snapjaw",
-  "Description": "",
-  "FamilyId": "Snapjaw_family",
+  "Description": "Think of it as a shark made out of jagged glacier rock and bad intentions. This brute is adapted to the crushing cold, sporting a massive underbite that can snap through frozen decks and a pair of crimson fins that slice through slush like a hot knife. It’s a ruthless hunter from the depths of the frozen sea, utilizing those glowing red peepers to locate the faint warmth of anything dumb enough to swim in its territory.",
+  "FamilyId": "Dunkleosteidae",
   "Rarity": "Legendary",
   "IsGlobal": false,
   "Weight": 20,
   "Size": 85,
   "Habitats": {
-    "Zones": ["3"],
+    "Zones": [
+      "3"
+    ],
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "Any"
-    ],
-    "Required_weather": ["Any"],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,
@@ -32,5 +32,9 @@
     "Difficulty": 14,
     "Behavior": "aggressive",
     "Stamina": 180
+  },
+  "Book_info": {
+    "Habitat_Info": "• Whisperfrost |    Frontiers",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage8.ui"
   }
 }

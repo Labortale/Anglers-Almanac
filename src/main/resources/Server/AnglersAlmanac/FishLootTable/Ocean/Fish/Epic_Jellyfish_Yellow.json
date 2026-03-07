@@ -5,33 +5,34 @@
     "saltwater"
   ],
   "Name": "Yellow Jellyfish",
-  "Description": "Its glow is mesmerizing.",
-  "FamilyId": "Jellyfish_family",
+  "Description": "The \"Gold-Stinger\" looks like a dropped lantern floating in the surf. It was one of the first things in the sea to ever grow real muscles for swimming, though it still prefers to let the midNight currents do most of the heavy lifting.",
+  "FamilyId": "Ulmaridae",
   "Rarity": "Epic",
   "IsGlobal": false,
   "Weight": 75,
   "Size": 50,
   "Habitats": {
-    "Zones": ["Ocean"],
+    "Zones": [
+      "Ocean"
+    ],
     "Tiers": [],
     "Regions": [],
     "Biomes": [],
-    "Time_of_day": [
-      "Any"
-    ],
-    "Required_weather": [
-      "Any"
-    ],
-    "Moon_phase": -1,
     "Min_depth": 5,
     "Height": {
       "Min_y": 0,
       "Max_y": -1
-    }
+    },
+    "Time_of_day": [
+      "Night"
+    ]
   },
   "Minigame_stats": {
     "Difficulty": 7,
     "Behavior": "erratic",
     "Stamina": 120
+  },
+  "Book_info": {
+    "Habitat_Info": "• Ocean:|• Night"
   }
 }

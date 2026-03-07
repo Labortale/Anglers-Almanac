@@ -2,8 +2,8 @@
   "ItemId": "Fish_Tang_Sailfin_Item",
   "Category": ["fish", "saltwater"],
   "Name": "Sailfin Tang",
-  "Description": "Tang",
-  "FamilyId": "Tang_family",
+  "Description": "A striped reef-dweller, master of the scare tactic. This fellow can flare its massive top and bottom fins in the blink of an eye to double its size in an instant. But the real threat is the bone-like \"scalpel\" hidden in the tail area.",
+  "FamilyId": "Acanthuridae",
   "Rarity": "Uncommon",
   "IsGlobal": false,
   "Weight": 150,
@@ -19,9 +19,9 @@
       "Shore",
       "Beach"
     ],
-    "Time_of_day": ["Any"],
-    "Required_weather": ["Any"],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,
@@ -32,5 +32,8 @@
     "Difficulty": 4,
     "Behavior": "darting",
     "Stamina": 40
+  },
+  "Book_info": {
+    "Habitat_Info": "• Oceans|• Shores and Beaches|• Active at all hours"
   }
 }

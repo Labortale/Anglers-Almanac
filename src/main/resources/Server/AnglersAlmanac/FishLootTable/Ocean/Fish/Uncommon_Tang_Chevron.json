@@ -2,8 +2,8 @@
   "ItemId": "Fish_Tang_Chevron_Item",
   "Category": ["fish", "saltwater"],
   "Name": "Chevron Tang",
-  "Description": "Tang",
-  "FamilyId": "Tang_family",
+  "Description": "This one is a real show-stopper with its intricate dark red zig-zags that look like it is constantly in motion. As they mature, this bright orange-red colour gradually changes to a deep moody purple, but they never lose their feisty attitude or their lightning speed.",
+  "FamilyId": "Acanthuridae",
   "Rarity": "Uncommon",
   "IsGlobal": false,
   "Weight": 150,
@@ -19,9 +19,9 @@
       "Shore",
       "Beach"
     ],
-    "Time_of_day": ["Any"],
-    "Required_weather": ["Any"],
-    "Moon_phase": -1,
+
+
+   
     "Min_depth": 3,
     "Height": {
       "Min_y": 0,
@@ -32,5 +32,8 @@
     "Difficulty": 4,
     "Behavior": "darting",
     "Stamina": 40
+  },
+  "Book_info": {
+    "Habitat_Info": "• Oceans|• Shores and Beaches|• Active at all hours"
   }
 }

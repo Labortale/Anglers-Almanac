@@ -8,9 +8,8 @@ import static com.hypixel.hytale.server.core.command.system.AbstractCommand.LOGG
 
 public class RegisterManager {
 
-    private static final String PACKAGE_NAME = "dev.rm20.anglersalmanac.commands";
-
     public static void registerCommands(AnglersAlmanac plugin) {
+        final String PACKAGE_NAME = "dev.rm20.anglersalmanac.commands";
         try {
             ClassPath classPath = ClassPath.from(plugin.getClass().getClassLoader());
             int count = 0;
@@ -41,4 +40,45 @@ public class RegisterManager {
             e.printStackTrace();
         }
     }
+
+    public static void registerEvents(AnglersAlmanac plugin) {
+        final String PACKAGE_NAME = "dev.rm20.anglersalmanac.events";
+        try {
+            ClassPath classPath = ClassPath.from(plugin.getClass().getClassLoader());
+            int count = 0;
+
+            for (ClassPath.ClassInfo classInfo : classPath.getTopLevelClassesRecursive(PACKAGE_NAME)) {
+                Class<?> loadedClass = classInfo.load();
+
+                if (loadedClass.isAnnotationPresent(EventInfo.class)) {
+                    EventInfo info = loadedClass.getAnnotation(EventInfo.class);
+                    Class eventType = info.value(); // Use raw Class here for easier interop
+
+                    try {
+                        // Use a raw cast to register the event without generic conflicts
+                        plugin.getEventRegistry().registerGlobal(eventType, (event) -> {
+                            try {
+                                loadedClass.getMethod("handle", eventType).invoke(null, event);
+                            } catch (Exception e) {
+                                plugin.getLogger().atSevere()
+                                        .withCause(e)
+                                        .log("Failed to execute event handler in: " + loadedClass.getSimpleName());
+                            }
+                        });
+
+                        plugin.getLogger().atInfo().log("Successfully registered event: " + loadedClass.getSimpleName());
+                        count++;
+                    } catch (Exception e) {
+                        plugin.getLogger().atSevere().log("Could not find valid 'handle' method in: " + loadedClass.getSimpleName());
+                        e.printStackTrace();
+                    }
+                }
+            }
+            plugin.getLogger().atInfo().log("Registered " + count + " events automatically.");
+        } catch (Exception e) {
+            plugin.getLogger().atSevere().log("Failed to load event classes.");
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -1,0 +1,24 @@
+{
+  "ItemId": "Fish_Eel_Moray_Item",
+  "Name": "Eel Moray",
+  "Rarity": "Legendary",
+  "Description": "A golden Nightmare that hides in the crevices of the reef, waiting for a meal to swim too close. It has a set of hidden jaws in the back of its throat just to bring the prey down deep. And once those needle teeth have closed in, it ain't never letting go. It doesn't have scales like a normal fish; it has a thick, slippery coating of slime that lets it slip through jagged rocks like a ghost.",
+  "FamilyId": "Muraenidae",
+  "Weight": 30,
+  "Size": 250,
+  "Habitats": {
+    "Zones": [
+      "2"
+    ],
+    "Min_depth": 3
+  },
+  "Minigame_stats": {
+    "Difficulty": 10,
+    "Behavior": "aggressive",
+    "Stamina": 85
+  },
+  "Book_info": {
+    "Habitat_Info": "• Howling Sands",
+    "Page_File_Ui": "Almanac/Fish/Pages/FishPage6.ui"
+  }
+}
