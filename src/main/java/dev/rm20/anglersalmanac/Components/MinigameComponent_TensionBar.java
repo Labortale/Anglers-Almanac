@@ -1,5 +1,7 @@
 package dev.rm20.anglersalmanac.Components;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hypixel.hytale.component.*;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
@@ -28,6 +30,7 @@ import org.jspecify.annotations.NonNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class MinigameComponent_TensionBar  extends Minigame implements Component<EntityStore> {
     public static ComponentType<EntityStore, MinigameComponent_TensionBar> COMPONENT_TYPE;
@@ -150,28 +153,46 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         // Attempt to despawn additional models.
         for(UUID id : gameModels.values()){
             Ref<EntityStore> ref = world.getEntityRef(id);
-            if(ref != null){
-                world.execute(() -> {
-                    store.removeEntity(ref, RemoveReason.REMOVE);
-                });
+            if(ref != null && ref.isValid()){
+                try {
+                    world.execute(() -> {
+                        store.removeEntity(ref, RemoveReason.REMOVE);
+                    });
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         barModelEntityIds.clear();
 
         if(audioPlayerId != null) {
             Ref<EntityStore> audioPlayerRef = world.getEntityRef(audioPlayerId);
-            if (audioPlayerRef != null) {
-                world.execute(() -> {
-                    store.removeEntity(audioPlayerRef, RemoveReason.REMOVE);
-                });
+            if (audioPlayerRef != null && audioPlayerRef.isValid()) {
+                try {
+                    world.execute(() -> {
+                        store.removeEntity(audioPlayerRef, RemoveReason.REMOVE);
+                    });
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
 
         // Despawn self.
-        world.execute(() -> {
-            store.removeEntity(store.getExternalData().getRefFromUUID(selfUUID), RemoveReason.REMOVE);
-        });
+        Ref<EntityStore> selfRef = store.getExternalData().getRefFromUUID(selfUUID);
+
+        if (selfRef != null && selfRef.isValid()) {
+            world.execute(() -> {
+                try {
+                    world.execute(() -> {
+                        store.removeEntity(selfRef, RemoveReason.REMOVE);
+                    });
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
     }
 
     public void spawnMinigameAdditionals(CommandBuffer<EntityStore> commandBuffer, Vector3d gamePos ){
@@ -432,26 +453,30 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
 
         // -------- TENSION BAR --------------------------------
+
+        final Cache<UUID, TransformComponent> transformCache = Caffeine.newBuilder()
+                .expireAfterAccess(5, TimeUnit.SECONDS) // Auto-cleanup if minigame ends
+                .build();
+
+
         float sectionHeight = 0.015625f * minigameScale;  //0.015625 = 1/64  (0-1 range to block texel size)
         Vector3d newBarPos = gamePos.clone();
         newBarPos.add(new Vector3d(0,(barPos * minigameScale) - ((sectionHeight * barModelEntityIds.size())/2) ,0));
         Vector3d layering = newBarPos.clone().add(TransformUtils.moveAwayFrom(newBarPos.clone() ,playerPos.clone(), 0.2));
         newBarPos = new Vector3d(layering.x, newBarPos.y, layering.z);
-
+        Vector3d currentSegPos = newBarPos.clone();
         //AnglersAlmanac.LOGGER.atInfo().log("newBarPos: %s", newBarPos);
 
-        for(int i = 0; i < barModelEntityIds.size(); i++) {
-            UUID uuid = barModelEntityIds.get(i);
-            Ref<EntityStore> barModelRef = commandBuffer.getExternalData().getWorld().getEntityRef(uuid);
-            assert barModelRef != null;
+        for (UUID uuid : barModelEntityIds) {
+            TransformComponent tc = transformCache.get(uuid, id -> {
+                Ref<EntityStore> ref = commandBuffer.getExternalData().getWorld().getEntityRef(id);
+                return (ref != null) ? commandBuffer.getComponent(ref, TransformComponent.getComponentType()) : null;
+            });
 
-            float posAdjustment = sectionHeight * i;
-            Vector3d pos = newBarPos.clone().add(new Vector3d(0, posAdjustment, 0));
-
-            //AnglersAlmanac.LOGGER.atInfo().log("section %s pos: %s",i, pos);
-            // Apply bar position and rotation.
-            commandBuffer.getComponent(barModelRef, TransformComponent.getComponentType()).setPosition(pos.clone());
-            TransformUtils.applyBillboardYOnly(uuid, pos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), commandBuffer);
+            if (tc == null) continue;
+            tc.setPosition(currentSegPos.clone());
+            TransformUtils.applyBillboardYOnly(uuid, currentSegPos, playerHeadPos, Vector3f.ZERO, commandBuffer);
+            currentSegPos.add(0, sectionHeight, 0);
         }
 
 
@@ -575,12 +600,13 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
     @Override
     public void applyFishStaminaModifer(FishLootManager.MinigameStats stats) {
-        // 30 represents standard stamina, with stats higher than 30 increasing time to catch, and stats lower than 30 reducing time to catch.
+        // 30 represents standard stamina, with stats higher than 45 increasing time to catch, and stats lower than 45 reducing time to catch.
         // The stamina difference is dampened to prevent extreme modifications.
         AnglersAlmanac.LOGGER.atInfo().log("Base reelRate = %s", gameConfig.fishReelRate);
         float dampeningFactor = 0.33f;
-        float dampenedStamina = stats.stamina + (30f - stats.stamina) * dampeningFactor;
-        float modifier = 30f / dampenedStamina;
+        float baselineStamina = 45f;
+        float dampenedStamina = stats.stamina + (baselineStamina - stats.stamina) * dampeningFactor;
+        float modifier = baselineStamina / dampenedStamina;
         gameConfig.fishReelRate *= modifier;
         AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina! stamina = %s, modifier: %s,  reelRate = %s", stats.stamina,modifier,  gameConfig.fishReelRate);
     }
