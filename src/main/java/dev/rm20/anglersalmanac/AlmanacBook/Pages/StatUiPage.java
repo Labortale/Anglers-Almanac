@@ -78,18 +78,22 @@ public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData
         String topFish = (stats.topFish != null && !stats.topFish.isEmpty()) ? FishLootManager.getFishData(stats.topFish.get(0).name()).getName() : "None yet!";
         uiCommandBuilder.set("#MostFound.TextSpans", Message.raw("Most found: " + topFish));
 
-
+        List<Map.Entry<String, Integer>> sortedFish = stats.catchMap.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(15)
+                .toList();
         for (int i = 0; i < 10; i++) {
             String labelId = "#Fish" + (i + 1);
 
-            if (stats.topFish != null && i < stats.topFish.size()) {
-                AlmanacDatabase.FishEntry entry = stats.topFish.get(i);
-                FishLootManager loot = FishLootManager.getFishData(entry.name());
+            if (i < sortedFish.size()) {
+                Map.Entry<String, Integer> entry = sortedFish.get(i);
+                FishLootManager loot = FishLootManager.getFishData(entry.getKey());
                 if(loot == null)
                 {
+                    uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + entry.getKey() + " : " + entry.getValue()));
                     continue;
                 }
-                uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.count()));
+                uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.getValue()));
             } else {
                 uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- ??? : 0"));
             }
