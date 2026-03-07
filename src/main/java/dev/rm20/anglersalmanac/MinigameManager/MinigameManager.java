@@ -72,11 +72,11 @@ public class MinigameManager {
     }
 
     public static void CancelGame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef){
-        //AnglersAlmanac.LOGGER.atInfo().log("Selecting Minigame to cancel:");
+
     // Select which minigame to use from the config and cancel it.
         switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
             case "TensionBar":
-                //AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
+                AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
                 commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).despawnSelf(commandBuffer.getExternalData().getWorld());
                 break;
             case "NoMinigame":
@@ -102,6 +102,7 @@ public class MinigameManager {
 
 
     public static FishLootManager FirstRoll(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
+        AnglersAlmanac.LOGGER.atInfo().log("Doing first roll");
         AnglersAlmanac plugin = AnglersAlmanac.getInstance();
         Store<EntityStore> store = bobberRef.getStore();
 

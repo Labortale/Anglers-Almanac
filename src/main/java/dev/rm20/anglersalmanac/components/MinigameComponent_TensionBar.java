@@ -1,20 +1,32 @@
 package dev.rm20.anglersalmanac.components;
 
+import com.hypixel.hytale.builtin.asseteditor.AssetTypeRegistry;
 import com.hypixel.hytale.component.*;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.protocol.Animation;
+import com.hypixel.hytale.protocol.AnimationSlot;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.protocol.packets.asseteditor.AssetEditorAssetType;
+import com.hypixel.hytale.protocol.packets.asseteditor.AssetEditorUpdateAsset;
+import com.hypixel.hytale.protocol.packets.asseteditor.AssetPath;
+import com.hypixel.hytale.protocol.packets.assets.UpdateModelvfxs;
 import com.hypixel.hytale.server.core.asset.type.model.config.Model;
 import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
+import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.component.*;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
+import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
+import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
+import com.hypixel.hytale.server.npc.corecomponents.audiovisual.ActionPlayAnimation;
+import com.hypixel.hytale.server.npc.corecomponents.audiovisual.builders.BuilderActionPlayAnimation;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.MinigameManager.Minigame;
 import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
@@ -23,11 +35,14 @@ import dev.rm20.anglersalmanac.config.MinigameConfig_TensionBar;
 import dev.rm20.anglersalmanac.utils.FishLootManager;
 import dev.rm20.anglersalmanac.utils.MinigameRodStats;
 import dev.rm20.anglersalmanac.utils.TransformUtils;
+import dev.rm20.anglersalmanac.utils.WeightableAnimation;
+import org.bson.BsonDocument;
+import org.bson.BsonValue;
+import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class MinigameComponent_TensionBar  extends Minigame implements Component<EntityStore> {
     public static ComponentType<EntityStore, MinigameComponent_TensionBar> COMPONENT_TYPE;
@@ -36,6 +51,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     public MinigameComponent_TensionBar() {
 
     }
+    private boolean DEBUG = true;
 
     // Internal use:
     public float fightProgress = 0.25f; // The progress to successful catch. Success when progress is at 1f.
@@ -45,18 +61,22 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     public float nextFishMoveTime = 0.5f; // The time until the next fish movement.
     public float fishMoveTimer = 0f; // Counts up until next fish move.
     public float fishVelocity = 0f; // The movement of the fish.
+    public float fishTargetVelocity = 0f; // The desired movement of the fish.
     public Ref<EntityStore> ownerRef;
     public Ref<EntityStore> bobberRef;
     public UUID selfUUID;
     public enum Trigger {NOTRIGGER, FISHMOVE, SUCCESS, FAIL}
     public Trigger stateTrigger = Trigger.NOTRIGGER;
     public UUID minigameFishModelId;
-    public UUID minigameBarModelId;
+    //public UUID minigameBarModelId;
+    public HashMap<String, UUID> gameModels = new HashMap<>();
     public UUID audioPlayerId;
     public float minigameScale = 2f; // The visual size of the minigame display, adjusted based on distance from bobber.
 
     public String[] reelInSounds = {"AA_Fishing_Reel_Slow0", "AA_Fishing_Reel_Slow1", "AA_Fishing_Reel_Slow2", "AA_Fishing_Reel_Slow3"};
     public String[] escapeSounds = {"AA_Fishing_Line_Tension0", "AA_Fishing_Line_Tension1", "AA_Fishing_Line_Tension2", "AA_Fishing_Line_Tension3"};
+    public String[] barMidSectionModels = {"AA_TensionBar_Mid0", "AA_TensionBar_Mid1", "AA_TensionBar_Mid2"};
+    public List<UUID> barModelEntityIds = new ArrayList<>();
 
     public MinigameConfig_TensionBar gameConfig;
     public FishLootManager.MinigameStats fishStats;
@@ -98,13 +118,18 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         UUID id = UUIDUtil.generateVersion3UUID();
         holder.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(id));
 
+        Vector3d spawnPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        holder.addComponent(TransformComponent.getComponentType(), new TransformComponent(spawnPos.add(0, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset, 0), Vector3f.ZERO));
+
+
         //  --- Minigame --------
         MinigameComponent_TensionBar game = new MinigameComponent_TensionBar(playerRef, bobberRef, id);
             // Set minigame config as defaults.
-        game.gameConfig = AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get();
+        game.gameConfig = AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().clone();
             // Assign fish and apply modifiers.
         game.fishHooked = MinigameManager.FirstRoll(bobberRef, commandBuffer.getComponent(playerRef, Player.getComponentType()),commandBuffer, commandBuffer.getComponent(bobberRef, BobberComponent.getComponentType()).getWaterDepth());
         assert game.fishHooked != null;
+        AnglersAlmanac.LOGGER.atInfo().log("Loading modifiers for fish: %s", game.fishHooked.getName());
         game.applyFishModifiers(game.fishHooked.getMinigameStats());
             // Apply rod modifiers.
         //AnglersAlmanac.LOGGER.atInfo().log("RodAssetId String = %s", rodAssetId);
@@ -126,7 +151,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
             commandBuffer.addEntity(holder, AddReason.SPAWN);
         });
 
-        game.spawnMinigameAdditionals(commandBuffer);
+        game.spawnMinigameAdditionals(commandBuffer, spawnPos.clone());
 
         return game;
     }
@@ -138,23 +163,15 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Store<EntityStore> store = world.getEntityStore().getStore();
 
         // Attempt to despawn additional models.
-        if(minigameFishModelId != null) {
-            Ref<EntityStore> fishModelRef = world.getEntityRef(minigameFishModelId);
-            if (fishModelRef != null) {
+        for(UUID id : gameModels.values()){
+            Ref<EntityStore> ref = world.getEntityRef(id);
+            if(ref != null){
                 world.execute(() -> {
-                    store.removeEntity(fishModelRef, RemoveReason.REMOVE);
+                    store.removeEntity(ref, RemoveReason.REMOVE);
                 });
             }
         }
-
-        if(minigameBarModelId != null) {
-            Ref<EntityStore> barModelRef = world.getEntityRef(minigameBarModelId);
-            if (barModelRef != null) {
-                world.execute(() -> {
-                    store.removeEntity(barModelRef, RemoveReason.REMOVE);
-                });
-            }
-        }
+        barModelEntityIds.clear();
 
         if(audioPlayerId != null) {
             Ref<EntityStore> audioPlayerRef = world.getEntityRef(audioPlayerId);
@@ -172,9 +189,13 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         });
     }
 
-    public void spawnMinigameAdditionals(CommandBuffer<EntityStore> commandBuffer){
+    public void spawnMinigameAdditionals(CommandBuffer<EntityStore> commandBuffer, Vector3d gamePos ){
 
         Vector3d bobberPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+
+        Vector3d playerPos = commandBuffer.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
+        float camOffset =  commandBuffer.getComponent(ownerRef, ModelComponent.getComponentType()).getModel().getEyeHeight();
+        Vector3d playerHeadPos = playerPos.clone().add(new Vector3d(0, camOffset,0));
 
         // Spawn audio player
         AudioPlayerComponent apc = AudioPlayerComponent.spawnNewAudioPlayerEntity(bobberPos, commandBuffer);
@@ -187,16 +208,16 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Holder<EntityStore> fishModelEntity = EntityStore.REGISTRY.newHolder();
         UUID fishModelId = UUIDUtil.generateVersion3UUID();
         fishModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(fishModelId));
-        minigameFishModelId = fishModelId;
+        gameModels.put("fish", fishModelId);
 
 
 
         // Assign transform to minigame and move it above the bobber.
         fishModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
-        Vector3d newPos = bobberPos.clone();
-        newPos = newPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset,0));
-        fishModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newPos);
-        //TransformUtils.applyBillboard(store.getExternalData().getRefFromUUID(fishModelId), ownerRef, new Vector3f(90,0,0), store);
+        Vector3d newPos = gamePos.clone();
+        newPos = newPos.add(new Vector3d(0,(fishPos * minigameScale),0));
+        fishModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newPos.clone());
+        TransformUtils.applyBillboard(commandBuffer.getExternalData().getRefFromUUID(gameModels.get("fish")), ownerRef, new Vector3f(90,0,0), commandBuffer);
 
         // Add model.
         ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset("SSF_FishIcon");
@@ -205,6 +226,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         fishModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(model.toReference()));
         fishModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(model));
         fishModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(model.getBoundingBox()));
+
 
         // Attach network component.
         fishModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
@@ -218,91 +240,283 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
 
         //---------- BAR MODEL -----------------------------------------------------
+
+        float barSizeMinusEnds = (gameConfig.barRadius*2f) - 0.03125f; // 0.03125 = (1/64) * 2  --- 0-1 range to block texel size * 2.
+        if(barSizeMinusEnds < 0) barSizeMinusEnds = 0;
+        int numSections = Math.round(barSizeMinusEnds * 64.0f) + 2;
+
+        //AnglersAlmanac.LOGGER.atInfo().log("barRadius: %s, numSections %s", gameConfig.barRadius, numSections);
+
+        for(int i = 0; i < numSections; i++) {
+            // For amount needed.
+            Holder<EntityStore> barModelEntity = EntityStore.REGISTRY.newHolder();
+            UUID barModelEntityId = UUID.randomUUID();
+            barModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(barModelEntityId));
+            gameModels.put("bar_" + i, barModelEntityId);
+            barModelEntityIds.add(barModelEntityId);
+
+            // Assign transform to minigame and move it above the bobber.
+            barModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
+            Vector3d newBarPos = gamePos.clone();
+            newBarPos.add(new Vector3d(0, (barPos * minigameScale), 0));
+            Vector3d layering = newBarPos.clone().add(TransformUtils.moveAwayFrom(newBarPos.clone(), playerPos.clone(), 0.2));
+            newBarPos = new Vector3d(layering.x, newBarPos.y, layering.z);
+            barModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newBarPos.clone());
+
+
+            // Add model.
+            String modelName = barMidSectionModels[new Random().nextInt(barMidSectionModels.length)];
+            if(i == 0 || i == numSections - 1){ modelName = "AA_TensionBar_End"; }
+
+            ModelAsset barModelAsset = ModelAsset.getAssetMap().getAsset(modelName);
+            if (barModelAsset == null) barModelAsset = ModelAsset.DEBUG;
+            Model barModel = Model.createScaledModel(barModelAsset, minigameScale);
+
+            ModelComponent barModelComponent = new ModelComponent(barModel);
+            barModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(barModel.toReference()));
+            barModelEntity.addComponent(ModelComponent.getComponentType(), barModelComponent);
+            barModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(barModel.getBoundingBox()));
+
+            barModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
+
+            world.execute(() -> {commandBuffer.addEntity(barModelEntity, AddReason.SPAWN);});
+        }
+
+
+
+        // DEBUG BAR
+        /*
         Holder<EntityStore> barModelEntity = EntityStore.REGISTRY.newHolder();
         UUID barModelEntityId = UUID.randomUUID();
         barModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(barModelEntityId));
-        minigameBarModelId = barModelEntityId;
+        gameModels.put("bar_DEBUG", barModelEntityId);
 
         // Assign transform to minigame and move it above the bobber.
         barModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
-        Vector3d newBarPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
-        //newBarPos = newBarPos.add(new Vector3d(0,bobber.minigameModelVerticalOffset,0));
-        Vector3d playerPos = commandBuffer.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
-        newBarPos = newBarPos.add(TransformUtils.moveAwayFrom(newBarPos ,playerPos, 2));
-        barModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newBarPos);
-        //HelperTransforms.applyBillboard(barModelEntityId, bobber.ownerID, new Vector3f(90,0,0), store);
+        Vector3d newBarPos = gamePos.clone();
+        newBarPos.add(new Vector3d(0, (barPos * minigameScale), 0));
+        Vector3d barLayering = newBarPos.clone().add(TransformUtils.moveAwayFrom(newBarPos.clone(), playerPos.clone(), 0.2));
+        newBarPos = new Vector3d(barLayering.x, newBarPos.y, barLayering.z);
+        barModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(newBarPos.clone().add(new Vector3d(1.2, 0, 0)));
+
+        ModelAsset barModelAsset = ModelAsset.getAssetMap().getAsset("SSF_FishingBar");
+        if (barModelAsset == null) barModelAsset = ModelAsset.DEBUG;
+        Model barModel = Model.createScaledModel(barModelAsset, (gameConfig.barRadius* 2f) * minigameScale);
+
+        ModelComponent barModelComponent = new ModelComponent(barModel);
+        barModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(barModel.toReference()));
+        barModelEntity.addComponent(ModelComponent.getComponentType(), barModelComponent);
+        barModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(barModel.getBoundingBox()));
+
+        barModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
+
+        world.execute(() -> {commandBuffer.addEntity(barModelEntity, AddReason.SPAWN);});
+
+         */
+
+
+        //---------- Frame MODEL -----------------------------------------------------
+        Holder<EntityStore> frameUpperModelEntity = EntityStore.REGISTRY.newHolder();
+        UUID frameUpperModelEntityId = UUID.randomUUID();
+        frameUpperModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(frameUpperModelEntityId));
+        gameModels.put("frameUpper", frameUpperModelEntityId);
+
+        frameUpperModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
+        Vector3d upperFramePos = gamePos.clone();
+        Vector3d layering = upperFramePos.clone().add(TransformUtils.moveAwayFrom(upperFramePos.clone(), playerPos.clone(), 0.2));
+        upperFramePos = new Vector3d(layering.x, upperFramePos.y, layering.z);
+        upperFramePos.add(new Vector3d(0, minigameScale + (gameConfig.barRadius * minigameScale * 0.75f), 0));
+        frameUpperModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(upperFramePos.clone());
+        TransformUtils.applyBillboardYOnly(gameModels.get("frameUpper"), upperFramePos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), commandBuffer);
+
+
+
+        Holder<EntityStore> frameLowerModelEntity = EntityStore.REGISTRY.newHolder();
+        UUID frameLowerModelEntityId = UUID.randomUUID();
+        frameLowerModelEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(frameLowerModelEntityId));
+        gameModels.put("frameLower", frameLowerModelEntityId);
+
+        frameLowerModelEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
+        Vector3d lowerFramePos = gamePos.clone();
+        layering = lowerFramePos.clone().add(TransformUtils.moveAwayFrom(lowerFramePos.clone(), playerPos.clone(), 0.2));
+        lowerFramePos = new Vector3d(layering.x, lowerFramePos.y, layering.z);
+        lowerFramePos.add(new Vector3d(0, -gameConfig.barRadius * minigameScale * 0.75f, 0));
+        frameLowerModelEntity.getComponent(TransformComponent.getComponentType()).setPosition(lowerFramePos.clone());
+        TransformUtils.applyBillboardYOnly(gameModels.get("frameLower"), lowerFramePos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), commandBuffer);
+
 
 
         // Add model.
-        ModelAsset barModelAsset = ModelAsset.getAssetMap().getAsset("SSF_FishingBar");
-        if (barModelAsset == null) barModelAsset = ModelAsset.DEBUG;
-        Model barModel = Model.createScaledModel(barModelAsset, (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barRadius * 2f) * minigameScale);
-        barModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(barModel.toReference()));
-        barModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(barModel));
-        barModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(barModel.getBoundingBox()));
+        ModelAsset frameModelAsset = ModelAsset.getAssetMap().getAsset("SSF_MinigameFrame");
+        if (frameModelAsset == null) frameModelAsset = ModelAsset.DEBUG;
+
+        Model frameModel = Model.createScaledModel(frameModelAsset, minigameScale * 0.5f);
+        frameUpperModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(frameModel.toReference()));
+        frameUpperModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(frameModel));
+        frameUpperModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(frameModel.getBoundingBox()));
+
+        //Model frameLowerModel = Model.createScaledModel(frameModelAsset, minigameScale * 0.5f);
+        frameLowerModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(frameModel.toReference()));
+        frameLowerModelEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(frameModel));
+        frameLowerModelEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(frameModel.getBoundingBox()));
 
 
 
         // Attach network component.
-        barModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
+
+        frameUpperModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
+        frameLowerModelEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
 
         // Spawn the model in the world.
         world.execute(() -> {
-            commandBuffer.addEntity(barModelEntity, AddReason.SPAWN);
-            //AnglersAlmanac.LOGGER.atInfo().log("Spawned bar model at: %s", barModelEntity.getComponent(TransformComponent.getComponentType()).getPosition());
+            commandBuffer.addEntity(frameLowerModelEntity, AddReason.SPAWN);
+            commandBuffer.addEntity(frameUpperModelEntity, AddReason.SPAWN);
+        });
+
+
+        // ------ Catch Zone ------------------
+        Holder<EntityStore> catchZoneEntity = EntityStore.REGISTRY.newHolder();
+        UUID catchZoneEntityId = UUID.randomUUID();
+        catchZoneEntity.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(catchZoneEntityId));
+        gameModels.put("catchZone", catchZoneEntityId);
+
+        Vector3d catchZonePos = gamePos.clone();
+        // Place at first water block from player and bobber.
+        Vector3d dirToBobber = bobberPos.clone().subtract(playerPos.clone()).normalize();
+        double distToBobber = playerPos.clone().distanceTo(bobberPos.clone());
+        //Vector3d underfootBlockPos = playerPos.clone().subtract(new Vector3d(0, 1, 0));
+        AnglersAlmanac.LOGGER.atInfo().log("underfootPos: %s", playerPos.clone());
+        for(double i = 0.0; i < distToBobber; i+= 0.5){
+            Vector3d checkPos = playerPos.clone().add(dirToBobber.clone().scale(i));
+            AnglersAlmanac.LOGGER.atInfo().log("i: %s, stepping: %s",i, checkPos.clone());
+            if(TransformUtils.isInFluid(checkPos.toVector3i(), world)){
+                catchZonePos = checkPos.toVector3i().toVector3d().add(new Vector3d(0.5, 1.0, 0.5));
+                AnglersAlmanac.LOGGER.atInfo().log("in water: %s", catchZonePos.clone());
+                break;
+            }
+        }
+
+        catchZoneEntity.addComponent(TransformComponent.getComponentType(), new TransformComponent());
+        catchZoneEntity.getComponent(TransformComponent.getComponentType()).setPosition(catchZonePos.clone());
+
+        ModelAsset catchZoneModelAsset = ModelAsset.getAssetMap().getAsset("AA_FishCatchZone");
+        Model catchZoneModel = Model.createScaledModel(catchZoneModelAsset, 2f);
+        catchZoneEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(catchZoneModel.toReference()));
+        catchZoneEntity.addComponent(ModelComponent.getComponentType(), new ModelComponent(catchZoneModel));
+        catchZoneEntity.addComponent(BoundingBox.getComponentType(), new BoundingBox(catchZoneModel.getBoundingBox()));
+
+        catchZoneEntity.addComponent(NetworkId.getComponentType(), new NetworkId(commandBuffer.getExternalData().takeNextNetworkId()));
+
+        world.execute(() -> {
+            commandBuffer.addEntity(catchZoneEntity, AddReason.SPAWN);
         });
 
     }
 
-    public void updateMinigameModelPositions(Store<EntityStore> store){
+    public void updateMinigameModelPositions(CommandBuffer<EntityStore> commandBuffer, float deltaTime){
 
-        // Do fish logic.
-        Ref<EntityStore> fishModelRef = store.getExternalData().getWorld().getEntityRef(minigameFishModelId);
-        if(fishModelRef == null) return;
-        if(!bobberRef.isValid()) return;
-        // Do fish model motion.
-        Vector3d newFishPos = Objects.requireNonNull(store.getComponent(bobberRef, TransformComponent.getComponentType())).getPosition().clone();
+        World world = commandBuffer.getExternalData().getWorld();
 
-        /*
-        // Move fish to player based on progress.
-        Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(bobber.ownerID);
-        if(playerRef != null) {
-            Vector3d playerPos = store.getComponent(playerRef, TransformComponent.getComponentType()).getPosition().clone();
-            newFishPos = HelperTransforms.moveTowards(newFishPos, playerPos, bobber.fightProgress/100f);
+        Ref<EntityStore> game = commandBuffer.getExternalData().getWorld().getEntityRef(selfUUID);
+        assert game != null;
+        //AnglersAlmanac.LOGGER.atInfo().log("game: %s", game.toString());
+        Vector3d gamePos = Objects.requireNonNull(commandBuffer.getComponent(game, TransformComponent.getComponentType())).getPosition();
+        Vector3d playerPos = commandBuffer.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
+        float camOffset =  commandBuffer.getComponent(ownerRef, ModelComponent.getComponentType()).getModel().getEyeHeight();
+        Vector3d playerHeadPos = playerPos.clone().add(new Vector3d(0, camOffset,0));
+
+
+        // Do fish logic.3
+        Ref<EntityStore> fishModelRef = world.getEntityRef(gameModels.get("fish"));
+        if(fishModelRef == null){
+            AnglersAlmanac.LOGGER.atWarning().log("fishModelRef is null");
+            return;
         }
+        //if(!bobberRef.isValid()) return;
+        // Do fish model motion.
 
-         */
-
+        Vector3d newFishPos = gamePos.clone();
         // Adjust fish height based on minigame fishPos.
-        newFishPos = newFishPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset + (fishPos * minigameScale),0));
-
-
-
-        store.getComponent(fishModelRef, TransformComponent.getComponentType()).setPosition(newFishPos);
+        newFishPos = newFishPos.add(new Vector3d(0,(fishPos * minigameScale),0));
+        commandBuffer.getComponent(fishModelRef, TransformComponent.getComponentType()).setPosition(newFishPos.clone());
         // Do Fish rotation.
-        float camOffset =  store.getComponent(ownerRef, ModelComponent.getComponentType()).getModel().getEyeHeight();
-        Vector3d playerHeadPos = store.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone().add(new Vector3d(0, camOffset,0));
-        TransformUtils.applyBillboardYOnly(minigameFishModelId, newFishPos, playerHeadPos ,new Vector3f(90,0,0), store);
+        TransformUtils.applyBillboardYOnly(gameModels.get("fish"), newFishPos, playerHeadPos ,new Vector3f(90,0,0), commandBuffer);
 
 
-        // Do bar logic.
-        Ref<EntityStore> barModelRef = store.getExternalData().getWorld().getEntityRef(minigameBarModelId);
-        if(barModelRef == null) return;
+        //AnglersAlmanac.LOGGER.atInfo().log("gamePos: %s", gamePos);
 
-        // Do bar model motion.
-        Vector3d newBarPos = store.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
-        newBarPos = newBarPos.add(new Vector3d(0,AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().minigameModelVerticalOffset + (barPos * minigameScale) ,0));
-        Vector3d playerPos = store.getComponent(ownerRef, TransformComponent.getComponentType()).getPosition().clone();
 
-        Vector3d layering = newBarPos.clone().add(TransformUtils.moveAwayFrom(newBarPos.clone() ,playerPos, 0.2));
+        // -------- TENSION BAR --------------------------------
+        float sectionHeight = 0.015625f * minigameScale;  //0.015625 = 1/64  (0-1 range to block texel size)
+        Vector3d newBarPos = gamePos.clone();
+        newBarPos.add(new Vector3d(0,(barPos * minigameScale) - ((sectionHeight * barModelEntityIds.size())/2) ,0));
+        Vector3d layering = newBarPos.clone().add(TransformUtils.moveAwayFrom(newBarPos.clone() ,playerPos.clone(), 0.2));
         newBarPos = new Vector3d(layering.x, newBarPos.y, layering.z);
 
-        store.getComponent(barModelRef, TransformComponent.getComponentType()).setPosition(newBarPos);
+        //AnglersAlmanac.LOGGER.atInfo().log("newBarPos: %s", newBarPos);
 
-        // Do bar rotation.
-        TransformUtils.applyBillboardYOnly(minigameBarModelId, newBarPos, playerHeadPos, new Vector3f(0,0,0), store);
+        for(int i = 0; i < barModelEntityIds.size(); i++) {
+            UUID uuid = barModelEntityIds.get(i);
+            Ref<EntityStore> barModelRef = commandBuffer.getExternalData().getWorld().getEntityRef(uuid);
+            assert barModelRef != null;
+
+            float posAdjustment = sectionHeight * i;
+            Vector3d pos = newBarPos.clone().add(new Vector3d(0, posAdjustment, 0));
+
+            //AnglersAlmanac.LOGGER.atInfo().log("section %s pos: %s",i, pos);
+            // Apply bar position and rotation.
+            commandBuffer.getComponent(barModelRef, TransformComponent.getComponentType()).setPosition(pos.clone());
+            TransformUtils.applyBillboardYOnly(uuid, pos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), commandBuffer);
+        }
 
 
+        // DEBUG BAR MOVEMENT
+        /*
+        Vector3d debugBarPos = gamePos.clone();
+        debugBarPos.add(new Vector3d(0.4 * minigameScale,(barPos * minigameScale) ,0));
+        Vector3d debugLayering = debugBarPos.clone().add(TransformUtils.moveAwayFrom(debugBarPos.clone() ,playerPos.clone(), 0.2));
+        debugBarPos = new Vector3d(debugLayering.x, debugBarPos.y, debugLayering.z);
+        Ref<EntityStore> barModelRef = commandBuffer.getExternalData().getWorld().getEntityRef(gameModels.get("bar_DEBUG"));
+        commandBuffer.getComponent(barModelRef, TransformComponent.getComponentType()).setPosition(debugBarPos.clone());
+        TransformUtils.applyBillboardYOnly(gameModels.get("bar_DEBUG"), debugBarPos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), commandBuffer);
+        */
+
+
+        // --------- FRAME -------------------------------
+        Ref<EntityStore> lowerFrameRef = commandBuffer.getExternalData().getWorld().getEntityRef(gameModels.get("frameLower"));
+        if(lowerFrameRef != null) {
+            Vector3d lowerFramePos = gamePos.clone();
+            layering = lowerFramePos.clone().add(TransformUtils.moveAwayFrom(lowerFramePos.clone(), playerPos.clone(), 0.2));
+            lowerFramePos = new Vector3d(layering.x, lowerFramePos.y, layering.z);
+            lowerFramePos.add(new Vector3d(0, -gameConfig.barRadius * minigameScale * 0.75f, 0));
+            commandBuffer.getComponent(lowerFrameRef, TransformComponent.getComponentType()).setPosition(lowerFramePos.clone());
+            TransformUtils.applyBillboardYOnly(gameModels.get("frameLower"), lowerFramePos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), commandBuffer);
+        }
+
+        Ref<EntityStore> upperFrameRef = commandBuffer.getExternalData().getWorld().getEntityRef(gameModels.get("frameUpper"));
+        if(upperFrameRef != null) {
+            Vector3d upperFramePos = gamePos.clone();
+            layering = upperFramePos.clone().add(TransformUtils.moveAwayFrom(upperFramePos.clone(), playerPos.clone(), 0.2));
+            upperFramePos = new Vector3d(layering.x, upperFramePos.y, layering.z);
+            upperFramePos.add(new Vector3d(0, minigameScale + (gameConfig.barRadius * minigameScale * 0.75f), 0));
+            commandBuffer.getComponent(upperFrameRef, TransformComponent.getComponentType()).setPosition(upperFramePos.clone());
+            TransformUtils.applyBillboardYOnly(gameModels.get("frameUpper"), upperFramePos.clone(), playerHeadPos.clone(), new Vector3f(0, 0, 0), commandBuffer);
+        }
+
+
+        // ----- Bobber -------------
+        Vector3d catchZonePos = commandBuffer.getComponent(commandBuffer.getExternalData().getRefFromUUID(gameModels.get("catchZone")), TransformComponent.getComponentType()).getPosition().clone();
+        Vector3d bobberPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+        Vector3d vecToCatchZone = catchZonePos.clone().subtract(gamePos.clone());
+        Vector3d bobberTargetPos = gamePos.clone().add(vecToCatchZone.scale(fightProgress));
+        Vector3d dirToTargetPos = bobberTargetPos.clone().subtract(bobberPos.clone()).normalize();
+        double distToTargetPos = bobberPos.distanceTo(bobberTargetPos);
+
+        Vector3d force = dirToTargetPos.scale(distToTargetPos * 20.0 * deltaTime);
+        commandBuffer.getComponent(bobberRef, Velocity.getComponentType()).addForce(force);
+
+        // Add a little extra movement bypassing physics to fix bobber stuck on things.
+        commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).setPosition(bobberPos.clone().add(force.scale(0.1)));
     }
 
     public void DoInteraction(@NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler){
@@ -311,7 +525,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         //Move bar up.
         barVelocity = Math.clamp(barVelocity + (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed * AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration)
                 + (AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity*AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barAcceleration)
-                , AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed);
+                , -AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barGravity, AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().barSpeed);
     }
 
 
@@ -328,8 +542,8 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
     @Override
     public void applyDifficultyModifer(FishLootManager.MinigameStats stats) {
-        gameConfig.fishMaxVeocity += (float) stats.difficulty / 10;
-        gameConfig.fishChangeDirectionMaxInterval = gameConfig.fishChangeDirectionMaxInterval / ((float) stats.difficulty / 50);
+        gameConfig.fishMaxVeocity += (float) stats.difficulty / 20f;
+        gameConfig.fishChangeDirectionMaxInterval = gameConfig.fishChangeDirectionMaxInterval / ((float) stats.difficulty / 8f);
         AnglersAlmanac.LOGGER.atInfo().log("Applying fish difficulty! stat: %s, fishMaxVelocity: %s", stats.difficulty, gameConfig.fishMaxVeocity);
     }
 
@@ -342,13 +556,15 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
                 gameConfig.fishMinSpeed = 1.0f;
                 break;
             case "floater":
-                gameConfig.fishBouyancy += gameConfig.fishMaxVeocity * 0.4f;
+                gameConfig.fishBouyancy += gameConfig.fishMaxVeocity * 0.6f;
                 break;
             case "sinker:":
-                gameConfig.fishBouyancy -= gameConfig.fishMaxVeocity * 0.4f;
+                gameConfig.fishBouyancy -= gameConfig.fishMaxVeocity * 0.6f;
                 break;
             case "heavy_sinker":
-                gameConfig.fishBouyancy -= gameConfig.fishMaxVeocity * 0.7f;
+                gameConfig.fishMaxVeocity *= 1.2f;
+                gameConfig.fishBouyancy -= gameConfig.fishMaxVeocity * 0.9f;
+
                 break;
             case "aggressive":
                 // Never slow, turns rapidly.
@@ -363,9 +579,9 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
                 break;
             case "steady":
                 // Rarely changes direction. Very predictable.
-                gameConfig.fishMaxVeocity *= 0.8f;
-                gameConfig.fishMinSpeed = 0.4f;
-                gameConfig.fishChangeDirectionMaxInterval += 2f;
+                gameConfig.fishMaxVeocity *= 0.7f;
+                gameConfig.fishMinSpeed = 0.5f;
+                gameConfig.fishChangeDirectionMaxInterval += 0.2f;
                 break;
 
         }
@@ -374,18 +590,29 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
     @Override
     public void applyFishStaminaModifer(FishLootManager.MinigameStats stats) {
-
-        AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina!");
+        // 30 represents standard stamina, with stats higher than 30 increasing time to catch, and stats lower than 30 reducing time to catch.
+        // The stamina difference is dampened to prevent extreme modifications.
+        AnglersAlmanac.LOGGER.atInfo().log("Base reelRate = %s", gameConfig.fishReelRate);
+        float dampeningFactor = 0.33f;
+        float dampenedStamina = stats.stamina + (30f - stats.stamina) * dampeningFactor;
+        float modifier = 30f / dampenedStamina;
+        gameConfig.fishReelRate *= modifier;
+        AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina! stamina = %s, modifier: %s,  reelRate = %s", stats.stamina,modifier,  gameConfig.fishReelRate);
     }
 
     @Override
     public void applyRodControlModifer(RodStats rodStats) {
-        AnglersAlmanac.LOGGER.atInfo().log("Applying rod control");
+        gameConfig.barSpeed *= rodStats.control;
+        gameConfig.barGravity *= rodStats.control;
+        gameConfig.barAcceleration *= rodStats.control/2f;
+        AnglersAlmanac.LOGGER.atInfo().log("Applying rod control! barSpeed = %s, barGravity = %s, barAccel = %s", gameConfig.barSpeed, gameConfig.barGravity, gameConfig.barAcceleration);
     }
 
     @Override
     public void applyRodDifficultyModifer(RodStats rodStats) {
-        AnglersAlmanac.LOGGER.atInfo().log("Applying rod difficulty");
+        gameConfig.barRadius /= rodStats.difficulty;
+        AnglersAlmanac.LOGGER.atInfo().log("Applying rod difficulty! barRadius = %s", gameConfig.barRadius);
+
     }
 
     @Override

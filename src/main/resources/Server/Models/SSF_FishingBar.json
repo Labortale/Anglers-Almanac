@@ -14,5 +14,16 @@
   },
   "MinScale": 0.1,
   "MaxScale": 1,
-  "Texture": "VFX/Fishing/SSF_FishingBar.png"
+  "Texture": "VFX/Fishing/SSF_FishingBar.png",
+  "AnimationSets": {
+    "anims": {
+      "Animations": [
+        {
+          "Animation": "VFX/Fishing/SSF_FishingBar.blockyanim",
+          "Speed": 1,
+          "Looping": true
+        }
+      ]
+    }
+  }
 }
