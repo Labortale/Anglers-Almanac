@@ -21,6 +21,8 @@ public class MinigameRodStats implements JsonAssetWithMap<String, DefaultAssetMa
 
     public String id;
     public AssetExtraInfo.Data data;
+    public String name;
+    public String description;
     public RodStats stats;
 
     public static final String KEY = "AA_MinigameRodStats";
@@ -34,7 +36,10 @@ public class MinigameRodStats implements JsonAssetWithMap<String, DefaultAssetMa
             (t, data) -> t.data = data,
             t -> t.data
     )
-        .append(RodStats.KEYED_CODEC, (s, v) -> s.stats = v, (g) -> g.stats).add()
+        .appendInherited(new KeyedCodec<>("Name", Codec.STRING), (t, v) -> t.name = v, t -> t.name, (t, p) -> t.name = p.name).add()
+        .appendInherited(new KeyedCodec<>("Description", Codec.STRING), (t, v) -> t.description = v, t -> t.description, (t, p) -> t.description = p.description).add()
+        .appendInherited(new KeyedCodec<>("Stats", RodStats.CODEC), (t, v) -> t.stats = v, t -> t.stats, (t, p) -> t.stats = p.stats).add()
+        //.append(RodStats.KEYED_CODEC, (s, v) -> s.stats = v, (g) -> g.stats).add()
     .build();
 
     public static final KeyedCodec<MinigameRodStats> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);

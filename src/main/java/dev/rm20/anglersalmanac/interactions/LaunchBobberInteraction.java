@@ -62,7 +62,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         if (meta != null)
         {
             // TODO: add check for metadata breaking when player is disconnected during minigame.
-            AnglersAlmanac.LOGGER.atInfo().log("metadata: %s, %s, %s", meta.getBoundBobber(), meta.getBoundMinigame(), meta.getMode());
+            //AnglersAlmanac.LOGGER.atInfo().log("metadata: %s, %s, %s", meta.getBoundBobber(), meta.getBoundMinigame(), meta.getMode());
         }
         if (
             // Minigame UUID is invalid.

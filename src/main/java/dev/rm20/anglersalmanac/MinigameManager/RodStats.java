@@ -1,6 +1,10 @@
 package dev.rm20.anglersalmanac.MinigameManager;
 
 
+import com.hypixel.hytale.assetstore.AssetExtraInfo;
+import com.hypixel.hytale.assetstore.AssetStore;
+import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
+import com.hypixel.hytale.assetstore.map.JsonAssetWithMap;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -8,12 +12,12 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 
 public class RodStats{
 
-    float control;
-    float difficulty;
-    float forgiveness;
-    float stamina;
-    float fishWeightMul;
-    float rarityMul;
+    public float control;
+    public float difficulty;
+    public float forgiveness;
+    public float stamina;
+    public float fishWeightMul;
+    public float rarityMul;
 
 
     public RodStats(){
@@ -37,4 +41,6 @@ public class RodStats{
             .append(new KeyedCodec<>("RarityMul",   Codec.FLOAT), (s, v) -> s.rarityMul   = v, (g) -> g.rarityMul).add()
             .build();
     public static final KeyedCodec<RodStats> KEYED_CODEC = new KeyedCodec<>(KEY, CODEC);
+
+
 }
