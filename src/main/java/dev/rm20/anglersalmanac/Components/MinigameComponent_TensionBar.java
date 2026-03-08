@@ -151,45 +151,41 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Store<EntityStore> store = world.getEntityStore().getStore();
 
         // Attempt to despawn additional models.
-        for(UUID id : gameModels.values()){
+        List<Ref<EntityStore>> toRemove = new ArrayList<>();
+        for (UUID id : gameModels.values()) {
             Ref<EntityStore> ref = world.getEntityRef(id);
-            if(ref != null && ref.isValid()){
-                try {
-                    world.execute(() -> {
-                        store.removeEntity(ref, RemoveReason.REMOVE);
-                    });
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+            if (ref != null) toRemove.add(ref);
+        }
+
+        world.execute(() -> {
+            for (Ref<EntityStore> ref : toRemove) {
+                if (ref.isValid()) {
+                    store.removeEntity(ref, RemoveReason.REMOVE);
                 }
             }
-        }
+            gameModels.clear();
+        });
         barModelEntityIds.clear();
 
-        if(audioPlayerId != null) {
+        // Despawn audio
+        if (audioPlayerId != null) {
             Ref<EntityStore> audioPlayerRef = world.getEntityRef(audioPlayerId);
-            if (audioPlayerRef != null && audioPlayerRef.isValid()) {
-                try {
-                    world.execute(() -> {
+            if (audioPlayerRef != null) {
+                world.execute(() -> {
+                    if (audioPlayerRef.isValid()) {
                         store.removeEntity(audioPlayerRef, RemoveReason.REMOVE);
-                    });
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                    }
+                });
             }
         }
 
 
         // Despawn self.
         Ref<EntityStore> selfRef = store.getExternalData().getRefFromUUID(selfUUID);
-
-        if (selfRef != null && selfRef.isValid()) {
+        if (selfRef != null) {
             world.execute(() -> {
-                try {
-                    world.execute(() -> {
-                        store.removeEntity(selfRef, RemoveReason.REMOVE);
-                    });
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                if (selfRef.isValid()) {
+                    store.removeEntity(selfRef, RemoveReason.REMOVE);
                 }
             });
         }
@@ -516,17 +512,20 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
         // ----- Bobber -------------
         Vector3d catchZonePos = commandBuffer.getComponent(commandBuffer.getExternalData().getRefFromUUID(gameModels.get("catchZone")), TransformComponent.getComponentType()).getPosition().clone();
-        Vector3d bobberPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
-        Vector3d vecToCatchZone = catchZonePos.clone().subtract(gamePos.clone());
-        Vector3d bobberTargetPos = gamePos.clone().add(vecToCatchZone.scale(fightProgress));
-        Vector3d dirToTargetPos = bobberTargetPos.clone().subtract(bobberPos.clone()).normalize();
-        double distToTargetPos = bobberPos.distanceTo(bobberTargetPos);
+        if(bobberRef.isValid())
+        {
+            Vector3d bobberPos = commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition().clone();
+            Vector3d vecToCatchZone = catchZonePos.clone().subtract(gamePos.clone());
+            Vector3d bobberTargetPos = gamePos.clone().add(vecToCatchZone.scale(fightProgress));
+            Vector3d dirToTargetPos = bobberTargetPos.clone().subtract(bobberPos.clone()).normalize();
+            double distToTargetPos = bobberPos.distanceTo(bobberTargetPos);
 
-        Vector3d force = dirToTargetPos.scale(distToTargetPos * 20.0 * deltaTime);
-        commandBuffer.getComponent(bobberRef, Velocity.getComponentType()).addForce(force);
+            Vector3d force = dirToTargetPos.scale(distToTargetPos * 20.0 * deltaTime);
+            commandBuffer.getComponent(bobberRef, Velocity.getComponentType()).addForce(force);
 
-        // Add a little extra movement bypassing physics to fix bobber stuck on things.
-        commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).setPosition(bobberPos.clone().add(force.scale(0.1)));
+            // Add a little extra movement bypassing physics to fix bobber stuck on things.
+            commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).setPosition(bobberPos.clone().add(force.scale(0.1)));
+        }
     }
 
     public void DoInteraction(@NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler){

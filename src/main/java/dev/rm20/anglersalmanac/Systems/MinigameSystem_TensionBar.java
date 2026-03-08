@@ -106,11 +106,16 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 Minigame.PerformanceRating  rating = game.getPerformanceRating(game.getPerformancePercentage());
                 AnglersAlmanac.LOGGER.atInfo().log("Minigame performance rating = %s", rating);
                 if(rating == Minigame.PerformanceRating.FAIL) LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
-
                 // Deal rewards.
 
-                FishLootManager lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
-                MinigameManager.DropLoot(lootID, player, commandBuffer,game.bobberRef,rating);
+                if(game.fishHooked!=null)
+                {
+                    MinigameManager.DropLoot(game.fishHooked, player, commandBuffer,game.bobberRef,rating);
+                }
+                else {
+                    FishLootManager lootID = MinigameManager.FirstRoll(game.bobberRef, player, commandBuffer, store.getComponent(game.bobberRef, BobberComponent.getComponentType()).getWaterDepth());
+                    MinigameManager.DropLoot(lootID, player, commandBuffer,game.bobberRef,rating);
+                }
                 if(rating == Minigame.PerformanceRating.PERFECT){
                     // TODO Deal chance of bonus loot.
                 }
