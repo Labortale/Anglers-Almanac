@@ -19,42 +19,42 @@ import com.hypixel.hytale.server.core.universe.world.WorldMapTracker;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.hypixel.hytale.server.npc.util.InventoryHelper;
+import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.Components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.Metadata.FishingContext;
 import dev.rm20.anglersalmanac.Metadata.FishingRodData;
 import dev.rm20.anglersalmanac.Metadata.ZoneInfo;
-import dev.rm20.anglersalmanac.Utils.EnvironmentParser;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
+import dev.rm20.anglersalmanac.Utils.EnvironmentParser;
 import dev.rm20.anglersalmanac.Utils.TimeUtils;
 import org.jspecify.annotations.NonNull;
 
 import java.awt.*;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 import static com.hypixel.hytale.server.core.universe.world.WorldConfig.formatDisplayName;
 import static dev.rm20.anglersalmanac.MinigameManager.Minigame.PerformanceRating.NIL;
 
 public class MinigameManager {
-    public static void StartGame(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth)
-    {
+    public static void StartGame(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
 
         //Assuming active hotbar item has not changed.
         ItemStack fishingRod = player.getInventory().getActiveHotbarItem();
 
 
         // Select which minigame to use from the config and set it up.
-        switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
+        switch (AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()) {
             case "TensionBar":
                 FishingRodData meta = fishingRod.getFromMetadataOrNull(FishingRodData.KEYED_CODEC);
-                if(meta== null)
-                {
+                if (meta == null) {
                     LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
                     break;
                 }
-                Inventory inv  = player.getInventory();
-                MinigameComponent_TensionBar minigame = MinigameComponent_TensionBar.spawnMinigame(commandBuffer,player.getReference(), bobberRef, fishingRod.getItemId());
+                Inventory inv = player.getInventory();
+                MinigameComponent_TensionBar minigame = MinigameComponent_TensionBar.spawnMinigame(commandBuffer, player.getReference(), bobberRef, fishingRod.getItemId());
                 LaunchBobberInteraction.updateMetadata(inv, inv.getActiveHotbarSlot(), inv.getActiveHotbarItem(), meta.getBoundBobber(), minigame.selfUUID, 1);
                 break;
             case "NoMinigame":
@@ -70,10 +70,10 @@ public class MinigameManager {
 
     }
 
-    public static void CancelGame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef){
+    public static void CancelGame(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef) {
 
-    // Select which minigame to use from the config and cancel it.
-        switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
+        // Select which minigame to use from the config and cancel it.
+        switch (AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()) {
             case "TensionBar":
                 AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
                 commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).despawnSelf(commandBuffer.getExternalData().getWorld());
@@ -87,8 +87,8 @@ public class MinigameManager {
     }
 
 
-    public static void DoMinigameInteraction(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef, @NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler){
-        switch(AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()){
+    public static void DoMinigameInteraction(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef, @NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler) {
+        switch (AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()) {
             case "TensionBar":
                 commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).DoInteraction(interactionType, context, cooldownHandler);
                 break;
@@ -145,8 +145,7 @@ public class MinigameManager {
         );
         // get fish
         FishLootManager lootEntry = FishLootManager.getRandomWeightedLoot(LocationInfo);
-        if(lootEntry == null)
-        {
+        if (lootEntry == null) {
             return null;
         }
         String lootID = lootEntry.getItemID();
@@ -176,41 +175,40 @@ public class MinigameManager {
         assert player.getReference() != null;
         TransformComponent transform = player.getReference().getStore().getComponent(player.getReference(), TransformComponent.getComponentType());
 
-        ItemUtils.interactivelyPickupItem(player.getReference(), loot, transform.getPosition(),commandBuffer);
+        ItemUtils.interactivelyPickupItem(player.getReference(), loot, transform.getPosition(), commandBuffer);
 
         //TODO
         //Rework to make it look like the fish is coming from the bobber and fly to the player?
 
     }
 
-    public static void DropLoot(FishLootManager loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef, Minigame.PerformanceRating rating){
-        if(loot ==null) return;
-        if(loot.getItemID() == null) return;
+    public static void DropLoot(FishLootManager loot, Player player, CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> bobberRef, Minigame.PerformanceRating rating) {
+        if (loot == null) return;
+        if (loot.getItemID() == null) return;
         ItemStack fishStack;
         fishStack = InventoryHelper.createItem(loot.getItemID());
 
         if (fishStack == null) {
             return;
         }
-        if(loot.getQuantity()!=null)
-        {
+        if (loot.getQuantity() != null) {
             int min = loot.getQuantity().min_amount;
             int max = loot.getQuantity().max_amount;
 
             if (max <= min) {
                 fishStack.withQuantity(min);
             } else {
-                int quantity = new Random().nextInt(min,max + 1);
+                int quantity = new Random().nextInt(min, max + 1);
                 fishStack.withQuantity(quantity);
                 // No idea if the thing above works need testing
             }
         }
         DropItem(fishStack, player, commandBuffer, bobberRef);
-        SaveLoot(player,loot, rating);
+        SaveLoot(player, loot, rating);
     }
 
-    public static void SaveLoot(Player player, FishLootManager loot, Minigame.PerformanceRating rating)
-    {
+    public static void SaveLoot(Player player, FishLootManager loot, Minigame.PerformanceRating rating) {
+        long startTime = System.currentTimeMillis();
         //save to database
         var playerRef = player.getReference();
         assert playerRef != null;
@@ -218,34 +216,41 @@ public class MinigameManager {
         com.hypixel.hytale.server.core.universe.PlayerRef playerRef1 = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
         assert uuid != null;
         boolean isLegendary = loot.getRarity().equalsIgnoreCase("Legendary");
-        boolean isNewDiscovery = AnglersAlmanac.getInstance().database.saveCatch(uuid.getUuid().toString(), loot.getId(),isLegendary,rating);
-        if(playerRef1 == null) return;
-        if (isNewDiscovery && isLegendary) {
-            String fishDisplayName = formatDisplayName(loot.getName());
-            Message fishDisplay = Message.raw(fishDisplayName).color(Color.YELLOW);
-            Message FishFound = Message.raw("LEGENDARY DISCOVERY");
-            EventTitleUtil.showEventTitleToPlayer(
-                    playerRef1,
-                    fishDisplay,
-                    FishFound,
-                    false, null, 2, 0.5f, 0.5f
-            );
-            //Play sound
-            return;
-        }
-        if (isNewDiscovery) {
-            String fishDisplayName = formatDisplayName(loot.getName());
-            Message fishDisplay = Message.raw(fishDisplayName).color(Color.GREEN);
-            Message FishFound = Message.raw("New Fish Found");
-            EventTitleUtil.showEventTitleToPlayer(
-                    playerRef1,
-                    fishDisplay,
-                    FishFound,
-                    false, null, 2, 0.5f, 0.5f
-            );
-            //Play sound
 
-        }
+        CompletableFuture.supplyAsync(() -> {
+            return AnglersAlmanac.getInstance().database.saveCatch(uuid.getUuid().toString(), loot.getId(), isLegendary, rating);
+        }).thenAccept(isNewDiscovery -> {
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+            if (duration > 100) {
+                AnglersAlmanac.LOGGER.atWarning().log("Slow DB Write: " +duration+"ms for player "+uuid.getUuid());
+            }
+
+            //AnglersAlmanac.LOGGER.atInfo().log("DB Write: " +duration+"ms for player "+uuid.getUuid());
+
+
+            if (playerRef1 == null) return;
+            if (isNewDiscovery) {
+                String fishDisplayName = formatDisplayName(loot.getName());
+                if (isLegendary) {
+                    showDiscoveryUI(playerRef1, fishDisplayName, "LEGENDARY DISCOVERY", Color.YELLOW);
+                } else {
+                    showDiscoveryUI(playerRef1, fishDisplayName, "New Fish Found", Color.GREEN);
+                }
+            }
+            BookPageManager.invalidateCache(String.valueOf(playerRef1.getUuid()));
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
+        });
     }
+
+
+    private static void showDiscoveryUI(PlayerRef ref, String fishName, String header, Color color) {
+        Message fishDisplay = Message.raw(fishName).color(color);
+        Message titleHeader = Message.raw(header);
+        EventTitleUtil.showEventTitleToPlayer(ref, fishDisplay, titleHeader, false, null, 2, 0.5f, 0.5f);
+    }
+
 
 }

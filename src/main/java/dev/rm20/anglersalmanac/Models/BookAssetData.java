@@ -252,7 +252,7 @@ public class BookAssetData implements JsonAssetWithMap<String, DefaultAssetMap<S
                 .toArray(habitatsInfo[]::new);
 
         master.buildCache();
-        //AnglersAlmanac.getInstance().getLogger().atInfo().log("Built book with "+ master.habitats.length+ " Habitats");
+        //AnglersAlmanac.LOGGER.atInfo().log("Built book with "+ master.habitats.length+ " Habitats");
         return master;
     }
 

@@ -6,7 +6,9 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
+import dev.rm20.anglersalmanac.AlmanacBook.AlmanacBook;
 import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
+import dev.rm20.anglersalmanac.AlmanacBook.AlmanacRepository;
 import dev.rm20.anglersalmanac.Components.BobberComponent;
 import dev.rm20.anglersalmanac.Config.AnglersAlmanacConfig;
 import dev.rm20.anglersalmanac.Config.MinigameConfig_TensionBar;
@@ -25,7 +27,7 @@ public class AnglersAlmanac extends JavaPlugin {
     public static Config<MinigameConfig_TensionBar> MINIGAME_CONFIG_TENSIONBAR;
     public static Config<AnglersAlmanacConfig> MOD_CONFIG;
     public AlmanacDatabase database;
-
+    public AlmanacRepository Book_IDs;
     public FishLootManager fishLootManager;
     public BookAssetData bookAssetData;
     public AnglersAlmanac(@Nonnull JavaPluginInit init) {
@@ -76,10 +78,9 @@ public class AnglersAlmanac extends JavaPlugin {
 
         //start database
         this.database = new AlmanacDatabase();
+        this.Book_IDs = new AlmanacRepository();
         MOD_CONFIG.save();
         MINIGAME_CONFIG_TENSIONBAR.save();
-
-        //AlmanacBook.registerAlmanacBase();
 
         // Plugin Mod Analytics
         new HStats("55078602-d7a1-4794-b30c-f42529f3d1d4", getManifest().getVersion().toString());
@@ -91,6 +92,10 @@ public class AnglersAlmanac extends JavaPlugin {
         super.shutdown();
         if (this.database != null) {
             this.database.close();
+        }
+        if(this.Book_IDs != null)
+        {
+            this.Book_IDs.close();
         }
     }
 

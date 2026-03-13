@@ -11,7 +11,7 @@ public class OnPlayerDisconnectEvent {
     public static void handle(PlayerDisconnectEvent event) {
         if(Universe.get().getPlayerCount()<=1)
         {
-            //AnglersAlmanac.getInstance().getLogger().atInfo().log("Clearing book Cache");
+            //AnglersAlmanac.LOGGER.atInfo().log("Clearing book Cache");
             BookAssetData.invalidateCache();
             FishLootManager.invalidateCache();
         }

@@ -17,7 +17,7 @@ public record FishingContext(
 
     //help with debug
     public void logContext() {
-        AnglersAlmanac.getInstance().getLogger().atInfo().log(String.format(
+        AnglersAlmanac.LOGGER.atInfo().log(String.format(
                 "--- Fishing Context Trace ---\n" +
                         "Location: [Zone: %s, Tier: %d, Region: %s, Biome: %s]\n" +
                         "Environment: [Time: %s, Weather: %s, Moon: %d]\n" +

@@ -53,7 +53,7 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGui
         pageUtils.buildTabs(uiCommandBuilder, uiEventBuilder, Page);
         BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
         List<BookAssetData.FishEntry> Fish = bookAsset.getFishByHabitat(ZoneName);
-        //AnglersAlmanac.getInstance().getLogger().atInfo().log(Fish.toString());
+        //AnglersAlmanac.LOGGER.atInfo().log(Fish.toString());
         String name = ZoneName;
 
         if (zoneInfo != null && zoneInfo.displayName != null && !zoneInfo.displayName.isEmpty()) {
@@ -112,7 +112,7 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGui
         Player player = store.getComponent(ref, Player.getComponentType());
         if (player == null || data.getButton() == null) return;
 
-        //AnglersAlmanac.getInstance().getLogger().atInfo().log(data.getButton());
+        //AnglersAlmanac.LOGGER.atInfo().log(data.getButton());
         if (data.getButton().equals("PrevPage")) {
             OpenPage(player, (Page - 1), PlayerUUID, PlayerName);
         }
@@ -167,7 +167,7 @@ public class FishZoneUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGui
                     false
             );
 
-            boolean hasCaught = AnglersAlmanac.getInstance().database.hasPlayerCaught(playerUUID, currentFish.id());
+            boolean hasCaught = Stats.hasCaught(currentFish.id());
 
             if (hasCaught && actualItem != null) {
                 uiCommandBuilder.set(slotPath + " #ItemIcon.ItemId", actualItem.getItemID());

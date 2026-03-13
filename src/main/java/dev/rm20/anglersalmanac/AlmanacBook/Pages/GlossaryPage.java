@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
 import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.Models.BookAssetData;
@@ -66,7 +67,7 @@ public class GlossaryPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiDa
 
     private void buildDynamicFishGrid(List<BookAssetData.FishEntry> validFishItems, String playerUUID, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder) {
         uiCommandBuilder.clear("#LeftFishGridContainer");
-
+        AlmanacDatabase.PlayerStatsData stats = BookPageManager.getStats(playerUUID);
         int itemsPerRow = 5;
         int maxSlots = 50;
         int limit = Math.min(validFishItems.size(), maxSlots);
@@ -91,7 +92,7 @@ public class GlossaryPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiDa
                     false
             );
 
-            boolean hasCaught = AnglersAlmanac.getInstance().database.hasPlayerCaught(playerUUID, currentFish.id());
+            boolean hasCaught = stats.hasCaught(currentFish.id());
 
             if (hasCaught && actualItem != null) {
                 uiCommandBuilder.set(slotPath + " #ItemIcon.ItemId", actualItem.getItemID());

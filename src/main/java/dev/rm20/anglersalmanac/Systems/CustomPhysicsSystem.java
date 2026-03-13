@@ -134,7 +134,7 @@ public class CustomPhysicsSystem extends EntityTickingSystem<EntityStore> {
     private void applyWaterForces(float dt, Vector3d position, Vector3d velocity, BobberComponent bobber, World world) {
         double waterTop = getWaterSurfaceLevel(world,position);
         bobber.setWaterDepth(calculateWaterDepth(world,position,waterTop));
-//        AnglersAlmanac.getInstance().getLogger().atInfo().log(String.valueOf(bobber.getWaterDepth()));
+//        AnglersAlmanac.LOGGER.atInfo().log(String.valueOf(bobber.getWaterDepth()));
         double targetY = waterTop - 0.25;
 
         double depthError = targetY - position.y;

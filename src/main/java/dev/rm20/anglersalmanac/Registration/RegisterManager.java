@@ -40,7 +40,7 @@ public class RegisterManager {
     }
 
     public static void registerEvents(AnglersAlmanac plugin) {
-        final String PACKAGE_NAME = "dev.rm20.anglersalmanac.events";
+        final String PACKAGE_NAME = "dev.rm20.anglersalmanac.Events";
         try {
             ClassPath classPath = ClassPath.from(plugin.getClass().getClassLoader());
             int count = 0;

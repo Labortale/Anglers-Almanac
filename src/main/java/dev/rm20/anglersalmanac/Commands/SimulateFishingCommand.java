@@ -90,6 +90,6 @@ public class SimulateFishingCommand extends AbstractPlayerCommand {
         }
         sb.append("\n===========================================");
 
-        AnglersAlmanac.getInstance().getLogger().atInfo().log(sb.toString());
+        AnglersAlmanac.LOGGER.atInfo().log(sb.toString());
     }
 }

@@ -42,7 +42,7 @@ public class LinearSkillPage extends InteractiveCustomUIPage<DialEventData> {
         // Randomize position and cast to int
         // 0 to (600 - 60)
         this.zoneX = new Random().nextInt(540);
-        //AnglersAlmanac.getInstance().getLogger().atInfo().log(String.valueOf((int) zoneX));
+        //AnglersAlmanac.LOGGER.atInfo().log(String.valueOf((int) zoneX));
         Anchor anchor = new Anchor();
         anchor.setWidth(Value.of(60));
         anchor.setWidth(Value.of(60));

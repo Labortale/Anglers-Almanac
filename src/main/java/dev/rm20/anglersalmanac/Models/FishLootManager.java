@@ -290,7 +290,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
         }
 
         if (possibleLoot.isEmpty()) {
-            AnglersAlmanac.getInstance().getLogger().atInfo().log("No eligible fish found for this context!");
+            AnglersAlmanac.LOGGER.atInfo().log("No eligible fish found for this context!");
             return null;
         }
 
@@ -318,7 +318,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     private static boolean isEligible(FishLootManager loot, GeoKey key) {
         Habitats hab = loot.getHabitats();
         if (hab == null) {
-            //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + " is has no habitat info");
+            //AnglersAlmanac.LOGGER.atInfo().log(loot.getName() + " is has no habitat info");
             return true;
         }
 
@@ -337,7 +337,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
         }
 
         if (loot.isGlobal()) {
-            //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + " is global fish");
+            //AnglersAlmanac.LOGGER.atInfo().log(loot.getName() + " is global fish");
             return true;
         }
 
@@ -347,7 +347,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
             hasRequirement = true;
             for (String b : hab.biomes) {
                 if (b.equalsIgnoreCase(key.biome())) {
-                    //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + "found at biome: "+ key.biome());
+                    //AnglersAlmanac.LOGGER.atInfo().log(loot.getName() + "found at biome: "+ key.biome());
                     matchedAny = true;
                     break;
                 }
@@ -358,7 +358,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
             hasRequirement = true;
             for (String r : hab.regions) {
                 if (r.equalsIgnoreCase(key.region())) {
-                    //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + "found at region: "+ key.region());
+                    //AnglersAlmanac.LOGGER.atInfo().log(loot.getName() + "found at region: "+ key.region());
                     matchedAny = true;
                     break;
                 }
@@ -371,7 +371,7 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
                 if (z.equalsIgnoreCase(key.zone())) {
                     // If zone matches, still respect the tier requirement if it exists
                     if (hab.tier == null || hab.tier.length == 0 || Arrays.stream(hab.tier).anyMatch(t -> t == key.tier())) {
-                        //AnglersAlmanac.getInstance().getLogger().atInfo().log(loot.getName() + "found at zone and tier: "+ key.zone() + " : "+ key.tier());
+                        //AnglersAlmanac.LOGGER.atInfo().log(loot.getName() + "found at zone and tier: "+ key.zone() + " : "+ key.tier());
                         matchedAny = true;
                     }
                     break;

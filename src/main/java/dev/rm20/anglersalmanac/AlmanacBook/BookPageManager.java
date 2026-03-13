@@ -1,5 +1,7 @@
 package dev.rm20.anglersalmanac.AlmanacBook;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.PageManager;
@@ -14,11 +16,67 @@ import dev.rm20.anglersalmanac.Models.BookAssetData;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class BookPageManager {
+
+    private static final Cache<String, AlmanacDatabase.PlayerStatsData> statsCache = Caffeine.newBuilder()
+            .expireAfterAccess(5, TimeUnit.MINUTES)
+            .maximumSize(128)
+            .build();
+
+    public static AlmanacDatabase.PlayerStatsData getStats(String playerUUID)
+    {
+        AlmanacDatabase.PlayerStatsData cachedStats = statsCache.getIfPresent(playerUUID);
+        if(cachedStats !=null)
+        {
+            return cachedStats;
+        }
+        else{
+            AlmanacDatabase.PlayerStatsData stats =  AnglersAlmanac.getInstance().database.getPlayerStats(playerUUID);
+            statsCache.put(playerUUID, stats);
+            return stats;
+        }
+    }
+    public static void invalidateCache(String playerUUID)
+    {
+        statsCache.invalidate(playerUUID);
+    }
+    public static void invalidateCache()
+    {
+        statsCache.invalidateAll();
+    }
+
     public static void OpenPage(Player player, int page, String playerUUID, String playerName) {
+        AlmanacDatabase.PlayerStatsData cachedStats = statsCache.getIfPresent(playerUUID);
+        if(cachedStats !=null)
+        {
+            renderPage(player, page, playerUUID, playerName, cachedStats);
+        }
+        else
+        {
+            AlmanacDatabase.PlayerStatsData stats = AnglersAlmanac.getInstance().database.getPlayerStats(playerUUID);
+            statsCache.put(playerUUID, stats);
+            renderPage(player, page, playerUUID, playerName, stats);
+
+            // Move out of main thread
+//            CompletableFuture.supplyAsync(() -> {
+//                return AnglersAlmanac.getInstance().database.getPlayerStats(playerUUID);
+//            }).thenAccept(stats -> {
+//                statsCache.put(playerUUID, stats);
+//                renderPage(player, page, playerUUID, playerName, stats);
+//            }).exceptionally(ex -> {
+//                ex.printStackTrace();
+//                return null;
+//            });
+        }
         AlmanacDatabase db = AnglersAlmanac.getInstance().database;
         AlmanacDatabase.PlayerStatsData stats = db.getPlayerStats(playerUUID);
+    }
+
+    private static void renderPage(Player player, int page, String playerUUID, String playerName, AlmanacDatabase.PlayerStatsData stats)
+    {
         Ref<EntityStore> playerRef = player.getReference();
         PlayerRef playerRef1 = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
         BookAssetData bookAsset = BookAssetData.getMasterMergedBook();
@@ -28,7 +86,7 @@ public class BookPageManager {
         List<BookAssetData.SpreadTemplate> pages = bookAsset.getFlattenedPages();
         BookAssetData.SpreadTemplate currentSpread = pages.get(page);
         String UiFile = currentSpread.uiFile;
-        //AnglersAlmanac.getInstance().getLogger().atInfo().log(pages.get(page).uiFile);
+        //AnglersAlmanac.LOGGER.atInfo().log(pages.get(page).uiFile);
         if (UiFile.equalsIgnoreCase("Almanac/AlmanacStats.ui")) {
             StatUiPage statUiPage = new StatUiPage(playerRef1, playerUUID, playerName, stats);
             pageManager.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
@@ -60,9 +118,8 @@ public class BookPageManager {
             GlossaryPage glossaryPage = new GlossaryPage(playerRef1, playerUUID, playerName, page);
             pageManager.openCustomPage(playerRef, playerRef.getStore(), glossaryPage);
         } else {
-            AnglersAlmanac.getInstance().getLogger().atSevere().log("Error getting UI with page: "+page+" @ "+UiFile);
+            AnglersAlmanac.LOGGER.atSevere().log("Error getting UI with page: "+page+" @ "+UiFile);
         }
-
     }
 
     public static int getNextPage(int currentPage) {
@@ -114,5 +171,7 @@ public class BookPageManager {
         }
         return -1;
     }
+
+
 
 }

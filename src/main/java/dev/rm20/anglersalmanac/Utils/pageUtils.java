@@ -22,7 +22,7 @@ import java.util.Objects;
 public class pageUtils {
     public static void FillPage(UICommandBuilder ui, String slotPath, FishLootManager data, String PlayerUUID, AlmanacDatabase.PlayerStatsData Stats) {
         slotPath = slotPath+"[0] ";
-        boolean caught = AnglersAlmanac.getInstance().database.hasPlayerCaught(PlayerUUID, data.getId());
+        boolean caught = Stats.hasCaught(data.getId());
         String cleanName = data.getItemID().replace("Fish_", "").replace("_Item", "");
 
         // Image

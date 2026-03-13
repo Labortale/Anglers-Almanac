@@ -70,7 +70,18 @@ public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData
         uiCommandBuilder.set("#GreatCount.TextSpans", Message.raw("Great: " + great));
         uiCommandBuilder.set("#Header.TextSpans", Message.raw( (this.PlayerName != null ? this.PlayerName : "Unknown")+" Stats:" ));
 
-        String topFish = (stats.topFish != null && !stats.topFish.isEmpty()) ? FishLootManager.getFishData(stats.topFish.get(0).name()).getName() : "None yet!";
+        String topFish = "None yet!";
+
+        if (stats.topFish != null && !stats.topFish.isEmpty()) {
+            String fishId = stats.topFish.get(0).name();
+            var fishData = FishLootManager.getFishData(fishId);
+
+            if (fishData != null) {
+                topFish = fishData.getName();
+            } else {
+                topFish = fishId;
+            }
+        }
         uiCommandBuilder.set("#MostFound.TextSpans", Message.raw("Most found: " + topFish));
 
         List<Map.Entry<String, Integer>> sortedFish = stats.catchMap.entrySet().stream()

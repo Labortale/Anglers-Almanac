@@ -4,11 +4,6 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.protocol.ItemBase;
-import com.hypixel.hytale.protocol.ItemTranslationProperties;
-import com.hypixel.hytale.protocol.UpdateType;
-import com.hypixel.hytale.protocol.packets.assets.UpdateItems;
-import com.hypixel.hytale.protocol.packets.assets.UpdateTranslations;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -22,10 +17,8 @@ import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
 import dev.rm20.anglersalmanac.Metadata.BookData;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.Nullable;
 
-import static dev.rm20.anglersalmanac.AlmanacBook.AlmanacBook.registerItemOnServer;
 import static dev.rm20.anglersalmanac.AlmanacBook.AlmanacBook.syncCustomBookDisplay;
 
 
@@ -34,51 +27,96 @@ public class OpenBookInteraction extends SimpleInstantInteraction {
             OpenBookInteraction.class, OpenBookInteraction::new, SimpleInstantInteraction.CODEC
     ).build();
 
+    private static final String UNINITIALIZED_ID = "Almanac_Book";
+    private static final String INITIALIZED_PREFIX = "almanac.book.";
+
     @Override
-    protected void firstRun(@Nonnull InteractionType interactionType, @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldownHandler) {
-        CommandBuffer<EntityStore> commandBuffer = context.getCommandBuffer();
+    protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldown) {
+        CommandBuffer<EntityStore> buffer = context.getCommandBuffer();
         Ref<EntityStore> playerRef = context.getOwningEntity();
         ItemStack heldItem = context.getHeldItem();
-        if (commandBuffer == null || playerRef == null || heldItem == null) return;
-        Player player = commandBuffer.getComponent(playerRef, Player.getComponentType());
-        if (player == null) return;
+
+        if (buffer == null || heldItem == null) {
+            return;
+        }
+
+        String itemId = heldItem.getItemId();
+        boolean isRawBook = itemId.equals(UNINITIALIZED_ID);
+        boolean isInitializedBook = itemId.startsWith(INITIALIZED_PREFIX);
+        if (!isRawBook && !isInitializedBook) {
+            return;
+        }
+
+        Player player = buffer.getComponent(playerRef, Player.getComponentType());
+        if (player == null) {
+            return;
+        }
+
         BookData data = heldItem.getFromMetadataOrNull(BookData.KEY, BookData.CODEC);
-        if (data == null || data.getPlayerUUID().isEmpty()) {
-            ItemStack newBook;
-            UUIDComponent uuid = playerRef.getStore().getComponent(playerRef, UUIDComponent.getComponentType());
-            if(uuid == null) return;
-            BookData newData = new BookData();
-            newData.setPlayerUUID(uuid.getUuid().toString());
-            newData.setPlayerName(player.getDisplayName());
-            newData.setPageNumber(0);
-            newBook = heldItem.withMetadata(BookData.KEYED_CODEC, newData);
-            byte slot = player.getInventory().getActiveHotbarSlot();
-            player.getInventory().getHotbar().replaceItemStackInSlot(slot, heldItem, newBook);
-            PlayerRef playerRef1 = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
-            syncCustomBookDisplay(
-                    playerRef1,
-                    uuid.getUuid().toString(),
-                    player.getDisplayName()
-            );
-            BookPageManager.OpenPage(player,0,newData.getPlayerUUID(),newData.getPlayerName());
-            //PageManager pageManager = player.getPageManager();
-            //StatUiPage statUiPage = new StatUiPage(playerRef1,newData.getPlayerUUID(),player.getDisplayName());
-            //.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
-        }
-        else
-        {
-            PlayerRef playerRef1 = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
-            //PageManager pageManager = player.getPageManager();
-            //StatUiPage statUiPage = new StatUiPage(playerRef1,data.getPlayerUUID(),player.getDisplayName());
-            //pageManager.openCustomPage(playerRef, playerRef.getStore(), statUiPage);
-            BookPageManager.OpenPage(player,0,data.getPlayerUUID(),data.getPlayerName());
 
-            syncCustomBookDisplay(
-                    playerRef1,
-                    data.getPlayerUUID(),
-                    data.getPlayerName()
-            );
+        if (isRawBook || data == null || data.getPlayerUUID().isEmpty()) {
+            if (data != null) {
+                data = upgradeToInitializedBook(playerRef, player, heldItem, data);
+            } else {
+                data = initializeNewBook(playerRef, player, heldItem);
+            }
+            if (data == null) {
+                return;
+            }
         }
 
+
+        // 3. Centralized Execution
+        openAndSyncBook(playerRef, player, data);
+    }
+
+    private BookData initializeNewBook(Ref<EntityStore> playerRef, Player player, ItemStack heldItem) {
+        UUIDComponent uuidComp = playerRef.getStore().getComponent(playerRef, UUIDComponent.getComponentType());
+        if (uuidComp == null) return null;
+
+        String uuidStr = uuidComp.getUuid().toString();
+
+        BookData newData = new BookData();
+        newData.setPlayerUUID(uuidStr);
+        newData.setPlayerName(player.getDisplayName());
+        newData.setPageNumber(0);
+
+        //ItemStack updatedItem = heldItem.withMetadata(BookData.KEYED_CODEC, newData);
+        byte slot = player.getInventory().getActiveHotbarSlot();
+        PlayerRef playerRefComp = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
+
+
+        if (playerRefComp != null) {
+            Item newbook = syncCustomBookDisplay(playerRefComp, newData.getPlayerUUID(), newData.getPlayerName());
+            ItemStack newHeldedItem = new ItemStack(newbook.getId(), 1);
+            newHeldedItem.withMetadata(BookData.KEYED_CODEC, newData);
+            player.getInventory().getHotbar().replaceItemStackInSlot(slot, heldItem, newHeldedItem);
+        }
+
+
+        return newData;
+    }
+
+    private BookData upgradeToInitializedBook(Ref<EntityStore> playerRef, Player player, ItemStack heldItem, @Nullable BookData existingData) {
+        if (existingData == null) {
+            return null;
+        }
+        byte slot = player.getInventory().getActiveHotbarSlot();
+        PlayerRef playerRefComp = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
+        if (playerRefComp != null) {
+            Item newbook = syncCustomBookDisplay(playerRefComp, existingData.getPlayerUUID(), existingData.getPlayerName());
+            ItemStack newHeldedItem = new ItemStack(newbook.getId(), 1);
+            newHeldedItem.withMetadata(BookData.KEYED_CODEC, existingData);
+            player.getInventory().getHotbar().replaceItemStackInSlot(slot, heldItem, newHeldedItem);
+        }
+        return existingData;
+    }
+
+    private void openAndSyncBook(Ref<EntityStore> playerRef, Player player, BookData data) {
+        PlayerRef playerRefComp = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
+        if (playerRefComp != null) {
+            syncCustomBookDisplay(playerRefComp, data.getPlayerUUID(), data.getPlayerName());
+        }
+        BookPageManager.OpenPage(player, 0, data.getPlayerUUID(), data.getPlayerName());
     }
 }
