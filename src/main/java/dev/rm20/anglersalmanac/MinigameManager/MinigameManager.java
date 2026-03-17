@@ -4,7 +4,9 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -15,6 +17,8 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.SoundUtil;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldMapTracker;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
@@ -234,8 +238,18 @@ public class MinigameManager {
                 String fishDisplayName = formatDisplayName(loot.getName());
                 if (isLegendary) {
                     showDiscoveryUI(playerRef1, fishDisplayName, "LEGENDARY DISCOVERY", Color.YELLOW);
+                    int audio = SoundEvent.getAssetMap().getIndex("AA_Fishing_Book_New_Fish_2");
+                    assert player.getWorld() != null;
+                    player.getWorld().execute(() -> {
+                        SoundUtil.playSoundEvent2dToPlayer(playerRef1, audio, SoundCategory.UI);
+                    });
                 } else {
                     showDiscoveryUI(playerRef1, fishDisplayName, "New Fish Found", Color.GREEN);
+                    int audio = SoundEvent.getAssetMap().getIndex("AA_Fishing_Book_New_Fish_1");
+                    assert player.getWorld() != null;
+                    player.getWorld().execute(() -> {
+                        SoundUtil.playSoundEvent2dToPlayer(playerRef1, audio, SoundCategory.UI);
+                    });
                 }
             }
             BookPageManager.invalidateCache(String.valueOf(playerRef1.getUuid()));

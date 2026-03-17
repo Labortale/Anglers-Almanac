@@ -15,6 +15,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.*;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
@@ -200,7 +201,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Vector3d playerHeadPos = playerPos.clone().add(new Vector3d(0, camOffset,0));
 
         // Spawn audio player
-        AudioPlayerComponent apc = AudioPlayerComponent.spawnNewAudioPlayerEntity(bobberPos, commandBuffer);
+        AudioPlayerComponent apc = AudioPlayerComponent.spawnNewAudioPlayerEntity(bobberPos, commandBuffer, ownerRef);
         apc.addSounds(reelInSounds);
         apc.allowedOverlap = 30000000;
         audioPlayerId = apc.selfUUID;
