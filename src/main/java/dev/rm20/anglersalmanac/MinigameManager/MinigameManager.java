@@ -146,14 +146,47 @@ public class MinigameManager {
         // Habitats info
         WorldMapTracker worldMapTracker = player.getWorldMapTracker();
         WorldMapTracker.ZoneDiscoveryInfo currentZone = worldMapTracker.getCurrentZone();
-        String RawZone = currentZone.regionName();
+        String Region = "Unknown";
+        String Biome = "Unknown";
+        String zone = "Unknown";
+        int tier = 1;
+        if(currentZone!=null)
+        {
+            String RawZone = currentZone.regionName();
+            Region = currentZone.zoneName();
+            Biome = worldMapTracker.getCurrentBiomeName();
+            ZoneInfo info = EnvironmentParser.parse(RawZone);
+            zone = info.zone();
+            tier = info.tier();
+        }
+        else
+        {
+            World world = player.getWorld();
+            AnglersAlmanac.LOGGER.atInfo().log(world.getName());
+            String worldName = world.getName();
+            if (worldName.contains("Portals_Taiga")) {
+                zone = "3";
+                Region = "Portals_Taiga";
+            }
+            else if(worldName.contains("Portals_Hedera"))
+            {
+                zone = "3";
+                Region = "Portals_Hedera";
+            }
+            else if (worldName.contains("Portals_Oasis"))
+            {
+                zone = "2";
+                Region = "Portals_Oasis";
+            }
+            else if(worldName.contains("Portals_Jungles"))
+            {
+                Region = "Portals_Jungles";
+            } else if (worldName.contains("Portals_Henges")) {
+                zone = "3";
+                Region = "Portals_Henges";
+            }
+        }
 
-
-        String Region = currentZone.zoneName();
-        String Biome = worldMapTracker.getCurrentBiomeName();
-        ZoneInfo info = EnvironmentParser.parse(RawZone);
-        String zone = info.zone();
-        int tier = info.tier();
 
         // Combine
         FishingContext LocationInfo = new FishingContext(

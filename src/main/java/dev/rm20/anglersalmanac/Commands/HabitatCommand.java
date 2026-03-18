@@ -56,7 +56,7 @@ public class HabitatCommand extends AbstractPlayerCommand {
             // Zone/Biome/Region Info
             WorldMapTracker worldMapTracker = player.getWorldMapTracker();
             WorldMapTracker.ZoneDiscoveryInfo currentZone = worldMapTracker.getCurrentZone();
-
+            //AnglersAlmanac.LOGGER.atInfo().log(worldMapTracker.getCurrentBiomeName());
             String rawZone = currentZone.regionName();
             String region = currentZone.zoneName();
             String biome = worldMapTracker.getCurrentBiomeName();
