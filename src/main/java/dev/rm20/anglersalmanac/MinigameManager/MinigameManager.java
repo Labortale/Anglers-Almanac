@@ -162,7 +162,7 @@ public class MinigameManager {
         else
         {
             World world = player.getWorld();
-            AnglersAlmanac.LOGGER.atInfo().log(world.getName());
+            //AnglersAlmanac.LOGGER.atInfo().log(world.getName());
             String worldName = world.getName();
             if (worldName.contains("Portals_Taiga")) {
                 zone = "3";
