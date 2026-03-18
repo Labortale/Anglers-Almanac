@@ -1,0 +1,28 @@
+{
+  "ItemId": "Plant_Fruit_Coconut",
+  "Name": "Coconut",
+  "FamilyId": "Fruit",
+  "Rarity": "Junk",
+  "IsGlobal": false,
+  "Weight": 75,
+  "Habitats": {
+    "Zones": [],
+    "Tiers": [],
+    "Regions": [],
+    "Biomes": [
+      "Trenches",
+      "Shore",
+      "Beach"
+    ],
+    "Min_depth": 3,
+    "Height": {
+      "Min_y": 0,
+      "Max_y": -1
+    }
+  },
+  "Minigame_stats": {
+    "Difficulty": 0,
+    "Behavior": "None",
+    "Stamina": 0
+  }
+}

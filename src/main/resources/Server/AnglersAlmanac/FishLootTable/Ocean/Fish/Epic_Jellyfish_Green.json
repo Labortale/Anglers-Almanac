@@ -30,7 +30,7 @@
   },
   "Minigame_stats": {
     "Difficulty": 7,
-    "Behavior": "erratic",
+    "Behavior": "Erratic",
     "Stamina": 120
   },
   "Book_info": {

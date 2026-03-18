@@ -27,7 +27,7 @@
   },
   "Minigame_stats": {
     "Difficulty": 0,
-    "Behavior": "none",
+    "Behavior": "None",
     "Stamina": 0
   }
 }

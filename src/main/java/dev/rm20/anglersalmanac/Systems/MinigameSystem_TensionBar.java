@@ -20,6 +20,7 @@ import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
 import dev.rm20.anglersalmanac.Utils.TransformUtils;
 import dev.rm20.anglersalmanac.Metadata.FishingRodData;
+import dev.rm20.anglersalmanac.Utils.Validator.MinigameBehaviour;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -73,7 +74,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
 
 
                 // Override parameters for fish with "darting" behaviour.
-                if(game.fishHooked.getMinigameStats().behavior.equals("darting")){
+                if(game.fishHooked.getMinigameStats().behavior == MinigameBehaviour.DARTING){
                     // Toggle between max speed and stopped.
                     if(Math.abs(game.fishTargetVelocity) >= game.gameConfig.fishMaxVeocity ){
                         maxFishVel = game.gameConfig.fishMaxVeocity * 0.1f;
@@ -104,7 +105,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
             case SUCCESS:
                 //AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
                 Minigame.PerformanceRating  rating = game.getPerformanceRating(game.getPerformancePercentage());
-                AnglersAlmanac.LOGGER.atInfo().log("Minigame performance rating = %s", rating);
+                //AnglersAlmanac.LOGGER.atInfo().log("Minigame performance rating = %s", rating);
                 if(rating == Minigame.PerformanceRating.FAIL) LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 // Deal rewards.
 

@@ -33,25 +33,40 @@ public class AlmanacRepository {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("SQLite Driver not found in classpath!", e);
         }
+
+        try {
+            File dbFile = new File(DB_PATH);
+            File parentDir = dbFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                if (parentDir.mkdirs()) {
+                    AnglersAlmanac.LOGGER.atInfo().log("Created database directory: " + parentDir.getPath());
+                }
+            }
+            HikariConfig config = getHikariConfig();
+            dataSource = new HikariDataSource(config);
+            setupDatabase();
+        } catch (Exception e) {
+            AnglersAlmanac.LOGGER.atSevere().withCause(e).log("Failed to make folder for BookIDs.db");
+        }
+
+    }
+
+
+    private static HikariConfig getHikariConfig() {
         HikariConfig config = new HikariConfig();
-
-
         config.setJdbcUrl("jdbc:sqlite:" + DB_PATH);
         config.setPoolName("AlmanacBookPool");
         config.setMaximumPoolSize(1);
-        config.setMinimumIdle(2);
+        config.setMinimumIdle(1);
         config.setIdleTimeout(30000);
         config.setMaxLifetime(1800000);
         config.setConnectionTimeout(5000);
 
-        dataSource = new HikariDataSource(config);
-
-        // Initialize the table immediately
-        File dir = new File("mods/dev.rm20_AnglersAlmanac/Data/");
-        if (!dir.exists()) dir.mkdirs();
-        setupDatabase();
+        // Performance properties for SQLite
+        config.addDataSourceProperty("journal_mode", "WAL");
+        config.addDataSourceProperty("synchronous", "NORMAL");
+        return config;
     }
-
 
     public static Connection getConnection() throws SQLException {
         return dataSource.getConnection();

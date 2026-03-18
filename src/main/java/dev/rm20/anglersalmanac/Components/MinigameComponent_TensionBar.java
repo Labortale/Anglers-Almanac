@@ -15,6 +15,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.*;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.UUIDUtil;
@@ -117,7 +118,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
             // Assign fish and apply modifiers.
         game.fishHooked = MinigameManager.FirstRoll(bobberRef, commandBuffer.getComponent(playerRef, Player.getComponentType()),commandBuffer, commandBuffer.getComponent(bobberRef, BobberComponent.getComponentType()).getWaterDepth());
         assert game.fishHooked != null;
-        AnglersAlmanac.LOGGER.atInfo().log("Loading modifiers for fish: %s", game.fishHooked.getName());
+        //AnglersAlmanac.LOGGER.atInfo().log("Loading modifiers for fish: %s", game.fishHooked.getName());
         game.applyFishModifiers(game.fishHooked.getMinigameStats());
             // Apply rod modifiers.
         //AnglersAlmanac.LOGGER.atInfo().log("RodAssetId String = %s", rodAssetId);
@@ -128,7 +129,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         //-----------------------
 
         // DEBUG
-        AnglersAlmanac.LOGGER.atInfo().log("Fish diffiucly = %s, behaviour = %s, stamina = %s", game.fishHooked.getMinigameStats().difficulty, game.fishHooked.getMinigameStats().behavior, game.fishHooked.getMinigameStats().stamina);
+        //AnglersAlmanac.LOGGER.atInfo().log("Fish diffiucly = %s, behaviour = %s, stamina = %s", game.fishHooked.getMinigameStats().difficulty, game.fishHooked.getMinigameStats().behavior, game.fishHooked.getMinigameStats().stamina);
 
 
         // Adjust minigame initialisation variables:
@@ -200,7 +201,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Vector3d playerHeadPos = playerPos.clone().add(new Vector3d(0, camOffset,0));
 
         // Spawn audio player
-        AudioPlayerComponent apc = AudioPlayerComponent.spawnNewAudioPlayerEntity(bobberPos, commandBuffer);
+        AudioPlayerComponent apc = AudioPlayerComponent.spawnNewAudioPlayerEntity(bobberPos, commandBuffer, ownerRef);
         apc.addSounds(reelInSounds);
         apc.allowedOverlap = 30000000;
         audioPlayerId = apc.selfUUID;
@@ -387,13 +388,13 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         Vector3d dirToBobber = bobberPos.clone().subtract(playerPos.clone()).normalize();
         double distToBobber = playerPos.clone().distanceTo(bobberPos.clone());
         //Vector3d underfootBlockPos = playerPos.clone().subtract(new Vector3d(0, 1, 0));
-        AnglersAlmanac.LOGGER.atInfo().log("underfootPos: %s", playerPos.clone());
+        //AnglersAlmanac.LOGGER.atInfo().log("underfootPos: %s", playerPos.clone());
         for(double i = 0.0; i < distToBobber; i+= 0.5){
             Vector3d checkPos = playerPos.clone().add(dirToBobber.clone().scale(i));
-            AnglersAlmanac.LOGGER.atInfo().log("i: %s, stepping: %s",i, checkPos.clone());
+            //AnglersAlmanac.LOGGER.atInfo().log("i: %s, stepping: %s",i, checkPos.clone());
             if(TransformUtils.isInFluid(checkPos.toVector3i(), world)){
                 catchZonePos = checkPos.toVector3i().toVector3d().add(new Vector3d(0.5, 1.0, 0.5));
-                AnglersAlmanac.LOGGER.atInfo().log("in water: %s", catchZonePos.clone());
+                //AnglersAlmanac.LOGGER.atInfo().log("in water: %s", catchZonePos.clone());
                 break;
             }
         }
@@ -543,7 +544,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     public int getPerformancePercentage(){
         int totalGameTicks  = ticksReeling + ticksEscaping;
         int performancePercentage = (int)( ((float)ticksReeling  / (float)totalGameTicks) * 100);
-        AnglersAlmanac.LOGGER.atInfo().log("Minigame performance percentage = %s", performancePercentage);
+        //AnglersAlmanac.LOGGER.atInfo().log("Minigame performance percentage = %s", performancePercentage);
         return performancePercentage;
     }
 
@@ -552,42 +553,49 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
 
     @Override
     public void applyDifficultyModifer(FishLootManager.MinigameStats stats) {
+        if(stats == null)
+        {
+            gameConfig.fishMaxVeocity += (float) 1 / 20f;
+            gameConfig.fishChangeDirectionMaxInterval = gameConfig.fishChangeDirectionMaxInterval / ((float) 1 / 8f);
+            return;
+        }
         gameConfig.fishMaxVeocity += (float) stats.difficulty / 20f;
         gameConfig.fishChangeDirectionMaxInterval = gameConfig.fishChangeDirectionMaxInterval / ((float) stats.difficulty / 8f);
-        AnglersAlmanac.LOGGER.atInfo().log("Applying fish difficulty! stat: %s, fishMaxVelocity: %s", stats.difficulty, gameConfig.fishMaxVeocity);
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying fish difficulty! stat: %s, fishMaxVelocity: %s", stats.difficulty, gameConfig.fishMaxVeocity);
     }
 
     @Override
     public void applyFishBehaviourModifer(FishLootManager.MinigameStats stats) {
+        if(stats ==null) return;
         switch (stats.behavior){
-            case "darting":
+            case DARTING:
                 // Stays still, then max speed, then still again, repeat.
                 // Behaviour is mostly assigned in minigame system when triggering FISHMOVE.
                 gameConfig.fishMinSpeed = 1.0f;
                 break;
-            case "floater":
+            case FLOATER:
                 gameConfig.fishBouyancy += gameConfig.fishMaxVeocity * 0.6f;
                 break;
-            case "sinker:":
+            case SINKER:
                 gameConfig.fishBouyancy -= gameConfig.fishMaxVeocity * 0.6f;
                 break;
-            case "heavy_sinker":
+            case HEAVY_SINKER:
                 gameConfig.fishMaxVeocity *= 1.2f;
                 gameConfig.fishBouyancy -= gameConfig.fishMaxVeocity * 0.9f;
 
                 break;
-            case "aggressive":
+            case AGGRESSIVE:
                 // Never slow, turns rapidly.
                 gameConfig.fishMaxVeocity *= 0.9f;
                 gameConfig.fishMinSpeed = 0.7f;
                 gameConfig.fishChangeDirectionMaxInterval *= 0.5f;
                 break;
-            case "erratic":
+            case ERRATIC:
                 // Changes direction very frequently.
                 gameConfig.fishMaxVeocity *= 0.6f;
                 gameConfig.fishChangeDirectionMaxInterval *= 0.1f;
                 break;
-            case "steady":
+            case STEADY:
                 // Rarely changes direction. Very predictable.
                 gameConfig.fishMaxVeocity *= 0.7f;
                 gameConfig.fishMinSpeed = 0.5f;
@@ -595,20 +603,24 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
                 break;
 
         }
-        AnglersAlmanac.LOGGER.atInfo().log("Applying fish behaviour! %s", stats.behavior);
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying fish behaviour! %s", stats.behavior);
     }
 
     @Override
     public void applyFishStaminaModifer(FishLootManager.MinigameStats stats) {
         // 30 represents standard stamina, with stats higher than 45 increasing time to catch, and stats lower than 45 reducing time to catch.
         // The stamina difference is dampened to prevent extreme modifications.
-        AnglersAlmanac.LOGGER.atInfo().log("Base reelRate = %s", gameConfig.fishReelRate);
+        //AnglersAlmanac.LOGGER.atInfo().log("Base reelRate = %s", gameConfig.fishReelRate);
         float dampeningFactor = 0.33f;
         float baselineStamina = 45f;
-        float dampenedStamina = stats.stamina + (baselineStamina - stats.stamina) * dampeningFactor;
+        float dampenedStamina = baselineStamina * dampeningFactor;
+        if(stats !=null)
+        {
+            dampenedStamina = stats.stamina + (baselineStamina - stats.stamina) * dampeningFactor;
+        }
         float modifier = baselineStamina / dampenedStamina;
         gameConfig.fishReelRate *= modifier;
-        AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina! stamina = %s, modifier: %s,  reelRate = %s", stats.stamina,modifier,  gameConfig.fishReelRate);
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina! stamina = %s, modifier: %s,  reelRate = %s", stats.stamina,modifier,  gameConfig.fishReelRate);
     }
 
     @Override
@@ -616,33 +628,33 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         gameConfig.barSpeed *= rodStats.control;
         gameConfig.barGravity *= rodStats.control;
         gameConfig.barAcceleration *= rodStats.control/2f;
-        AnglersAlmanac.LOGGER.atInfo().log("Applying rod control! barSpeed = %s, barGravity = %s, barAccel = %s", gameConfig.barSpeed, gameConfig.barGravity, gameConfig.barAcceleration);
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying rod control! barSpeed = %s, barGravity = %s, barAccel = %s", gameConfig.barSpeed, gameConfig.barGravity, gameConfig.barAcceleration);
     }
 
     @Override
     public void applyRodDifficultyModifer(RodStats rodStats) {
         gameConfig.barRadius /= rodStats.difficulty;
-        AnglersAlmanac.LOGGER.atInfo().log("Applying rod difficulty! barRadius = %s", gameConfig.barRadius);
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying rod difficulty! barRadius = %s", gameConfig.barRadius);
 
     }
 
     @Override
     public void applyRodForgivenessModifer(RodStats rodStats) {
-        AnglersAlmanac.LOGGER.atInfo().log("Applying rod forgiveness");
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying rod forgiveness");
     }
 
     @Override
     public void applyRodStaminaModifer(RodStats rodStats) {
-        AnglersAlmanac.LOGGER.atInfo().log("Applying rod stamina");
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying rod stamina");
     }
 
     @Override
     public void applyRodFishWeightModifer(RodStats rodStats) {
-        AnglersAlmanac.LOGGER.atInfo().log("Applying fish weight modfifer");
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying fish weight modfifer");
     }
 
     @Override
     public void applyRodRarityModifer(RodStats rodStats) {
-        AnglersAlmanac.LOGGER.atInfo().log("Applying fish rarity modifier");
+        //AnglersAlmanac.LOGGER.atInfo().log("Applying fish rarity modifier");
     }
 }

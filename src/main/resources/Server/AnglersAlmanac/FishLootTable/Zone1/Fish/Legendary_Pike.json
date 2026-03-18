@@ -33,7 +33,7 @@
   },
   "Minigame_stats": {
     "Difficulty": 10,
-    "Behavior": "aggressive",
+    "Behavior": "Aggressive",
     "Stamina": 100
   },
   "Book_info": {

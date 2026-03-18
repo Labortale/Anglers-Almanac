@@ -4,7 +4,9 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -16,6 +18,8 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.SoundUtil;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.WorldMapTracker;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
@@ -87,7 +91,16 @@ public class MinigameManager {
         switch (AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()) {
             case "TensionBar":
                 AnglersAlmanac.LOGGER.atInfo().log("Canceling TensionBar Minigame");
-                commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).despawnSelf(commandBuffer.getExternalData().getWorld());
+                MinigameComponent_TensionBar minigame = commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE);
+                if(minigame == null)
+                {
+                    AnglersAlmanac.LOGGER.atWarning().log("Missing ref for minigame");
+                    return;
+                }
+                else
+                {
+                    minigame.despawnSelf(commandBuffer.getExternalData().getWorld());
+                }
                 break;
             case "NoMinigame":
                 break;
@@ -98,22 +111,33 @@ public class MinigameManager {
     }
 
 
-    public static void DoMinigameInteraction(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef, @NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler) {
+    public static boolean DoMinigameInteraction(CommandBuffer<EntityStore> commandBuffer, Ref<EntityStore> minigameRef, @NonNull InteractionType interactionType, @NonNull InteractionContext context, @NonNull CooldownHandler cooldownHandler) {
         switch (AnglersAlmanac.MOD_CONFIG.get().getMinigameToUse()) {
             case "TensionBar":
-                commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE).DoInteraction(interactionType, context, cooldownHandler);
+                MinigameComponent_TensionBar minigame = commandBuffer.getComponent(minigameRef, MinigameComponent_TensionBar.COMPONENT_TYPE);
+                if(minigame == null)
+                {
+                    CancelGame(commandBuffer,minigameRef);
+                    AnglersAlmanac.LOGGER.atWarning().log("Missing ref for minigame");
+                    return false;
+                }
+                else
+                {
+                    minigame.DoInteraction(interactionType, context, cooldownHandler);
+                }
                 break;
             case "NoMinigame":
                 break;
             default:
                 break;
         }
+        return true;
     }
 
 
     public static FishLootManager FirstRoll(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {
-        AnglersAlmanac.LOGGER.atInfo().log("Doing first roll");
-        AnglersAlmanac plugin = AnglersAlmanac.getInstance();
+        //AnglersAlmanac.LOGGER.atInfo().log("Doing first roll");
+        //AnglersAlmanac plugin = AnglersAlmanac.getInstance();
         Store<EntityStore> store = bobberRef.getStore();
 
         // Location
@@ -133,14 +157,47 @@ public class MinigameManager {
         // Habitats info
         WorldMapTracker worldMapTracker = player.getWorldMapTracker();
         WorldMapTracker.ZoneDiscoveryInfo currentZone = worldMapTracker.getCurrentZone();
-        String RawZone = currentZone.regionName();
+        String Region = "Unknown";
+        String Biome = "Unknown";
+        String zone = "Unknown";
+        int tier = 1;
+        if(currentZone!=null)
+        {
+            String RawZone = currentZone.regionName();
+            Region = currentZone.zoneName();
+            Biome = worldMapTracker.getCurrentBiomeName();
+            ZoneInfo info = EnvironmentParser.parse(RawZone);
+            zone = info.zone();
+            tier = info.tier();
+        }
+        else
+        {
+            World world = player.getWorld();
+            //AnglersAlmanac.LOGGER.atInfo().log(world.getName());
+            String worldName = world.getName();
+            if (worldName.contains("Portals_Taiga")) {
+                zone = "3";
+                Region = "Portals_Taiga";
+            }
+            else if(worldName.contains("Portals_Hedera"))
+            {
+                zone = "3";
+                Region = "Portals_Hedera";
+            }
+            else if (worldName.contains("Portals_Oasis"))
+            {
+                zone = "2";
+                Region = "Portals_Oasis";
+            }
+            else if(worldName.contains("Portals_Jungles"))
+            {
+                Region = "Portals_Jungles";
+            } else if (worldName.contains("Portals_Henges")) {
+                zone = "3";
+                Region = "Portals_Henges";
+            }
+        }
 
-
-        String Region = currentZone.zoneName();
-        String Biome = worldMapTracker.getCurrentBiomeName();
-        ZoneInfo info = EnvironmentParser.parse(RawZone);
-        String zone = info.zone();
-        int tier = info.tier();
 
         // Combine
         FishingContext LocationInfo = new FishingContext(
@@ -186,7 +243,7 @@ public class MinigameManager {
         assert player.getReference() != null;
         TransformComponent transform = player.getReference().getStore().getComponent(player.getReference(), TransformComponent.getComponentType());
 
-        ItemUtils.interactivelyPickupItem(player.getReference(), loot, transform.getPosition(), commandBuffer);
+        ItemUtils.interactivelyPickupItem(player.getReference(), loot, transform.getPosition(),commandBuffer);
 
         //TODO
         //Rework to make it look like the fish is coming from the bobber and fly to the player?
@@ -245,8 +302,18 @@ public class MinigameManager {
                 String fishDisplayName = formatDisplayName(loot.getName());
                 if (isLegendary) {
                     showDiscoveryUI(playerRef1, fishDisplayName, "LEGENDARY DISCOVERY", Color.YELLOW);
+                    int audio = SoundEvent.getAssetMap().getIndex("AA_Fishing_Book_New_Fish_2");
+                    assert player.getWorld() != null;
+                    player.getWorld().execute(() -> {
+                        SoundUtil.playSoundEvent2dToPlayer(playerRef1, audio, SoundCategory.UI);
+                    });
                 } else {
                     showDiscoveryUI(playerRef1, fishDisplayName, "New Fish Found", Color.GREEN);
+                    int audio = SoundEvent.getAssetMap().getIndex("AA_Fishing_Book_New_Fish_1");
+                    assert player.getWorld() != null;
+                    player.getWorld().execute(() -> {
+                        SoundUtil.playSoundEvent2dToPlayer(playerRef1, audio, SoundCategory.UI);
+                    });
                 }
             }
             BookPageManager.invalidateCache(String.valueOf(playerRef1.getUuid()));

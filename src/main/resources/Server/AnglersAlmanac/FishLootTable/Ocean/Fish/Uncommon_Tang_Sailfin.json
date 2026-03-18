@@ -30,7 +30,7 @@
   },
   "Minigame_stats": {
     "Difficulty": 4,
-    "Behavior": "darting",
+    "Behavior": "Darting",
     "Stamina": 40
   },
   "Book_info": {

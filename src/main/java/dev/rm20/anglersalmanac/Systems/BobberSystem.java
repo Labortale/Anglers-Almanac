@@ -34,9 +34,10 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
     public void tick(float v, int i, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         BobberComponent component = archetypeChunk.getComponent(i, BobberComponent.getComponentType());
         TransformComponent transform = archetypeChunk.getComponent(i, TransformComponent.getComponentType());
+        Player player;
         if(component !=null)
         {
-            Player player = component.getPlayer();
+            player = component.getPlayer();
             if (player == null) {
                 commandBuffer.removeEntity(archetypeChunk.getReferenceTo(i), RemoveReason.REMOVE);
                 return;
@@ -58,6 +59,8 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
             }
             slot = player.getInventory().getActiveHotbarSlot();
             fishingRod = heldItem;
+        } else {
+            player = null;
         }
 
         if (component == null || !component.InWater()) return;
@@ -87,7 +90,7 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
                 World world = store.getExternalData().getWorld();
                 EntityStore store2 = world.getEntityStore();
                 world.execute(() -> {
-                    SoundUtil.playSoundEvent3d(audio, SoundCategory.SFX, transform.getPosition(), store2.getStore());
+                    SoundUtil.playSoundEvent3dToPlayer(player.getReference(), audio, SoundCategory.SFX, transform.getPosition(), store2.getStore());
                 });
                 // Reaction window: How long the player has to click.
                 // Making this slightly more random (e.g., 0.8s to 3.0s)

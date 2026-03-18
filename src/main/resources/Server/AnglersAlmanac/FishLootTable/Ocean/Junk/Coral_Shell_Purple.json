@@ -1,0 +1,28 @@
+{
+  "ItemId": "Deco_Coral_Shell_Purple",
+  "Name": "Coral Shell Purple",
+  "FamilyId": "Shell",
+  "Rarity": "Junk",
+  "IsGlobal": false,
+  "Weight": 25,
+  "Habitats": {
+    "Zones": [],
+    "Tiers": [],
+    "Regions": [],
+    "Biomes": [
+      "Trenches",
+      "Shore",
+      "Beach"
+    ],
+    "Min_depth": 3,
+    "Height": {
+      "Min_y": 0,
+      "Max_y": -1
+    }
+  },
+  "Minigame_stats": {
+    "Difficulty": 0,
+    "Behavior": "None",
+    "Stamina": 0
+  }
+}

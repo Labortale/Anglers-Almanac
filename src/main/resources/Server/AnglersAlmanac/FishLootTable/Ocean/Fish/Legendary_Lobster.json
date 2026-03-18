@@ -31,7 +31,7 @@
   },
   "Minigame_stats": {
     "Difficulty": 12,
-    "Behavior": "heavy_sinker",
+    "Behavior": "HeavySinker",
     "Stamina": 150
   },
   "Book_info": {

@@ -1,0 +1,29 @@
+{
+  "ItemId": "Ingredient_Ice_Essence",
+  "Category": [
+    "material",
+    "ingredient"
+  ],
+  "Name": "Essence of Ice",
+  "Description": "A stick",
+  "FamilyId": "Essences",
+  "Rarity": "Junk",
+  "IsGlobal": false,
+  "Weight": 75,
+  "Size": 30,
+  "Habitats": {
+    "Zones": [
+      "3"
+    ],
+    "Min_depth": 3,
+    "Height": {
+      "Min_y": 0,
+      "Max_y": -1
+    }
+  },
+  "Minigame_stats": {
+    "Difficulty": 0,
+    "Behavior": "None",
+    "Stamina": 0
+  }
+}

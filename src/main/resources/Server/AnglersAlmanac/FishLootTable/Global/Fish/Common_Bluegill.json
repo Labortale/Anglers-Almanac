@@ -28,7 +28,7 @@
   },
   "Minigame_stats": {
     "Difficulty": 3,
-    "Behavior": "steady",
+    "Behavior": "Steady",
     "Stamina": 20
   },
   "Book_info": {

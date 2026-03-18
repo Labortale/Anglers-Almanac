@@ -1,0 +1,33 @@
+{
+  "ItemId": "Ingredient_Fire_Essence",
+  "Category": [
+    "material",
+    "ingredient"
+  ],
+  "Name": "Essence of Fire",
+  "Description": "A stick",
+  "FamilyId": "Essences",
+  "Rarity": "Junk",
+  "IsGlobal": true,
+  "Weight": 75,
+  "Size": 30,
+  "Habitats": {
+    "Min_depth": 3,
+    "Height": {
+      "Min_y": 0,
+      "Max_y": 55
+    },
+    "Exclude_zones": [
+      "4"
+    ],
+    "Weight_multiplier": 0.75
+  },
+  "Minigame_stats": {
+    "Difficulty": 0,
+    "Behavior": "None",
+    "Stamina": 0
+  },
+  "Quantity": {
+    "Max": 4
+  }
+}

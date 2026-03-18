@@ -1,0 +1,32 @@
+{
+  "ItemId": "Ingredient_Life_Essence",
+  "Category": [
+    "material",
+    "ingredient"
+  ],
+  "Name": "Essence of Life",
+  "Description": "A stick",
+  "FamilyId": "Junk",
+  "Rarity": "Essences",
+  "IsGlobal": false,
+  "Weight": 75,
+  "Size": 30,
+  "Habitats": {
+    "Zones": [
+      "4"
+    ],
+    "Min_depth": 3,
+    "Height": {
+      "Min_y": 0,
+      "Max_y": 55
+    }
+  },
+  "Minigame_stats": {
+    "Difficulty": 0,
+    "Behavior": "None",
+    "Stamina": 0
+  },
+  "Quantity": {
+    "Max": 4
+  }
+}

@@ -17,6 +17,7 @@ import com.hypixel.hytale.codec.validation.Validators;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.Metadata.FishingContext;
 import dev.rm20.anglersalmanac.Registration.HytaleAsset;
+import dev.rm20.anglersalmanac.Utils.Validator.MinigameBehaviour;
 import dev.rm20.anglersalmanac.Utils.Validator.TimePeriod;
 
 import java.util.*;
@@ -93,9 +94,12 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
 
 
     public static final BuilderCodec<MinigameStats> STATS_CODEC = BuilderCodec.builder(MinigameStats.class, MinigameStats::new)
-            .append(new KeyedCodec<>("Difficulty", Codec.INTEGER), (s, v) -> s.difficulty = v, s -> s.difficulty).add()
-            .append(new KeyedCodec<>("Behavior", Codec.STRING), (s, v) -> s.behavior = v, s -> s.behavior).add()
-            .append(new KeyedCodec<>("Stamina", Codec.INTEGER), (s, v) -> s.stamina = v, s -> s.stamina).add()
+            .append(new KeyedCodec<>("Difficulty", Codec.INTEGER), (s, v) -> s.difficulty = v, s -> s.difficulty)
+            .addValidator(Validators.nonNull()).add()
+            .append(new KeyedCodec<>("Behavior", new EnumCodec<>(MinigameBehaviour.class)), (s, v) -> s.behavior = v, s -> s.behavior)
+            .addValidator(Validators.nonNull()).add()
+            .append(new KeyedCodec<>("Stamina", Codec.INTEGER), (s, v) -> s.stamina = v, s -> s.stamina)
+            .addValidator(Validators.nonNull()).add()
             .build();
 
 
@@ -237,9 +241,9 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     }
 
     public static class MinigameStats {
-        public int difficulty;
-        public String behavior = "normal";
-        public int stamina;
+        public int difficulty = 1;
+        public MinigameBehaviour behavior = MinigameBehaviour.NONE;
+        public int stamina = 1;
     }
 
     public static class Quantity {
@@ -428,6 +432,13 @@ public class FishLootManager implements JsonAssetWithMap<String, DefaultAssetMap
     }
 
     public MinigameStats getMinigameStats() {
+        if(minigameStats == null)
+        {
+            MinigameStats stats = new MinigameStats();
+            stats.stamina=0;
+            stats.difficulty=0;
+            stats.behavior=MinigameBehaviour.NONE;
+        }
         return minigameStats;
     }
 

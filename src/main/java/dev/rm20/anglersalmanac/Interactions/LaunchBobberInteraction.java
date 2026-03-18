@@ -60,18 +60,24 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
 
         // Catch for if the rod mode got messed up. (e.g. Disconnecting from server while minigame active).
         // Checks if the metadata is in a state which should not exist.
-        if (meta != null)
-        {
-            // TODO: add check for metadata breaking when player is disconnected during minigame.
-            //AnglersAlmanac.LOGGER.atInfo().log("metadata: %s, %s, %s", meta.getBoundBobber(), meta.getBoundMinigame(), meta.getMode());
-        }
-        if (
-            // Minigame UUID is invalid.
-                (meta != null && meta.getMode() != 0 && (meta.getBoundMinigame() != null && commandBuffer.getExternalData().getRefFromUUID(meta.getBoundMinigame()) == null))
-                        // Bobber UUID is invalid.
-                        | (meta != null && (meta.getBoundBobber() != null && commandBuffer.getExternalData().getRefFromUUID(meta.getBoundBobber()) == null))) {
-            AnglersAlmanac.LOGGER.atInfo().log("Fixing busted metadata");
-            cancelFishing(commandBuffer, player, heldItem);
+        if (meta != null) {
+            boolean shouldReset = false;
+            if (meta.getBoundBobber() != null) {
+                if (commandBuffer.getExternalData().getRefFromUUID(meta.getBoundBobber()) == null) {
+                    shouldReset = true;
+                }
+            }
+            if (!shouldReset && meta.getMode() != 0 && meta.getBoundMinigame() != null) {
+                if (commandBuffer.getExternalData().getRefFromUUID(meta.getBoundMinigame()) == null) {
+                    shouldReset = true;
+                }
+            }
+
+            if (shouldReset) {
+                AnglersAlmanac.LOGGER.atInfo().log("Fixing busted metadata for: "+player.getDisplayName());
+                cancelFishing(commandBuffer, player, heldItem);
+                meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
+            }
         }
 
         /*

@@ -15,7 +15,7 @@ import dev.rm20.anglersalmanac.Registration.EventInfo;
 @EventInfo(PlayerConnectEvent.class)
 public class OnPlayerConnect {
     public static void handle(PlayerConnectEvent event) {
-        AnglersAlmanac.LOGGER.atInfo().log("Player joined");
+        //AnglersAlmanac.LOGGER.atInfo().log("Player joined");
         PlayerRef playerRef1 = event.getPlayerRef();
         AlmanacBook.sendTranslations(playerRef1);
         //event.getPlayer().getInventory().markChanged();

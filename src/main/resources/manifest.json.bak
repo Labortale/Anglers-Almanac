@@ -1,0 +1,23 @@
+{
+    "Group": "dev.rm20",
+    "Name": "AnglersAlmanac",
+    "Version": "0.1.0",
+    "Description": "A fishing mod",
+    "Authors": [
+        {
+            "Name": "RM20",
+            "Email": "rm20killer@gmail.com",
+            "Url": "https://rm20.dev"
+        }
+    ],
+    "Website": "https://rm20killer.github.io/Anglers-Almanac-Doc/",
+    "ServerVersion": "*",
+    "Dependencies": {
+        
+    },
+    "OptionalDependencies": {
+        
+    },
+    "IncludesAssetPack": true,
+    "Main": "dev.rm20.anglersalmanac.AnglersAlmanac"
+}

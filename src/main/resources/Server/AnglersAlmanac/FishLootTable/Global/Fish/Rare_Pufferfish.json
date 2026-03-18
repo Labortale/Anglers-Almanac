@@ -26,7 +26,7 @@
   },
   "Minigame_stats": {
     "Difficulty": 8,
-    "Behavior": "floater",
+    "Behavior": "Floater",
     "Stamina": 35
   },
   "Book_info": {
