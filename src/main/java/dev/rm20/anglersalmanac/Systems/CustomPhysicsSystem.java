@@ -44,7 +44,7 @@ public class CustomPhysicsSystem extends EntityTickingSystem<EntityStore> {
         int fluidId = world.getFluidId((int)position.x, (int)Math.floor(position.y), (int)position.z);
         boolean inWater = (fluidId == 7||fluidId == 8||fluidId == 12);
 //        playedWaterSFX =false;
-        // 2. Apply Forces (Gravity or Buoyancy)
+        // 2. Apply Forces
         if (inWater) {
             if(!bobberComp.InWater())
             {
@@ -68,7 +68,7 @@ public class CustomPhysicsSystem extends EntityTickingSystem<EntityStore> {
             velocity.z *= 0.99;
         }
 
-        // 3. Collision (Runs in BOTH water and air to prevent clipping)
+        // 3. Collision
         Vector3d scaledVel = new Vector3d(velocity).scale(dt);
         CollisionResult result = new CollisionResult();
         Box box = boundingBoxComponent.getBoundingBox();
