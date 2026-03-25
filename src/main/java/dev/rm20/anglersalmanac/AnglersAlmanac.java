@@ -36,7 +36,6 @@ public class AnglersAlmanac extends JavaPlugin {
         instance = this;
         MINIGAME_CONFIG_TENSIONBAR = this.withConfig(MinigameConfig_TensionBar.KEY, MinigameConfig_TensionBar.CODEC);
         MOD_CONFIG = this.withConfig(AnglersAlmanacConfig.KEY, AnglersAlmanacConfig.CODEC);
-        //LOGGER.atInfo().log("Hello from " + this.getName() + " version " + this.getManifest().getVersion().toString());
     }
     public static AnglersAlmanac getInstance() {
         return instance;
@@ -49,24 +48,6 @@ public class AnglersAlmanac extends JavaPlugin {
         RegisterManager.registerCommands(this);
         RegisterManager.registerEvents(this);
         AssetRegisterManager.registerAll(this);
-
-        // Register FishLoot asset.
-//        AssetRegistry.register(HytaleAssetStore.builder(FishLootManager.class, new DefaultAssetMap<String, FishLootManager>())
-//                .setPath("AnglersAlmanac")
-//                .setCodec(FishLootManager.CODEC)
-//                .setKeyFunction(FishLootManager::getId)
-//                .build()
-//        );
-//
-//        // Register MinigameRodStats asset.
-//        AssetRegistry.register(HytaleAssetStore.builder(MinigameRodStats.class, new DefaultAssetMap<String, MinigameRodStats>())
-//                .setPath("AnglersAlmanacRodStats")
-//                .setCodec(MinigameRodStats.CODEC)
-//                .setKeyFunction(MinigameRodStats::getId)
-//                .build()
-//        );
-
-
 
         // Register Components
         ComponentManager.registerComponent(this);
