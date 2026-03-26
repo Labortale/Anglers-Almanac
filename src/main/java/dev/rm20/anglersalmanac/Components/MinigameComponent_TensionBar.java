@@ -154,7 +154,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         List<Ref<EntityStore>> toRemove = new ArrayList<>();
         for (UUID id : gameModels.values()) {
             Ref<EntityStore> ref = world.getEntityRef(id);
-            if (ref != null) toRemove.add(ref);
+            if (ref.isValid()) toRemove.add(ref);
         }
 
         world.execute(() -> {

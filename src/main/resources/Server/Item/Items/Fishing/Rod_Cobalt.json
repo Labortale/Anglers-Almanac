@@ -15,7 +15,7 @@
     "TimeSeconds": 1.0,
     "Input": [
       {
-        "ResourceTypeId": "Wood_Trunk",
+        "ResourceTypeId": "Ingredient_Bar_Cobalt",
         "Quantity": 4
       },
       {
