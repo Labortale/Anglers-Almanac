@@ -32,6 +32,7 @@ import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.Components.BobberComponent;
 import dev.rm20.anglersalmanac.Components.PhysicsComponent;
 import dev.rm20.anglersalmanac.Metadata.FishingRodData;
+import dev.rm20.anglersalmanac.Utils.BaitUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -125,6 +126,11 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         bobberHolder.addComponent(PhysicsComponent.getComponentType(), new PhysicsComponent());
         BobberComponent bobberComp = new BobberComponent();
         bobberComp.setPlayer(player);
+        ItemStack bait = BaitUtils.findBait(player.getReference().getStore(), player.getReference());
+        if (bait != null) {
+            BaitUtils.removeBait(player,bait.getItemId());
+            bobberComp.setBaitName(bait.getItemId());
+        }
         bobberHolder.addComponent(BobberComponent.getComponentType(), bobberComp);
         ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset("Bobber");
         if (modelAsset == null) modelAsset = ModelAsset.DEBUG;
@@ -147,7 +153,6 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         ItemStack heldItem = interactionContext.getHeldItem();
 //        FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
         InventoryComponent.Hotbar inv = player.getReference().getStore().getComponent(player.getReference(), InventoryComponent.Hotbar.getComponentType());
-
         updateMetadata(inv, interactionContext.getHeldItemSlot(), heldItem, bobberId, null, 0);
         //play sound here
         int audio = SoundEvent.getAssetMap().getIndex("AA_Fishing_Reel");
@@ -173,6 +178,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
                     //launchFishAtPlayer(bobberRef,player,commandBuffer,depth);
                 } else {
                     // Didn't hook fish, just stop fishing.
+                    BaitUtils.giveBait(player,bobberComp.getBaitName(),commandBuffer);
                     cancelFishing(commandBuffer, player, heldItem);
                 }
             }
