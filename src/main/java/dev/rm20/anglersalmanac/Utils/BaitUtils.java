@@ -4,6 +4,7 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentAccessor;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.ItemWithAllMetadata;
+import com.hypixel.hytale.protocol.packets.interface_.NotificationStyle;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
@@ -67,7 +68,7 @@ public class BaitUtils {
     {
         TransformComponent transform = player.getReference().getStore().getComponent(player.getReference(), TransformComponent.getComponentType());
         ItemUtils.interactivelyPickupItem(player.getReference(), stack, transform.getPosition(),commandBuffer);
-        SendReturnedBaitNotification(player,stack);
+        // qSendReturnedBaitNotification(player,stack);
     }
 
     public static void removeBait(Player player, String targetItemId) {
@@ -112,7 +113,8 @@ public class BaitUtils {
                     packetHandler,
                     titleMessage,
                     subtitleMessage,
-                    icon);
+                    icon,
+                    NotificationStyle.Success);
         } catch (Exception e) {
             AnglersAlmanac.LOGGER.atWarning().log("Failed to send notification to " + player.getDisplayName() + ": " + e.getMessage());
         }
@@ -133,7 +135,8 @@ public class BaitUtils {
             NotificationUtil.sendNotification(
                     packetHandler,
                     titleMessage,
-                    subtitleMessage
+                    subtitleMessage,
+                    icon
                     );
         } catch (Exception e) {
             AnglersAlmanac.LOGGER.atWarning().log("Failed to send notification to " + player.getDisplayName() + ": " + e.getMessage());
@@ -154,7 +157,8 @@ public class BaitUtils {
             NotificationUtil.sendNotification(
                     packetHandler,
                     titleMessage,
-                    subtitleMessage
+                    subtitleMessage,
+                    NotificationStyle.Danger
                     );
         } catch (Exception e) {
             AnglersAlmanac.LOGGER.atWarning().log("Failed to send notification to " + player.getDisplayName() + ": " + e.getMessage());

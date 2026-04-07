@@ -27,6 +27,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
+import static dev.rm20.anglersalmanac.Utils.BaitUtils.SendBaitNotification;
+
 public class BobberSystem extends EntityTickingSystem<EntityStore> {
     private final Random random = new Random();
     ItemStack fishingRod = null;
@@ -87,6 +89,7 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
                 boolean requiresBait = AnglersAlmanac.MOD_CONFIG.get().getShouldUseBait();
                 String baitName = component.getBaitName();
                 if (requiresBait && (baitName == null || baitName.isEmpty())) {
+                    SendBaitNotification(player);
                     AnglersAlmanac.LOGGER.atInfo().log("No bait on rod");
                     resetWaitTimer(component);
                     return;
