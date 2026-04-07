@@ -155,7 +155,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
         List<Ref<EntityStore>> toRemove = new ArrayList<>();
         for (UUID id : gameModels.values()) {
             Ref<EntityStore> ref = world.getEntityRef(id);
-            if (ref.isValid()) toRemove.add(ref);
+            if (ref != null && ref.isValid()) toRemove.add(ref);
         }
 
         world.execute(() -> {
@@ -627,7 +627,7 @@ public class MinigameComponent_TensionBar  extends Minigame implements Component
     public void applyRodControlModifer(RodStats rodStats) {
         gameConfig.barSpeed *= rodStats.control;
         gameConfig.barGravity *= rodStats.control;
-        gameConfig.barAcceleration *= rodStats.control/4f;
+        gameConfig.barAcceleration *= rodStats.control/2f;
         //AnglersAlmanac.LOGGER.atInfo().log("Applying rod control! barSpeed = %s, barGravity = %s, barAccel = %s", gameConfig.barSpeed, gameConfig.barGravity, gameConfig.barAcceleration);
     }
 
