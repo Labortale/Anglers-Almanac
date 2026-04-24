@@ -18,7 +18,9 @@ jobs:
       - name: Create Release Note File
         run: |
           # Get the tag name (e.g., v1.0.1) and current date
-          TAG_NAME=${{ github.event.release.tag_name }}
+          RAW_TAG=${{ github.event.release.tag_name }}
+          TAG_NAME=${RAW_TAG#v}
+          
           RELEASE_DATE=$(date +%Y-%m-%d)
           BODY="${{ github.event.release.body }}"
           
