@@ -5,6 +5,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.SoundCategory;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -27,6 +28,7 @@ import dev.rm20.anglersalmanac.AlmanacBook.BookPageManager;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.Components.BobberComponent;
 import dev.rm20.anglersalmanac.Components.MinigameComponent_TensionBar;
+import dev.rm20.anglersalmanac.IEvents.LootCaughtEvent;
 import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
 import dev.rm20.anglersalmanac.Metadata.FishingContext;
 import dev.rm20.anglersalmanac.Metadata.FishingModifier;
@@ -278,6 +280,7 @@ public class MinigameManager {
         }
         DropItem(fishStack, player, commandBuffer, bobberRef);
         SaveLoot(player, loot, rating);
+
     }
 
     public static void SaveLoot(Player player, FishLootManager loot, Minigame.PerformanceRating rating) {
@@ -303,6 +306,7 @@ public class MinigameManager {
 
 
             if (playerRef1 == null) return;
+            dispatchCaughtFishEvents(loot,isNewDiscovery,isLegendary,player);
             if (isNewDiscovery) {
                 String fishDisplayName = formatDisplayName(loot.getName());
                 if (isLegendary) {
@@ -328,6 +332,18 @@ public class MinigameManager {
         });
     }
 
+    public static void dispatchCaughtFishEvents(FishLootManager item, boolean isNew, boolean isLegendary, Player player) {
+        var eventBus = HytaleServer.get().getEventBus();
+        LootCaughtEvent mainEvent = new LootCaughtEvent(item, isNew, player);
+        eventBus.dispatchFor(LootCaughtEvent.class).dispatch(mainEvent);
+
+        if (isNew) {
+        }
+
+        if (isLegendary) {
+
+        }
+    }
 
     private static void showDiscoveryUI(PlayerRef ref, String fishName, String header, Color color) {
         Message fishDisplay = Message.raw(fishName).color(color);
