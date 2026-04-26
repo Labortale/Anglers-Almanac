@@ -41,14 +41,22 @@ public class ConfigUI extends InteractiveCustomUIPage<ConfigUI.BindingData> {
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Almanac/Config/AlmanacConfig.ui");
 
-        var config = AnglersAlmanac.MOD_CONFIG;
+        uiCommandBuilder.set("#Title483b3ca6.Text", Message.translation("anglersalmanac.config.label"));
 
+        uiCommandBuilder.set("#TensionBarEnabled.TooltipText", Message.translation("anglersalmanac.config.tensionBar.tooltip"));
+        uiCommandBuilder.set("#BaitRequired.TooltipText", Message.translation("anglersalmanac.config.baitRequired.tooltip"));
+        uiCommandBuilder.set("#XpEnabled.TooltipText", Message.translation("anglersalmanac.config.xpEnabled.tooltip"));
+
+
+
+        var config = AnglersAlmanac.MOD_CONFIG;
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#BaitRequired #CheckBox", EventData.of("@BaitRequired", "#BaitRequired #CheckBox.Value"), false);
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#XpEnabled #CheckBox", EventData.of("@XpEnabled", "#XpEnabled #CheckBox.Value"), false);
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#TensionBarEnabled #CheckBox", EventData.of("@TensionBarEnabled", "#TensionBarEnabled #CheckBox.Value"), false);
 
         uiCommandBuilder.set("#BaitRequired #CheckBox.Value", config.get().getShouldUseBait());
-        uiCommandBuilder.set("#XpEnabled #CheckBox.Value", true);
+        uiCommandBuilder.set("#XpEnabled #CheckBox.Value", false);
+        uiCommandBuilder.set("#XpEnabled #CheckBox.Disabled", true);
         if(config.get().getMinigameToUse().equalsIgnoreCase("TensionBar"))
         {
             uiCommandBuilder.set("#TensionBarEnabled #CheckBox.Value", true);

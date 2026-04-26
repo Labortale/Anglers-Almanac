@@ -35,7 +35,15 @@ public class SimulateFishingCommand extends AbstractPlayerCommand {
 
     @Override
     protected void execute(@Nonnull CommandContext commandContext, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
-        if (!(commandContext.sender() instanceof Player player)) return;
+        if (!(commandContext.sender() instanceof Player player)) {
+            commandContext.sendMessage(Message.translation("anglersalmanac.cmd.error.notPlayer"));
+            return;
+        }
+        if(!((Player) commandContext.sender()).hasPermission("AnglersAlmanac.admin"))
+        {
+            commandContext.sendMessage(Message.translation("anglersalmanac.cmd.error.noPerms"));
+            return;
+        }
         var transform = store.getComponent(ref, TransformComponent.getComponentType());
         double y = (transform != null) ? transform.getPosition().getY() : 0;
 
@@ -72,7 +80,7 @@ public class SimulateFishingCommand extends AbstractPlayerCommand {
         }
 
         logSimulation(locationInfo, results, totalRolls, failures);
-        commandContext.sendMessage(Message.raw("Simulation complete. Check server console for breakdown."));
+        commandContext.sendMessage(Message.translation("anglersalmanac.cmd.sim.done"));
     }
 
 

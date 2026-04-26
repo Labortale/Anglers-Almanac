@@ -25,6 +25,10 @@ public class pageUtils {
         boolean caught = Stats.hasCaught(data.getId());
         String cleanName = data.getItemID().replace("Fish_", "").replace("_Item", "");
 
+        ui.set(slotPath+ "#CountLabel.Text", Message.translation("anglersalmanac.almanac.fish.totalLabel"));
+        //ui.set(slotPath+ "#FamilyLabel.Text", Message.translation("anglersalmanac.almanac.fish.speciesLabel"));
+        //ui.set(slotPath+ "#HabitatTitle.Text", Message.translation("anglersalmanac.almanac.fish.habitatLabel"));
+
         // Image
 
         if (caught) {

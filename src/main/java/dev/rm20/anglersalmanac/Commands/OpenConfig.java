@@ -2,6 +2,7 @@ package dev.rm20.anglersalmanac.Commands;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
@@ -31,16 +32,15 @@ public class OpenConfig extends AbstractPlayerCommand {
     @Override
     protected void execute(@Nonnull CommandContext commandContext, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
         if (!(commandContext.sender() instanceof Player player)) {
-            commandContext.sendMessage(Message.raw("This command can only be run by a player!"));
+            commandContext.sendMessage(Message.translation("anglersalmanac.cmd.error.notPlayer"));
             return;
         }
         if(!((Player) commandContext.sender()).hasPermission("AnglersAlmanac.admin"))
         {
-            commandContext.sendMessage(Message.raw("You do not have permission to run this command"));
+            commandContext.sendMessage(Message.translation("anglersalmanac.cmd.error.noPerms"));
             return;
         }
 
         ((Player) commandContext.sender()).getPageManager().openCustomPage(ref,store,new ConfigUI(playerRef, CustomPageLifetime.CanDismissOrCloseThroughInteraction));
-
     }
 }

@@ -5,8 +5,10 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -62,13 +64,13 @@ public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData
         pageUtils.buildTabs(uiCommandBuilder, uiEventBuilder, 0);
         pageUtils.addDynamicNav(uiCommandBuilder, uiEventBuilder, 0);
 
-        uiCommandBuilder.set("#TotalFish.TextSpans", Message.raw("Total fish: " + stats.totalCatches));
-        uiCommandBuilder.set("#LegendaryCount.TextSpans", Message.raw("Legendary fish: " + stats.legendaryCount));
+        uiCommandBuilder.set("#TotalFish.TextSpans", Message.translation("anglersalmanac.almanac.stats.total").param("count", stats.totalCatches));
+        uiCommandBuilder.set("#LegendaryCount.TextSpans", Message.translation("anglersalmanac.almanac.stats.legendary").param("count", stats.legendaryCount));
         int perfects = stats.getRatingCount(Minigame.PerformanceRating.PERFECT);
-        uiCommandBuilder.set("#PerfectCount.TextSpans", Message.raw("Perfects: " + perfects));
+        uiCommandBuilder.set("#PerfectCount.TextSpans", Message.translation("anglersalmanac.almanac.stats.perfect").param("count", perfects));
         int great = stats.getRatingCount(Minigame.PerformanceRating.GREAT);
-        uiCommandBuilder.set("#GreatCount.TextSpans", Message.raw("Great: " + great));
-        uiCommandBuilder.set("#Header.TextSpans", Message.raw( (this.PlayerName != null ? this.PlayerName : "Unknown")+" Stats:" ));
+        uiCommandBuilder.set("#GreatCount.TextSpans", Message.translation("anglersalmanac.almanac.stats.great").param("count", great));
+        uiCommandBuilder.set("#Header.TextSpans", Message.translation("anglersalmanac.almanac.stats.player").param("name", (this.PlayerName != null ? this.PlayerName : Message.translation("anglersalmanac.almanac.unknown").toString())));
 
         String topFish = "None yet!";
 
@@ -97,9 +99,25 @@ public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData
                 if(loot == null)
                 {
                     uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + entry.getKey() + " : " + entry.getValue()));
-                    continue;
                 }
-                uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.getValue()));
+                else
+                {
+                    uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.getValue()));
+
+                    //todo: FIX this
+//                    ItemStack item = new ItemStack(loot.getItemID());
+//                    if(item.isValid())
+//                    {
+//                        String itemName =  Message.translation(item.getItem().getTranslationKey()).toString();
+//                        uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + itemName + " : " + entry.getValue()));
+//                    }
+//                    else
+//                    {
+//                        uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.getValue()));
+//
+//                    }
+
+                }
             } else {
                 uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- ??? : 0"));
             }
@@ -207,7 +225,9 @@ public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData
             uiCommandBuilder.set(basePath + " #HabitatProgressText.TextSpans", progressBar);
             // Add Tooltip
             uiCommandBuilder.set(basePath + " #HabitatButton.TooltipText",
-                    habitat.caught() + "/" + habitat.total() + " -> Click to view");
+                    Message.translation("anglersalmanac.almanac.stats.habitat_tooltip")
+                            .param("caught", habitat.caught())
+                            .param("total", habitat.total()));
             // Make button work
             uiEventBuilder.addEventBinding(
                     CustomUIEventBindingType.Activating,
