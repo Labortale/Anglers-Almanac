@@ -9,16 +9,18 @@ evaluationDependsOn(':core')
 idea {
     project {
         settings {
-            runConfigurations {
-                'HytaleServer'(org.jetbrains.gradle.ext.Application) {
-                    mainClass = 'com.hypixel.hytale.Main'
-                    // Focus on the core module
-                    moduleName = "${rootProject.name}.core.main"
+            if (project(':core').hasProperty('hytaleHome')) {
+                runConfigurations {
+                    'HytaleServer'(org.jetbrains.gradle.ext.Application) {
+                        mainClass = 'com.hypixel.hytale.Main'
+                        // Focus on the core module
+                        moduleName = "${rootProject.name}.core.main"
 
-                    def coreProj = project(':core')
-                    // Reach into core to get the arguments and directory
-                    programParameters = coreProj.createServerRunArguments(coreProj.sourceSets.main.java.srcDirs.first().parentFile.absolutePath)
-                    workingDirectory = coreProj.serverRunDir.absolutePath
+                        def coreProj = project(':core')
+                        // Reach into core to get the arguments and directory
+                        programParameters = coreProj.createServerRunArguments(coreProj.sourceSets.main.java.srcDirs.first().parentFile.absolutePath)
+                        workingDirectory = coreProj.serverRunDir.absolutePath
+                    }
                 }
             }
         }
