@@ -32,11 +32,17 @@ jobs:
       - name: Run Tests
         run: ./gradlew test
 
-      - name: Upload Artifact
+      - name: Upload Core Mod Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-jar
-          path: build/libs/*.jar
+          name: core-jar
+          path: core/build/libs/*.jar
+
+      - name: Upload API Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-jar
+          path: api/build/libs/*.jar
 
   release:
     needs: build
@@ -45,17 +51,23 @@ jobs:
     outputs:
       release_body: ${{ steps.create_release.outputs.body }}
     steps:
-      - name: Download Artifact
+      - name: Download Core Artifact
         uses: actions/download-artifact@v4
         with:
-          name: plugin-jar
-          path: build/libs
+          name: core-jar
+          path: release-artifacts
+
+      - name: Download API Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: api-jar
+          path: release-artifacts
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/libs/*.jar
+          files: release-artifacts/*.jar
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
