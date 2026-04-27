@@ -2,16 +2,16 @@ package dev.rm20.anglersalmanac.IEvents;
 
 import com.hypixel.hytale.event.IEvent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import dev.rm20.anglersalmanac.Models.FishLootManager;
+import dev.rm20.anglersalmanac.Models.FishLoot;
 
 public class LootCaughtEvent implements IEvent<Void> {
-    private final FishLootManager loot;
+    private final FishLoot loot;
     private final Player player;
     private final boolean newDiscovery;
     private final boolean isLegendary;
     private final float performance;
 
-    public LootCaughtEvent(FishLootManager lootId, boolean newDiscovery, boolean isLegendary, Player player, int performance) {
+    public LootCaughtEvent(FishLoot lootId, boolean newDiscovery, boolean isLegendary, Player player, int performance) {
         this.loot = lootId;
         this.player = player;
         this.newDiscovery = newDiscovery;
@@ -19,7 +19,7 @@ public class LootCaughtEvent implements IEvent<Void> {
         this.performance = performance;
     }
 
-    public FishLootManager getLoot() {
+    public FishLoot getLoot() {
         return loot;
     }
 

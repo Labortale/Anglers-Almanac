@@ -45,9 +45,7 @@ import java.awt.*;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
-import static com.hypixel.hytale.server.core.universe.world.WorldConfig.formatDisplayName;
 import static dev.rm20.anglersalmanac.Metadata.FishingModifier.mergeModifiers;
-import static dev.rm20.anglersalmanac.MinigameManager.Minigame.PerformanceRating.NIL;
 
 public class MinigameManager {
     public static void StartGame(Ref<EntityStore> bobberRef, Player player, CommandBuffer<EntityStore> commandBuffer, int depth) {

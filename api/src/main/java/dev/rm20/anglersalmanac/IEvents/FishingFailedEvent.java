@@ -2,18 +2,18 @@ package dev.rm20.anglersalmanac.IEvents;
 
 import com.hypixel.hytale.event.IEvent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import dev.rm20.anglersalmanac.Models.FishLootManager;
+import dev.rm20.anglersalmanac.Models.FishLoot;
 
 public class FishingFailedEvent implements IEvent<Void> {
-    private final FishLootManager lootMissed;
+    private final FishLoot lootMissed;
     private final Player player;
 
-    public FishingFailedEvent(FishLootManager lootMissed, Player player) {
+    public FishingFailedEvent(FishLoot lootMissed, Player player) {
         this.lootMissed = lootMissed;
         this.player = player;
     }
 
-    public FishLootManager getMissedLoot() {
+    public FishLoot getMissedLoot() {
         return lootMissed;
     }
 
