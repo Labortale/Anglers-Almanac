@@ -15,6 +15,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AlmanacBook.AlmanacDatabase;
+import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.MinigameManager.Minigame;
 import dev.rm20.anglersalmanac.Models.BookAssetData;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
@@ -105,17 +106,23 @@ public class StatUiPage extends InteractiveCustomUIPage<pageUtils.AlmanacGuiData
                     uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.getValue()));
 
                     //todo: FIX this
-//                    ItemStack item = new ItemStack(loot.getItemID());
-//                    if(item.isValid())
-//                    {
-//                        String itemName =  Message.translation(item.getItem().getTranslationKey()).toString();
-//                        uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + itemName + " : " + entry.getValue()));
-//                    }
-//                    else
-//                    {
-//                        uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.getValue()));
-//
-//                    }
+                    ItemStack item = new ItemStack(loot.getItemID());
+                    if(item.isValid())
+                    {
+                        String itemName =  Message.translation(item.getItem().getTranslationKey()).getAnsiMessage();
+                        if(itemName.isEmpty())
+                        {
+                            uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.getValue()));
+                        }
+                        else
+                        {
+                            uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + itemName + " : " + entry.getValue()));
+                        }
+                    }
+                    else
+                    {
+                        uiCommandBuilder.set(labelId + ".TextSpans", Message.raw("- " + loot.getName() + " : " + entry.getValue()));
+                    }
 
                 }
             } else {
