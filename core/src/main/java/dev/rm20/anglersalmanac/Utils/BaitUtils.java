@@ -43,6 +43,11 @@ public class BaitUtils {
     @Nullable
     public static FishBaitData getBaitData(ItemStack stack) {
         String itemId = stack.getItemId();
+        return getBaitData(itemId);
+    }
+
+    @Nullable
+    public static FishBaitData getBaitData(String itemId) {
         return FishBaitData.getAssetStore().getAssetMap().getAssetMap().values().stream()
                 .filter(data -> data.itemId != null && data.itemId.equals(itemId))
                 .findFirst()

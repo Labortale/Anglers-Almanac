@@ -216,7 +216,7 @@ public class FishLootManager extends FishLoot implements JsonAssetWithMap<String
                 if (weight > 0) {
                     if (modifiers != null) {
                         weight *= calculateFinalMultiplier(loot, ctx, modifiers);
-                        AnglersAlmanac.LOGGER.atInfo().log(loot.getId() + ":" + weight);
+                        //AnglersAlmanac.LOGGER.atInfo().log(loot.getId() + ":" + weight);
                     }
 
                     if (weight > 0) {

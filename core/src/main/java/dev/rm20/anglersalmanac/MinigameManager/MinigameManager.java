@@ -47,6 +47,7 @@ import dev.rm20.anglersalmanac.Metadata.ZoneInfo;
 import dev.rm20.anglersalmanac.Models.FishBaitData;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
 import dev.rm20.anglersalmanac.Models.MinigameRodStats;
+import dev.rm20.anglersalmanac.Utils.BaitUtils;
 import dev.rm20.anglersalmanac.Utils.EnvironmentParser;
 import dev.rm20.anglersalmanac.Utils.TimeUtils;
 import it.unimi.dsi.fastutil.Pair;
@@ -150,7 +151,8 @@ public class MinigameManager {
         BobberComponent bobberComp = store.getComponent(bobberRef, BobberComponent.getComponentType());
         FishingModifier.Modifiers baitMods = null;
         if (bobberComp != null && bobberComp.getBaitName() != null) {
-            FishBaitData baitAsset = FishBaitData.getAssetStore().getAssetMap().getAsset(bobberComp.getBaitName());
+            FishBaitData baitAsset = BaitUtils.getBaitData(bobberComp.getBaitName());
+            //AnglersAlmanac.LOGGER.atInfo().log(baitAsset.getId());
             if (baitAsset != null) baitMods = baitAsset.modifiers;
         }
         FishingModifier.Modifiers rodMods = null;
@@ -259,13 +261,13 @@ public class MinigameManager {
             World world = player.getWorld();
             Store<EntityStore> store = world.getEntityStore().getStore();
             Vector3d position = bobberRef.getStore().getComponent(bobberRef, TransformComponent.getComponentType()).getPosition();
-            position.setY(position.getY() + 2);
+            position.setY(position.getY() + 4);
             TransformComponent transform = player.getReference().getStore().getComponent(player.getReference(), TransformComponent.getComponentType());
             Vector3d PlayerPos = transform.getPosition();
             Vector3d direction = PlayerPos.clone().subtract(position).normalize();
-            Vector3f lookat = new Vector3f(Vector3f.lookAt(position, PlayerPos.toVector3f()));
+            Vector3f lookat = new Vector3f(Vector3f.lookAt(PlayerPos));
             world.execute(() -> {
-                Pair<Ref<EntityStore>, INonPlayerCharacter> result = NPCPlugin.get().spawnNPC(store, "Feran_Cub", null, position, lookat);
+                Pair<Ref<EntityStore>, INonPlayerCharacter> result = NPCPlugin.get().spawnNPC(store, loot.getEntityID(), null, position, new Vector3f(0,lookat.y,0));
 
                 if (result != null) {
                     Ref<EntityStore> npcRef = result.first();
@@ -283,16 +285,13 @@ public class MinigameManager {
                         Holder<EntityStore> holder = EntityStore.REGISTRY.newHolder();
                         holder.addComponent(Velocity.getComponentType(), new Velocity(launchVelocity));
                     }
-                    HeadRotation headRotation = npcRef.getStore().getComponent(npcRef, HeadRotation.getComponentType());
-                    if (headRotation != null) {
-                        headRotation.setRotation(Vector3f.ZERO);
-                    }
                 }
             });
 
             SaveLoot(player, loot, rating);
             return;
         }
+        //loot item
         if (loot.getItemID() == null) return;
         ItemStack fishStack;
         fishStack = InventoryHelper.createItem(loot.getItemID());
@@ -343,7 +342,7 @@ public class MinigameManager {
             dispatchCaughtFishEvents(loot, isNewDiscovery, isLegendary, player, ratingScore);
             if (isNewDiscovery) {
                 ItemStack itemStack = new ItemStack(loot.getItemID(),1);
-                String fishDisplayName = Message.translation(itemStack.getItem().getTranslationKey()).toString();
+                String fishDisplayName = Message.translation(itemStack.getItem().getTranslationKey()).getAnsiMessage();
                 if (isLegendary) {
                     showDiscoveryUI(playerRef1, fishDisplayName, Message.translation("fishing.caught.legDiscovered").toString(), Color.YELLOW);
                     int audio = SoundEvent.getAssetMap().getIndex("AA_Fishing_Book_New_Fish_2");

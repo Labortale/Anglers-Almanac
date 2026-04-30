@@ -1,12 +1,3 @@
 {
-  "ItemId": "Tool_Trap_Bait",
-  "Modifiers": {
-    "Items": [
-      {
-        "TargetId": "entity:Fish_Trout_Rainbow_Item",
-        "Multiplier": 1
-      }
-    ],
-    "DefaultMultiplier": 0
-  }
+  "ItemId": "Tool_Trap_Bait"
 }
