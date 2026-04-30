@@ -1,16 +1,15 @@
 package dev.rm20.anglersalmanac.AlmanacBook;
 
 import dev.rm20.anglersalmanac.AnglersAlmanac;
-import dev.rm20.anglersalmanac.MinigameManager.Minigame;
+import dev.rm20.anglersalmanac.Metadata.MinigamePRating;
+import dev.rm20.anglersalmanac.api.IAlmanacProvider;
 
 import java.io.File;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class AlmanacDatabase {
+public class AlmanacDatabase implements IAlmanacProvider {
     private static final String DB_PATH = "mods/dev.rm20_AnglersAlmanac/Data/almanac.db";
     //private HikariDataSource dataSource;
     private Connection connection;
@@ -97,7 +96,7 @@ public class AlmanacDatabase {
 
     }
 
-    public boolean saveCatch(String uuid, String fishId, boolean isLegendary, Minigame.PerformanceRating rating) {
+    public boolean saveCatch(String uuid, String fishId, boolean isLegendary, MinigamePRating.PerformanceRating rating) {
         boolean isFirstTime = false;
 
         try(Connection conn = getConnection())
@@ -212,23 +211,6 @@ public class AlmanacDatabase {
         return data;
     }
 
-    public static class PlayerStatsData {
-        public int totalCatches = 0;
-        public List<FishEntry> topFish = new ArrayList<>();
-        public int legendaryCount = 0;
-        public java.util.HashMap<String, Integer> ratingsMap = new java.util.HashMap<>();
-        public java.util.HashMap<String, Integer> catchMap = new java.util.HashMap<>();
-        public boolean hasCaught(String fishId) {
-            return catchMap.containsKey(fishId);
-        }
-
-        public int getRatingCount(Minigame.PerformanceRating rating) {
-            return ratingsMap.getOrDefault(rating.name(), 0);
-        }
-        public int getFishCount(String fishId) {
-            return catchMap.getOrDefault(fishId, 0);
-        }
-    }
 
     public boolean hasPlayerCaught(String playerUUID, String fishId) {
         String sql = "SELECT 1 FROM catches WHERE player_uuid = ? AND fish_id = ? LIMIT 1";
@@ -312,5 +294,4 @@ public class AlmanacDatabase {
         return counts;
     }
 
-    public record FishEntry(String name, int count) {}
 }

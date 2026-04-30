@@ -40,10 +40,7 @@ import dev.rm20.anglersalmanac.Components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.Components.PhysicsComponent;
 import dev.rm20.anglersalmanac.IEvents.LootCaughtEvent;
 import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
-import dev.rm20.anglersalmanac.Metadata.FishingContext;
-import dev.rm20.anglersalmanac.Metadata.FishingModifier;
-import dev.rm20.anglersalmanac.Metadata.FishingRodData;
-import dev.rm20.anglersalmanac.Metadata.ZoneInfo;
+import dev.rm20.anglersalmanac.Metadata.*;
 import dev.rm20.anglersalmanac.Models.FishBaitData;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
 import dev.rm20.anglersalmanac.Models.MinigameRodStats;
@@ -325,7 +322,7 @@ public class MinigameManager {
         PlayerRef playerRef1 = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
         assert uuid != null;
         boolean isLegendary = loot.getRarity().equalsIgnoreCase("Legendary");
-        Minigame.PerformanceRating rating = Minigame.getPerformanceRating(ratingScore);
+        MinigamePRating.PerformanceRating rating = Minigame.getPerformanceRating(ratingScore);
         CompletableFuture.supplyAsync(() -> {
             return AnglersAlmanac.getInstance().database.saveCatch(uuid.getUuid().toString(), loot.getId(), isLegendary, rating);
         }).thenAccept(isNewDiscovery -> {

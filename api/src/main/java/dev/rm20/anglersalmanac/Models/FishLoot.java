@@ -16,6 +16,7 @@ public class FishLoot {
     protected Habitats habitats;
     protected Quantity quantity;
     protected MinigameStats minigameStats;
+    protected BookInfo bookInfo;
     public FishLoot() {}
 
     // Getters
@@ -52,6 +53,16 @@ public class FishLoot {
     public Habitats getHabitats() {
         return habitats;
     }
+    public BookInfo getBookInfo() {return bookInfo;}
+
+    public static class BookInfo {
+        public String image_file;
+        public String habitat_info;
+        public String PageFileUI;
+    }
+
+
+
 
     public static class Habitats {
         public String[] zones = new String[0];

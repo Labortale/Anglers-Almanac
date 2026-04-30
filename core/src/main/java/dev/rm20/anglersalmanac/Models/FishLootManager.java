@@ -21,6 +21,7 @@ import dev.rm20.anglersalmanac.Registration.HytaleAsset;
 import dev.rm20.anglersalmanac.Utils.Validator.GameIcon;
 import dev.rm20.anglersalmanac.Utils.Validator.MinigameBehaviour;
 import dev.rm20.anglersalmanac.Utils.Validator.TimePeriod;
+import dev.rm20.anglersalmanac.api.ILootProvider;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @HytaleAsset(
         path = "AnglersAlmanac"
 )
-public class FishLootManager extends FishLoot implements JsonAssetWithMap<String, DefaultAssetMap<String, FishLootManager>> {
+public class FishLootManager extends FishLoot implements JsonAssetWithMap<String, DefaultAssetMap<String, FishLootManager>>, ILootProvider {
 
     // Codecs
     public static final BuilderCodec<BookInfo> Book_CODEC = BuilderCodec.builder(BookInfo.class, BookInfo::new)
@@ -152,7 +153,6 @@ public class FishLootManager extends FishLoot implements JsonAssetWithMap<String
     private AssetExtraInfo.Data data;
 
     private int size;
-    private BookInfo bookInfo;
 
     public FishLootManager() {
     }
@@ -163,9 +163,6 @@ public class FishLootManager extends FishLoot implements JsonAssetWithMap<String
     }
 
 
-    public BookInfo getBookInfo() {
-        return bookInfo;
-    }
     // Classes used by BuilderCodec
 
 
@@ -173,13 +170,6 @@ public class FishLootManager extends FishLoot implements JsonAssetWithMap<String
         Map<String, Float> exclude_zones = new HashMap<>();
     }
 
-
-
-    public static class BookInfo {
-        public String image_file;
-        public String habitat_info;
-        public String PageFileUI;
-    }
 
 
     // Reward logic
@@ -201,6 +191,10 @@ public class FishLootManager extends FishLoot implements JsonAssetWithMap<String
         geoLootCache.invalidateAll();
     }
 
+    @Override
+    public FishLoot getRandomFish(FishingContext ctx, @Nullable Object modifiers) {
+        return getRandomWeightedLoot(ctx, (FishingModifier.Modifiers) modifiers);
+    }
 
     public static FishLootManager getRandomWeightedLoot(FishingContext ctx, @Nullable FishingModifier.Modifiers modifiers) {
         GeoKey key = new GeoKey(ctx.biome(), ctx.region(), ctx.zone(), ctx.tier());

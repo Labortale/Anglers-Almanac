@@ -111,7 +111,7 @@ public class BaitUtils {
         ItemWithAllMetadata icon = new ItemStack(stack.getItemId(), 1).toPacket();
         Message titleMessage = Message.join(Message.translation(stack.getItem().getTranslationKey()));
         titleMessage.color(Color.RED);
-        Message subtitleMessage = Message.translation("fishing.bait.used");
+        Message subtitleMessage = Message.translation("anglersalmanac.fishing.bait.used");
         try {
             var packetHandler = playerRef1.getPacketHandler();
             NotificationUtil.sendNotification(
@@ -134,7 +134,7 @@ public class BaitUtils {
         ItemWithAllMetadata icon = new ItemStack(stack.getItemId(), 1).toPacket();
         Message titleMessage = Message.join(Message.translation(stack.getItem().getTranslationKey()));
         titleMessage.color(Color.GREEN);
-        Message subtitleMessage = Message.translation("fishing.bait.retuned");
+        Message subtitleMessage = Message.translation("anglersalmanac.fishing.bait.retuned");
         try {
             var packetHandler = playerRef1.getPacketHandler();
             NotificationUtil.sendNotification(
@@ -154,9 +154,9 @@ public class BaitUtils {
         if(playerRef == null) return;
         PlayerRef playerRef1 = playerRef.getStore().getComponent(playerRef, PlayerRef.getComponentType());
         if(playerRef1 == null) return;
-        Message titleMessage = Message.translation("fishing.bait.no");
+        Message titleMessage = Message.translation("anglersalmanac.fishing.bait.no");
         titleMessage.color(Color.RED);
-        Message subtitleMessage = Message.translation("fishing.bait.used");
+        Message subtitleMessage = Message.translation("anglersalmanac.fishing.bait.used");
         try {
             var packetHandler = playerRef1.getPacketHandler();
             NotificationUtil.sendNotification(
