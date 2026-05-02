@@ -46,6 +46,7 @@ import dev.rm20.anglersalmanac.Models.FishLootManager;
 import dev.rm20.anglersalmanac.Models.MinigameRodStats;
 import dev.rm20.anglersalmanac.Utils.BaitUtils;
 import dev.rm20.anglersalmanac.Utils.EnvironmentParser;
+import dev.rm20.anglersalmanac.Utils.FishingPowerUtils;
 import dev.rm20.anglersalmanac.Utils.TimeUtils;
 import it.unimi.dsi.fastutil.Pair;
 import org.jspecify.annotations.NonNull;
@@ -232,7 +233,7 @@ public class MinigameManager {
         );
         // get fish
 
-        FishLootManager lootEntry = FishLootManager.getRandomWeightedLoot(LocationInfo, masterModifier);
+        FishLootManager lootEntry = FishLootManager.getRandomWeightedLoot(LocationInfo, masterModifier, FishingPowerUtils.getTotalFishingPower(store,player.getReference()));
         if (lootEntry == null) {
             return FishLootManager.getFishData("Stick");
         }

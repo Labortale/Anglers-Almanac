@@ -15,7 +15,8 @@ public class MMOSkillTree {
     private static final String MOD_NAME = "MMOSkillTree";
     private static final String GROUP_NAME = "Ziggfreed";
     private Method getLevelMethod;
-
+    private Method getSkillComponentMethod;
+    private Method getLuckChanceMethod;
     public boolean enabled;
     public MMOSkillTree() {
         try {
@@ -30,7 +31,12 @@ public class MMOSkillTree {
             Object pluginInstance = pluginOptional.get();
             ClassLoader targetLoader = pluginInstance.getClass().getClassLoader();
             Class<?> apiClass = Class.forName("com.ziggfreed.mmoskilltree.api.MMOSkillTreeAPI", true, targetLoader);
+            Class<?> serviceClass = Class.forName("com.ziggfreed.mmoskilltree.service.SkillTreeService", true, targetLoader);
+            Class<?> skillComponentClass = Class.forName("com.ziggfreed.mmoskilltree.data.SkillComponent", true, targetLoader);
+
             this.getLevelMethod = apiClass.getMethod("getLevel", Store.class, Ref.class, String.class);
+            this.getSkillComponentMethod = apiClass.getMethod("getSkillComponent", Store.class, Ref.class);
+            this.getLuckChanceMethod = serviceClass.getMethod("getLuckChanceByName", skillComponentClass, String.class);
             this.enabled = true;
             AnglersAlmanac.LOGGER.atInfo().log("Successfully hooked into MMOSkillTree API.");
 
@@ -51,6 +57,20 @@ public class MMOSkillTree {
         } catch (Exception e) {
             AnglersAlmanac.LOGGER.atSevere().log("Failed to invoke getLevel: " + e.getMessage());
             return 0;
+        }
+    }
+
+    public double getFishingLuck(Store<EntityStore> store, Ref<EntityStore> ref) {
+        if (!enabled || getSkillComponentMethod == null || getLuckChanceMethod == null) return 0.0;
+
+        try {
+            Object skillComponent = getSkillComponentMethod.invoke(null, store, ref);
+            if (skillComponent == null) return 0.0;
+
+            Object luckResult = getLuckChanceMethod.invoke(null, skillComponent, "FISHING");
+            return (luckResult instanceof Double) ? (double) luckResult : 0.0;
+        } catch (Exception e) {
+            return 0.0;
         }
     }
 }
