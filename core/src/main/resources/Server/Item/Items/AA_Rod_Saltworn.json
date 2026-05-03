@@ -29,7 +29,6 @@
   "Model": "Items/Tools/Fishing_Rod/Rod_SaltWorn.blockymodel",
   "Texture": "Items/Tools/Fishing_Rod/AA_Rod_SaltWorn.png",
   "MaxDurability": 100,
-  "PlayerAnimationsId": "Hoe",
   "IconProperties": {
     "Scale": 0.6,
     "Rotation": [
@@ -48,5 +47,7 @@
       "Tool"
     ]
   },
-  "ItemSoundSetId": "ISS_Weapons_Wood"
+  "ItemSoundSetId": "ISS_Weapons_Wood",
+  "UsePlayerAnimations": false,
+  "PlayerAnimationsId": "AA_Rod"
 }
