@@ -88,6 +88,7 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
             FishingRodData meta = (heldItem != null) ? heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC) : null;
             UUIDComponent uuidComp = archetypeChunk.getComponent(i, UUIDComponent.getComponentType());
             UUID bobberUuid = (uuidComp != null) ? uuidComp.getUuid() : null;
+
             boolean isLinked = meta != null && bobberUuid != null && bobberUuid.equals(meta.getBoundBobber());
 
             if (!isLinked) {
@@ -100,7 +101,7 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
                         AnglersAlmanac.LOGGER.atWarning().withCause(e).log("Failed to remove bobber");
                     }
                 } else {
-                    AnglersAlmanac.LOGGER.atInfo().log(player.getDisplayName() + " fishing rod data changed while fishing.");
+                    //AnglersAlmanac.LOGGER.atInfo().log(player.getDisplayName() + " fishing rod data changed while fishing.");
                     LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod, slot);
                 }
                 return;
