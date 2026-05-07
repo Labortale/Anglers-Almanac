@@ -17,7 +17,7 @@ import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.Components.AudioPlayerComponent;
 import dev.rm20.anglersalmanac.Components.BobberComponent;
 import dev.rm20.anglersalmanac.Components.MinigameComponent_TensionBar;
-import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
+import dev.rm20.anglersalmanac.Interactions.Rod.UseRodInteraction;
 //import dev.rm20.anglersalmanac.models.FishingRodData;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
 import dev.rm20.anglersalmanac.Utils.TransformUtils;
@@ -106,13 +106,13 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 FishingFailedEvent mainEvent = new FishingFailedEvent(game.fishHooked,player);
                 eventBus.dispatchFor(FishingFailedEvent.class).dispatch(mainEvent);
                 
-                LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
+                UseRodInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
             case SUCCESS:
                 //AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
                 Minigame.PerformanceRating  rating = game.getPerformanceRating(game.getPerformancePercentage());
                 //AnglersAlmanac.LOGGER.atInfo().log("Minigame performance rating = %s", rating);
-                if(rating == Minigame.PerformanceRating.FAIL) LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
+                if(rating == Minigame.PerformanceRating.FAIL) UseRodInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 // Deal rewards.
 
                 if(game.fishHooked!=null)
@@ -128,7 +128,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 }
 
                 // Finish fishing.
-                LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
+                UseRodInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
         }
 

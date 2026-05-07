@@ -18,7 +18,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.Components.BobberComponent;
-import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
+import dev.rm20.anglersalmanac.Interactions.Rod.UseRodInteraction;
 import dev.rm20.anglersalmanac.Metadata.FishingRodData;
 
 import javax.annotation.Nonnull;
@@ -67,7 +67,7 @@ public class BobberSystem extends EntityTickingSystem<EntityStore> {
                         AnglersAlmanac.LOGGER.atWarning().withCause(e).log("Failed to remove bobber");
                     }
                 } else {
-                    LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod, slot);
+                    UseRodInteraction.cancelFishing(commandBuffer, player, fishingRod, slot);
                 }
                 return;
             }

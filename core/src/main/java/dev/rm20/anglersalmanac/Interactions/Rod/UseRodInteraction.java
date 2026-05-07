@@ -1,4 +1,4 @@
-package dev.rm20.anglersalmanac.Interactions;
+package dev.rm20.anglersalmanac.Interactions.Rod;
 
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -6,14 +6,10 @@ import com.hypixel.hytale.component.*;
 import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
-import com.hypixel.hytale.protocol.AnimationSet;
-import com.hypixel.hytale.protocol.AnimationSlot;
-import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.protocol.SoundCategory;
+import com.hypixel.hytale.protocol.*;
 import com.hypixel.hytale.server.core.asset.type.model.config.Model;
 import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
-import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -41,10 +37,10 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 
-public class LaunchBobberInteraction extends SimpleInstantInteraction {
+public class UseRodInteraction extends SimpleInstantInteraction {
 
-    public static final BuilderCodec<LaunchBobberInteraction> CODEC = BuilderCodec.builder(
-            LaunchBobberInteraction.class, LaunchBobberInteraction::new, SimpleInstantInteraction.CODEC
+    public static final BuilderCodec<UseRodInteraction> CODEC = BuilderCodec.builder(
+            UseRodInteraction.class, UseRodInteraction::new, SimpleInstantInteraction.CODEC
     ).build();
 
     @Override
@@ -59,157 +55,97 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
 
 
-        //AnglersAlmanac.LOGGER.atInfo().log("Testing if can cast / reel interaction");
+        if(!checkSaneMetadata(heldItem, commandBuffer)){
+            AnglersAlmanac.LOGGER.atInfo().log("Fixing busted metadata within UseRodInteraction for: "+player.getDisplayName());
+            cancelFishing(commandBuffer, player, heldItem);
+            context.getState().state = InteractionState.Failed;
+        }
 
+        if(shouldCast(heldItem, commandBuffer)){
+            // CastBobberInteraction set as Next in Interaction asset for the rods.
+            context.getState().state = InteractionState.Finished;
+        }else{
+            // ReelBobberInteraction must be set as Failed interaction in rods Interaction asset.
+            context.getState().state = InteractionState.Failed;
+        }
+
+
+        //AnglersAlmanac.LOGGER.atInfo().log("Doing cast / reel interaction!");
+
+
+
+    }
+
+    public static boolean shouldCast(ItemStack heldItem, @Nonnull ComponentAccessor<EntityStore> accessor) {
+        FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
+
+        if(!checkSaneMetadata(meta, accessor)){
+            return false;
+        }
+        // Choose reel or cast depending on rod state.
+        if (meta != null && meta.getBoundBobber() != null) {
+            if (meta.getMode() == 0) {
+                return false;
+            }
+        }
+
+        return true;
+
+
+    }
+
+
+    public static boolean checkSaneMetadata(ItemStack heldItem, @Nonnull ComponentAccessor<EntityStore> accessor) {
         // Catch for if the rod mode got messed up. (e.g. Disconnecting from server while minigame active).
         // Checks if the metadata is in a state which should not exist.
+        FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
         if (meta != null) {
             boolean shouldReset = false;
             if (meta.getBoundBobber() != null) {
-                if (commandBuffer.getExternalData().getRefFromUUID(meta.getBoundBobber()) == null) {
+                if (accessor.getExternalData().getRefFromUUID(meta.getBoundBobber()) == null) {
                     shouldReset = true;
                 }
             }
             if (!shouldReset && meta.getMode() != 0 && meta.getBoundMinigame() != null) {
-                if (commandBuffer.getExternalData().getRefFromUUID(meta.getBoundMinigame()) == null) {
+                if (accessor.getExternalData().getRefFromUUID(meta.getBoundMinigame()) == null) {
                     shouldReset = true;
                 }
             }
 
             if (shouldReset) {
-                AnglersAlmanac.LOGGER.atInfo().log("Fixing busted metadata for: "+player.getDisplayName());
-                cancelFishing(commandBuffer, player, heldItem);
                 meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
+                return false; // Something has broken.
             }
+            return true; // All seems okay.
         }
-
-        /*
-        // Check rod mode, moving to minigame interaction if in minigame mode.
-        if(meta != null && meta.getMode() != 0){
-            context.getState().state = InteractionState.Finished;
-            return;
-        }
-
-         */
-
-        //AnglersAlmanac.LOGGER.atInfo().log("Doing cast / reel interaction!");
-
-        // Choose reel or cast depending on rod state.
-        if (meta != null && meta.getBoundBobber() != null) {
-            if (meta.getMode() == 0) {
-                reelIn(commandBuffer, player, heldItem, meta.getBoundBobber(), meta, playerRef);
-            }
-        } else {
-            castOut(interactionType, context, player);
-        }
+        return false; // No metadata found.
     }
 
-    private void castOut(@Nonnull InteractionType interactionType, @Nonnull InteractionContext interactionContext, Player player) {
-        //AnglersAlmanac.LOGGER.atInfo().log("Casting out");
-        CommandBuffer<EntityStore> commandBuffer = interactionContext.getCommandBuffer();
-        Ref<EntityStore> playerRef = interactionContext.getOwningEntity();
-        TransformComponent transform = playerRef.getStore().getComponent(playerRef, TransformComponent.getComponentType());
-        Transform lookTransform = TargetUtil.getLook(playerRef, commandBuffer);
-        Vector3d spawnPos = transform.getPosition().clone();
-        spawnPos.add(0, 1.5, 0);
-        Vector3d lookDir = lookTransform.getDirection();
-        Vector3d launchVelocity = new Vector3d(lookDir.x * 15, (lookDir.y * 15) + 2, lookDir.z * 15);
-        Holder<EntityStore> bobberHolder = EntityStore.REGISTRY.newHolder();
-        Vector3f rotation = new Vector3f();
-        HeadRotation playerHead = commandBuffer.getComponent(playerRef, HeadRotation.getComponentType());
-        if (playerHead != null) {
-            rotation.setYaw(playerHead.getRotation().getYaw() + (float) (Math.PI / 180.0) * 180.0F);
-        }
-
-        bobberHolder.addComponent(HeadRotation.getComponentType(), new HeadRotation(rotation));
-        bobberHolder.addComponent(TransformComponent.getComponentType(), new TransformComponent(spawnPos, rotation));
-        bobberHolder.addComponent(Velocity.getComponentType(), new Velocity(launchVelocity));
-        bobberHolder.ensureComponent(PhysicsValues.getComponentType());
-        bobberHolder.addComponent(PhysicsComponent.getComponentType(), new PhysicsComponent());
-        BobberComponent bobberComp = new BobberComponent();
-        bobberComp.setPlayer(player);
-        ItemStack bait = BaitUtils.findBait(player.getReference().getStore(), player.getReference());
-
-        if (bait != null) {
-            BaitUtils.removeBait(player,bait.getItemId());
-            bobberComp.setBaitName(bait.getItemId());
-        }
-        else
-        {
-            BaitUtils.SendBaitNotification(player);
-        }
-        bobberHolder.addComponent(BobberComponent.getComponentType(), bobberComp);
-        ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset("Bobber");
-        if (modelAsset == null) modelAsset = ModelAsset.DEBUG;
-
-        Model model = Model.createScaledModel(modelAsset, 2f);
-        bobberHolder.addComponent(PersistentModel.getComponentType(), new PersistentModel(model.toReference()));
-        bobberHolder.addComponent(ModelComponent.getComponentType(), new ModelComponent(model));
-        if (model.getBoundingBox() != null) {
-            bobberHolder.addComponent(BoundingBox.getComponentType(), new BoundingBox(model.getBoundingBox()));
-        }
-        bobberHolder.putComponent(NetworkId.getComponentType(), new NetworkId(playerRef.getStore().getExternalData().takeNextNetworkId()));
-
-        UUID bobberId = UUID.randomUUID();
-        bobberHolder.addComponent(UUIDComponent.getComponentType(), new UUIDComponent(bobberId));
-
-        commandBuffer.getExternalData().getWorld().execute(() -> {
-            commandBuffer.addEntity(bobberHolder, AddReason.SPAWN);
-        });
-
-        ItemStack heldItem = interactionContext.getHeldItem();
-//        FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
-        InventoryComponent.Hotbar inv = player.getReference().getStore().getComponent(player.getReference(), InventoryComponent.Hotbar.getComponentType());
-        updateMetadata(inv, interactionContext.getHeldItemSlot(), heldItem, bobberId, null, 0);
-        //play sound here
-        int audio = SoundEvent.getAssetMap().getIndex("AA_Fishing_Reel");
-        SoundUtil.playSoundEvent3d(audio, SoundCategory.SFX, transform.getPosition(), playerRef.getStore());
-
-        // Trigger cast animation
-        //AnimationAction attackAnim = new AnimationAction("attack");
-        //AnimationUtils.playAnimation(player.getReference(), AnimationSlot.Action, "AA_Rod", "AA_Rod_Cast", true, interactionContext.getCommandBuffer().getStore());
-        //attackAnim.execute(ref, role, sensorInfo, dt, store);
-
-        //AnglersAlmanac.LOGGER.atInfo().log("Rod metadata %s, %s", heldItem.getFromMetadataOrNull(FishingRodData.KEYED_CODEC), heldItem.getFromMetadataOrNull(ItemModeData.KEYED_CODEC));
-    }
-
-
-    private void reelIn(CommandBuffer<EntityStore> commandBuffer, Player player, ItemStack heldItem, UUID bobberId, FishingRodData fishingRodData, Ref<EntityStore> playerRef) {
-        //AnglersAlmanac.LOGGER.atInfo().log("Reeling in");
-        //play sound here
-
-        World world = commandBuffer.getExternalData().getWorld();
-        Ref<EntityStore> bobberRef = world.getEntityStore().getRefFromUUID(bobberId);
-        if (bobberRef != null) {
-            BobberComponent bobberComp = bobberRef.getStore().getComponent(bobberRef, BobberComponent.getComponentType());
-            if (bobberComp != null) {
-                if (bobberComp.isCanCatch()) {
-                    //HytaleLogger.getLogger().atInfo().log("Fished a fish");
-                    int depth = bobberComp.getWaterDepth();
-
-                    MinigameManager.StartGame(bobberRef, player, commandBuffer, depth);
-                    //launchFishAtPlayer(bobberRef,player,commandBuffer,depth);
-                } else {
-                    // Didn't hook fish, just stop fishing.
-                    BaitUtils.giveBait(player,bobberComp.getBaitName(),commandBuffer);
-                    cancelFishing(commandBuffer, player, heldItem);
+    public static boolean checkSaneMetadata(FishingRodData meta, @Nonnull ComponentAccessor<EntityStore> accessor) {
+        // Catch for if the rod mode got messed up. (e.g. Disconnecting from server while minigame active).
+        // Checks if the metadata is in a state which should not exist.
+        if (meta != null) {
+            boolean shouldReset = false;
+            if (meta.getBoundBobber() != null) {
+                if (accessor.getExternalData().getRefFromUUID(meta.getBoundBobber()) == null) {
+                    shouldReset = true;
                 }
             }
-            else
-            {
-                AnglersAlmanac.LOGGER.atWarning().log("Failed to reel in" + bobberId);
-                AnglersAlmanac.LOGGER.atInfo().log("Fixing busted metadata");
-                cancelFishing(commandBuffer, player, heldItem);
+            if (!shouldReset && meta.getMode() != 0 && meta.getBoundMinigame() != null) {
+                if (accessor.getExternalData().getRefFromUUID(meta.getBoundMinigame()) == null) {
+                    shouldReset = true;
+                }
             }
 
-        } else {
-            AnglersAlmanac.LOGGER.atWarning().log("Failed to reel in" + bobberId);
-            AnglersAlmanac.LOGGER.atInfo().log("Fixing busted metadata");
-            cancelFishing(commandBuffer, player, heldItem);
+            if (shouldReset) {
+                return false; // Something has broken.
+            }
+            return true; // All seems okay.
         }
-
-
+        return false; // No metadata found.
     }
+
+
 
     public static void cancelFishing(CommandBuffer<EntityStore> commandBuffer, Player player, ItemStack heldItem) {
         //AnglersAlmanac.LOGGER.atInfo().log("Cancelling fishing.");
@@ -250,6 +186,7 @@ public class LaunchBobberInteraction extends SimpleInstantInteraction {
         }
 
         updateMetadata(inv, inv.getActiveSlot(), heldItem, null, null, 0);
+
 
     }
 
