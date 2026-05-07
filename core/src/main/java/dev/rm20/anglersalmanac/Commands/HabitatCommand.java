@@ -77,7 +77,9 @@ public class HabitatCommand extends AbstractPlayerCommand {
                     biome,
                     y,
                     "clear", // Hardcoded for test
-                    0
+                    0,
+                    null,
+                    1
             );
 
             // 5. Output
@@ -92,6 +94,6 @@ public class HabitatCommand extends AbstractPlayerCommand {
     }
 
     private void logToConsole(FishingContext ctx) {
-        AnglersAlmanac.LOGGER.atInfo().log();
+        //AnglersAlmanac.LOGGER.atInfo().log();
     }
 }

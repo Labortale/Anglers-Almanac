@@ -1,21 +1,18 @@
 package dev.rm20.anglersalmanac.AlmanacBook;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
-import dev.rm20.anglersalmanac.MinigameManager.Minigame;
+import dev.rm20.anglersalmanac.Metadata.MinigamePRating;
+import dev.rm20.anglersalmanac.api.IAlmanacProvider;
 
 import java.io.File;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class AlmanacDatabase {
+public class AlmanacDatabase implements IAlmanacProvider {
     private static final String DB_PATH = "mods/dev.rm20_AnglersAlmanac/Data/almanac.db";
-    private HikariDataSource dataSource;
-    //private Connection connection;
+    //private HikariDataSource dataSource;
+    private Connection connection;
 
     public AlmanacDatabase() {
         init();
@@ -35,43 +32,46 @@ public class AlmanacDatabase {
                     AnglersAlmanac.LOGGER.atInfo().log("Created database directory: " + parentDir.getPath());
                 }
             }
-            HikariConfig config = getHikariConfig();
-            dataSource = new HikariDataSource(config);
+
+            Class.forName("org.sqlite.JDBC");
+            String url = "jdbc:sqlite:" + DB_PATH;
+            connection = DriverManager.getConnection(url);
+
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute("PRAGMA journal_mode=WAL;");
+                stmt.execute("PRAGMA synchronous=NORMAL;");
+            }
+
             createTables();
         } catch (SQLException e) {
             AnglersAlmanac.LOGGER.atSevere().withCause(e).log("Failed to make folder for almanac.db");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("SQLite Driver not found in classpath!", e);
         }
     }
 
-    private static HikariConfig getHikariConfig() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:sqlite:" + DB_PATH);
-        config.setPoolName("AlmanacPool");
-        config.setMaximumPoolSize(1);
-        config.setMinimumIdle(1);
-        config.setIdleTimeout(30000);
-        config.setMaxLifetime(1800000);
-        config.setConnectionTimeout(5000);
 
-        // Performance properties for SQLite
-        config.addDataSourceProperty("journal_mode", "WAL");
-        config.addDataSourceProperty("synchronous", "NORMAL");
-        return config;
-    }
 
     private Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+        }
+        return connection;
     }
 
     public void close() {
-        if (dataSource != null && !dataSource.isClosed()) {
-            dataSource.close();
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     private void createTables() throws SQLException {
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
+        Connection conn = getConnection();
+        try (Statement stmt = conn.createStatement()){
             // Player's overall stats
             stmt.execute("CREATE TABLE IF NOT EXISTS players (" +
                     "uuid TEXT PRIMARY KEY, " +
@@ -96,11 +96,11 @@ public class AlmanacDatabase {
 
     }
 
-    public boolean saveCatch(String uuid, String fishId, boolean isLegendary, Minigame.PerformanceRating rating) {
+    public boolean saveCatch(String uuid, String fishId, boolean isLegendary, MinigamePRating.PerformanceRating rating) {
         boolean isFirstTime = false;
 
-        try(Connection conn = getConnection())
-        {
+        try {
+            Connection conn = getConnection();
             conn.setAutoCommit(false);
             try (var psCheck = conn.prepareStatement("SELECT 1 FROM catches WHERE player_uuid = ? AND fish_id = ?")) {
                 psCheck.setString(1, uuid);
@@ -112,7 +112,7 @@ public class AlmanacDatabase {
 
             int legValue = isLegendary ? 1 : 0;
             String playerSql = "INSERT INTO players(uuid, total_catches, legendary_catches) VALUES(?, 1, ?) " +
-                    "ON CONFLICT(uuid) DO UPDATE SET total_catches = total_catches + 1, legendary_catches = legendary_catches + ?";
+                    "ON CONFLICT (uuid) DO UPDATE SET total_catches = total_catches + 1, legendary_catches = legendary_catches + ?";
 
             try (var psPlayer = conn.prepareStatement(playerSql)) {
                 psPlayer.setString(1, uuid);
@@ -122,7 +122,7 @@ public class AlmanacDatabase {
             }
 
             String fishCountSQL = "INSERT INTO catches(player_uuid, fish_id, count) VALUES(?, ?, 1) " +
-                    "ON CONFLICT(player_uuid, fish_id) DO UPDATE SET count = count + 1";
+                    "ON CONFLICT (player_uuid, fish_id) DO UPDATE SET count = count + 1";
 
             try (var psFish = conn.prepareStatement(fishCountSQL)){
                 psFish.setString(1, uuid);
@@ -131,7 +131,7 @@ public class AlmanacDatabase {
             }
 
             String performanceSQL = "INSERT INTO performance_stats(player_uuid, rating, count) VALUES(?, ?, 1) " +
-                    "ON CONFLICT(player_uuid, rating) DO UPDATE SET count = count + 1";
+                    "ON CONFLICT (player_uuid, rating) DO UPDATE SET count = count + 1";
             try (var psRating = conn.prepareStatement(performanceSQL)){
                 psRating.setString(1, uuid);
                 psRating.setString(2, rating.name());
@@ -159,8 +159,8 @@ public class AlmanacDatabase {
         String sqlRatings = "SELECT rating, count FROM performance_stats WHERE player_uuid = ?";
         String sqlAllFish = "SELECT fish_id, count FROM catches WHERE player_uuid = ?";
 
-        try (Connection conn = dataSource.getConnection()) {
-
+        try {
+            Connection conn = getConnection();
             // 1. Get totals
             try (PreparedStatement ps = conn.prepareStatement(sqlTotal)) {
                 ps.setString(1, uuid);
@@ -211,29 +211,14 @@ public class AlmanacDatabase {
         return data;
     }
 
-    public static class PlayerStatsData {
-        public int totalCatches = 0;
-        public List<FishEntry> topFish = new ArrayList<>();
-        public int legendaryCount = 0;
-        public java.util.HashMap<String, Integer> ratingsMap = new java.util.HashMap<>();
-        public java.util.HashMap<String, Integer> catchMap = new java.util.HashMap<>();
-        public boolean hasCaught(String fishId) {
-            return catchMap.containsKey(fishId);
-        }
-
-        public int getRatingCount(Minigame.PerformanceRating rating) {
-            return ratingsMap.getOrDefault(rating.name(), 0);
-        }
-        public int getFishCount(String fishId) {
-            return catchMap.getOrDefault(fishId, 0);
-        }
-    }
 
     public boolean hasPlayerCaught(String playerUUID, String fishId) {
         String sql = "SELECT 1 FROM catches WHERE player_uuid = ? AND fish_id = ? LIMIT 1";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try
+        {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
 
             ps.setString(1, playerUUID);
             ps.setString(2, fishId);
@@ -241,7 +226,8 @@ public class AlmanacDatabase {
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             AnglersAlmanac.LOGGER.atSevere()
                     .withCause(e)
                     .log("Failed to check catch status for player: " + playerUUID);
@@ -250,10 +236,11 @@ public class AlmanacDatabase {
     }
 
     public void addFishEntry(String uuid, String fishId) {
-        String sql = "INSERT OR IGNORE INTO catches(player_uuid, fish_id, count) VALUES(?, ?, 0)";
+        String sql = "ON CONFLICT DO NOTHING INTO catches(player_uuid, fish_id, count) VALUES(?, ?, 0)";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
 
             ps.setString(1, uuid);
             ps.setString(2, fishId);
@@ -271,9 +258,9 @@ public class AlmanacDatabase {
                 ? "DELETE FROM catches WHERE player_uuid = ?"
                 : "DELETE FROM catches WHERE player_uuid = ? AND fish_id = ?";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
+        try  {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, uuid);
             if (!fishId.equals("*")) {
                 ps.setString(2, fishId);
@@ -292,9 +279,9 @@ public class AlmanacDatabase {
         Map<String, Integer> counts = new HashMap<>();
         String sql = "SELECT fish_id, count FROM catches WHERE player_uuid = ?";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, playerUUID);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -311,5 +298,4 @@ public class AlmanacDatabase {
         return counts;
     }
 
-    public record FishEntry(String name, int count) {}
 }
