@@ -19,7 +19,7 @@ import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.Components.AudioPlayerComponent;
 import dev.rm20.anglersalmanac.Components.BobberComponent;
 import dev.rm20.anglersalmanac.Components.MinigameComponent_TensionBar;
-import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
+import dev.rm20.anglersalmanac.Interactions.Rod.UseRodInteraction;
 //import dev.rm20.anglersalmanac.models.FishingRodData;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
 import dev.rm20.anglersalmanac.Utils.TransformUtils;
@@ -130,8 +130,8 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 var eventBus = HytaleServer.get().getEventBus();
                 FishingFailedEvent mainEvent = new FishingFailedEvent(game.fishHooked,player);
                 eventBus.dispatchFor(FishingFailedEvent.class).dispatch(mainEvent);
-                
-                LaunchBobberInteraction.cancelFishing(commandBuffer, player, game.fishingRod);
+
+                UseRodInteraction.cancelFishing(commandBuffer, player, game.fishingRod);
                 break;
             case SUCCESS:
                 if(game.DroppedItem)
@@ -142,7 +142,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 //AnglersAlmanac.LOGGER.atInfo().log("YOU WIN");
                 MinigamePRating.PerformanceRating  rating = Minigame.getPerformanceRating(game.getPerformancePercentage());
                 //AnglersAlmanac.LOGGER.atInfo().log("Minigame performance rating = %s", rating);
-                if(rating == MinigamePRating.PerformanceRating.FAIL) LaunchBobberInteraction.cancelFishing(commandBuffer, player, game.fishingRod);
+                if(rating == MinigamePRating.PerformanceRating.FAIL) UseRodInteraction.cancelFishing(commandBuffer, player, game.fishingRod);
                 // Deal rewards.
                 game.stateTrigger = MinigameComponent_TensionBar.Trigger.DONE;
                 if(game.fishHooked!=null)
@@ -158,7 +158,7 @@ public class MinigameSystem_TensionBar extends EntityTickingSystem<EntityStore> 
                 }
                 game.DroppedItem = true;
                 // Finish fishing.
-                LaunchBobberInteraction.cancelFishing(commandBuffer, player, game.fishingRod,game.Slot);
+                UseRodInteraction.cancelFishing(commandBuffer, player, game.fishingRod,game.Slot);
                 return;
         }
 

@@ -39,7 +39,7 @@ import dev.rm20.anglersalmanac.Components.BobberComponent;
 import dev.rm20.anglersalmanac.Components.MinigameComponent_TensionBar;
 import dev.rm20.anglersalmanac.Components.PhysicsComponent;
 import dev.rm20.anglersalmanac.IEvents.LootCaughtEvent;
-import dev.rm20.anglersalmanac.Interactions.LaunchBobberInteraction;
+import dev.rm20.anglersalmanac.Interactions.Rod.UseRodInteraction;
 import dev.rm20.anglersalmanac.Metadata.*;
 import dev.rm20.anglersalmanac.Models.FishBaitData;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
@@ -76,19 +76,19 @@ public class MinigameManager {
             case "TensionBar":
                 FishingRodData meta = fishingRod.getFromMetadataOrNull(FishingRodData.KEYED_CODEC);
                 if (meta == null) {
-                    LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
+                    UseRodInteraction.cancelFishing(commandBuffer, player, fishingRod);
                     break;
                 }
                 MinigameComponent_TensionBar minigame = MinigameComponent_TensionBar.spawnMinigame(commandBuffer, player.getReference(), bobberRef, fishingRod.getItemId());
-                LaunchBobberInteraction.updateMetadata(hotbarComp, hotbarComp.getActiveSlot(), hotbarComp.getActiveItem(), meta.getBoundBobber(), minigame.selfUUID, 1);
+                UseRodInteraction.updateMetadata(hotbarComp, hotbarComp.getActiveSlot(), hotbarComp.getActiveItem(), meta.getBoundBobber(), minigame.selfUUID, 1);
                 break;
             case "NoMinigame":
                 DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef, -1);
-                LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
+                UseRodInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
             default: // No Minigame, just reel fish.
                 DropLoot(FirstRoll(bobberRef, player, commandBuffer, depth), player, commandBuffer, bobberRef, -1);
-                LaunchBobberInteraction.cancelFishing(commandBuffer, player, fishingRod);
+                UseRodInteraction.cancelFishing(commandBuffer, player, fishingRod);
                 break;
         }
 
