@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.BoundingBox;
 import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
@@ -26,11 +27,12 @@ import dev.rm20.anglersalmanac.AnglersAlmanac;
 import dev.rm20.anglersalmanac.Config.MinigameConfig_TensionBar;
 import dev.rm20.anglersalmanac.Metadata.RodStats;
 import dev.rm20.anglersalmanac.MinigameManager.Minigame;
-import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.Models.FishLootManager;
 import dev.rm20.anglersalmanac.Models.MinigameRodStats;
+import dev.rm20.anglersalmanac.Utils.CatchUtils;
 import dev.rm20.anglersalmanac.Utils.TransformUtils;
 import org.joml.Vector3i;
+import dev.rm20.anglersalmanac.Utils.Validator.GameIcon;
 import org.jspecify.annotations.NonNull;
 
 import javax.annotation.Nullable;
@@ -60,7 +62,7 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
     public Ref<EntityStore> bobberRef;
     public UUID selfUUID;
 
-    public enum Trigger {NOTRIGGER, FISHMOVE, SUCCESS, FAIL}
+    public enum Trigger {NOTRIGGER, FISHMOVE, SUCCESS, FAIL, DONE}
 
     public Trigger stateTrigger = Trigger.NOTRIGGER;
     public UUID minigameFishModelId;
@@ -81,6 +83,9 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
     public int ticksReeling = 0;
     public int ticksEscaping = 0;
 
+    public ItemStack fishingRod = null;
+    public Byte Slot = null;
+    public Boolean DroppedItem = false;
 
     public MinigameComponent_TensionBar(Ref<EntityStore> ownerPlayerRef, Ref<EntityStore> bobberRef, UUID selfUUID) {
         this.ownerRef = ownerPlayerRef;
@@ -122,7 +127,7 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
         // Set minigame config as defaults.
         game.gameConfig = AnglersAlmanac.MINIGAME_CONFIG_TENSIONBAR.get().clone();
         // Assign fish and apply modifiers.
-        game.fishHooked = MinigameManager.FirstRoll(bobberRef, commandBuffer.getComponent(playerRef, Player.getComponentType()), commandBuffer, commandBuffer.getComponent(bobberRef, BobberComponent.getComponentType()).getWaterDepth());
+        game.fishHooked = CatchUtils.FirstRoll(bobberRef, commandBuffer.getComponent(playerRef, Player.getComponentType()), commandBuffer, commandBuffer.getComponent(bobberRef, BobberComponent.getComponentType()).getWaterDepth());
         assert game.fishHooked != null;
         //AnglersAlmanac.LOGGER.atInfo().log("Loading modifiers for fish: %s", game.fishHooked.getName());
         game.applyFishModifiers(game.fishHooked.getMinigameStats());
@@ -145,8 +150,19 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
         commandBuffer.getExternalData().getWorld().execute(() -> {
             commandBuffer.addEntity(holder, AddReason.SPAWN);
         });
-
-        game.spawnMinigameAdditionals(commandBuffer, new Vector3d(spawnPos));
+        String fishIcon = "SSF_FishIcon";
+        if(game.fishHooked.getMinigameStats() !=null)
+        {
+            if(game.fishHooked.getMinigameStats().gameIcon != null)
+            {
+                fishIcon = GameIcon.getModelId(game.fishHooked.getMinigameStats().gameIcon);
+            }
+        }
+        else
+        {
+            AnglersAlmanac.LOGGER.atWarning().log("Missing fish icon on" + game.fishHooked.getId());
+        }
+        game.spawnMinigameAdditionals(commandBuffer, new Vector3d(spawnPos), fishIcon);
 
         return game;
     }
@@ -211,7 +227,7 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
         }
     }
 
-    public void spawnMinigameAdditionals(CommandBuffer<EntityStore> commandBuffer, Vector3d gamePos) {
+    public void spawnMinigameAdditionals(CommandBuffer<EntityStore> commandBuffer, Vector3d gamePos, String fishIcon) {
 
         Vector3d bobberPos = new Vector3d(commandBuffer.getComponent(bobberRef, TransformComponent.getComponentType()).getPosition());
 
@@ -241,7 +257,7 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
         TransformUtils.applyBillboard(commandBuffer.getExternalData().getRefFromUUID(gameModels.get("fish")), ownerRef, new Vector3f(90, 0, 0), commandBuffer);
 
         // Add model.
-        ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset("SSF_FishIcon");
+        ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset(fishIcon);
         if (modelAsset == null) modelAsset = ModelAsset.DEBUG;
         Model model = Model.createScaledModel(modelAsset, 0.5f * minigameScale);
         fishModelEntity.addComponent(PersistentModel.getComponentType(), new PersistentModel(model.toReference()));
@@ -654,6 +670,7 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
     @Override
     public void applyRodForgivenessModifer(RodStats rodStats) {
         //AnglersAlmanac.LOGGER.atInfo().log("Applying rod forgiveness");
+        gameConfig.fishReelRate *= rodStats.forgiveness / 5f;
     }
 
     @Override

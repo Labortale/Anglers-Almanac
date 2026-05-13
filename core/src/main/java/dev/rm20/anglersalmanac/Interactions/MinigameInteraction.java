@@ -3,6 +3,7 @@ package dev.rm20.anglersalmanac.Interactions;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.protocol.Animation;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -14,6 +15,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Sim
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.rm20.anglersalmanac.AnglersAlmanac;
+import dev.rm20.anglersalmanac.Interactions.Rod.UseRodInteraction;
 import dev.rm20.anglersalmanac.MinigameManager.MinigameManager;
 import dev.rm20.anglersalmanac.Metadata.FishingRodData;
 import org.jspecify.annotations.NonNull;
@@ -29,7 +31,6 @@ public class MinigameInteraction extends SimpleInstantInteraction {
         Ref<EntityStore> playerRef = context.getOwningEntity();
         ItemStack heldItem = context.getHeldItem();
         if (commandBuffer == null || playerRef == null || heldItem == null) return;
-
         // Cancel interaction if the rod is not in minigame mode.
         FishingRodData meta = heldItem.getFromMetadataOrNull(FishingRodData.KEY, FishingRodData.CODEC);
         if(meta == null){

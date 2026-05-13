@@ -1,7 +1,7 @@
 {
   "TranslationProperties": {
-    "Name": "Cobalt Fishing Rod",
-    "Description": "Use to catch fish in any water."
+    "Name": "fishingrods.cobalt.name",
+    "Description": "fishingrods.cobalt.description"
   },
   "Categories": [
     "Items.Tools"
@@ -14,8 +14,13 @@
   "Interactions": {
     "Secondary": {
       "Interactions": [
-        "LaunchBobberInteraction"
-      ]
+        "UseRodInteraction"
+      ],
+      "RequireNewClick": true,
+      "Cooldown": {
+        "Id": "UseRod",
+        "Cooldown": 1
+      }
     },
     "Primary": {
       "Interactions": [

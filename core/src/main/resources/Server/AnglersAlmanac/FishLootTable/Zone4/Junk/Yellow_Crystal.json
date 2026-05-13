@@ -1,5 +1,5 @@
 {
-  "ItemId": "Rock_Crystal_Yello_Small",
+  "ItemId": "Rock_Crystal_Yellow_Small",
   "Habitats": {
     "Zones": [
       "4",
@@ -17,6 +17,11 @@
   "Quantity": {
     "Max": 2,
     "Min": 1
+  },
+  "Minigame_stats": {
+    "Difficulty": 0,
+    "Behavior": "None",
+    "Stamina": 0
   },
   "Weight": 75,
   "Rarity": "Junk"

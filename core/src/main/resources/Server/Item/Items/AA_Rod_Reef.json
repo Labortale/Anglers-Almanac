@@ -2,8 +2,13 @@
   "Interactions": {
     "Secondary": {
       "Interactions": [
-        "LaunchBobberInteraction"
-      ]
+        "UseRodInteraction"
+      ],
+      "RequireNewClick": true,
+      "Cooldown": {
+        "Id": "UseRod",
+        "Cooldown": 1
+      }
     },
     "Primary": {
       "Cooldown": {
@@ -20,8 +25,8 @@
     "Items.Tools"
   ],
   "TranslationProperties": {
-    "Name": "Reef Fishing Rod",
-    "Description": "Used to get fish from water"
+    "Name": "fishingrods.reef.name",
+    "Description": "fishingrods.reef.description"
   },
   "Model": "Items/Tools/Fishing_Rod/Rod_Reef.blockymodel",
   "Texture": "Items/Tools/Fishing_Rod/Rod_Reef.png",
@@ -38,5 +43,6 @@
       -39
     ]
   },
-  "PlayerAnimationsId": "Stick"
+  "PlayerAnimationsId": "AA_Rod",
+  "UsePlayerAnimations": false
 }
