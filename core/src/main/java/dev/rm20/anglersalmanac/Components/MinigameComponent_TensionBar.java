@@ -641,14 +641,16 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
         // 30 represents standard stamina, with stats higher than 45 increasing time to catch, and stats lower than 45 reducing time to catch.
         // The stamina difference is dampened to prevent extreme modifications.
         //AnglersAlmanac.LOGGER.atInfo().log("Base reelRate = %s", gameConfig.fishReelRate);
-        float dampeningFactor = 0.33f;
-        float baselineStamina = 45f;
+        float dampeningFactor = 0.18f;
+        float baselineStamina = 65f;
         float dampenedStamina = baselineStamina * dampeningFactor;
         if (stats != null) {
             dampenedStamina = stats.stamina + (baselineStamina - stats.stamina) * dampeningFactor;
         }
         float modifier = baselineStamina / dampenedStamina;
         gameConfig.fishReelRate *= modifier;
+
+        gameConfig.fishReelRate *= 2.42f;
         //AnglersAlmanac.LOGGER.atInfo().log("Applying fish stamina! stamina = %s, modifier: %s,  reelRate = %s", stats.stamina,modifier,  gameConfig.fishReelRate);
     }
 
@@ -670,7 +672,7 @@ public class MinigameComponent_TensionBar extends Minigame implements Component<
     @Override
     public void applyRodForgivenessModifer(RodStats rodStats) {
         //AnglersAlmanac.LOGGER.atInfo().log("Applying rod forgiveness");
-        gameConfig.fishReelRate *= rodStats.forgiveness / 5f;
+        gameConfig.fishReelRate *= rodStats.forgiveness / 4f;
     }
 
     @Override
